@@ -1,11 +1,11 @@
 [package]
 name = "thales"
 version = "0.1.0"
-edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
-description = "A lightweight and performant options trading bot"
+edition = "2024"
+authors = ["Cody Michael Jones <codymjones@pm.me>"]
+description = "An algorithmic options trading bot"
 license = "MIT"
-repository = "https://github.com/yourusername/options_trading_bot"
+repository = "https://github.com/cm-jones/thales"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
