@@ -8,32 +8,32 @@ StrategyBase::StrategyBase(const std::string& name, const utils::Config& config)
     : name_(name), config_(config) {
 }
 
-std::string StrategyBase::getName() const {
+std::string StrategyBase::get_name() const {
     return name_;
 }
 
-std::string StrategyBase::getDescription() const {
+std::string StrategyBase::get_description() const {
     return description_;
 }
 
-void StrategyBase::setDescription(const std::string& description) {
+void StrategyBase::set_description(const std::string& description) {
     description_ = description;
 }
 
-const utils::Config& StrategyBase::getConfig() const {
+const utils::Config& StrategyBase::get_config() const {
     return config_;
 }
 
-void StrategyBase::setConfigValue(const std::string& key, const utils::Config::ConfigValue& value) {
+void StrategyBase::set_config_value(const std::string& key, const utils::Config::ConfigValue& value) {
     config_.setValue(key, value);
 }
 
-void StrategyBase::validateConfig() {
+void StrategyBase::validate_config() {
     // Base implementation does nothing
     // Derived classes can override this to validate their specific configuration
 }
 
-void StrategyBase::loadSymbols() {
+void StrategyBase::load_symbols() {
     auto& logger = utils::Logger::getInstance();
     
     // Try to load symbols from the configuration

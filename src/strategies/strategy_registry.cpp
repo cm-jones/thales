@@ -1,6 +1,6 @@
 #include <thales/strategies/strategy_registry.h>
 #include <thales/utils/logger.h>
-#include <thales/strategies/black_scholes_arbitrage.h>
+#include <thales/strategies/black_scholes.h>
 
 namespace thales {
 namespace strategies {
@@ -18,7 +18,7 @@ bool StrategyRegistry::initialize() {
     
     try {
         // Load strategies from configuration
-        loadStrategiesFromConfig();
+        load_strategies_from_config();
         
         logger.info("Strategy registry initialized successfully with " + 
                    std::to_string(strategies_.size()) + " strategies");
@@ -32,7 +32,7 @@ bool StrategyRegistry::initialize() {
     }
 }
 
-bool StrategyRegistry::registerStrategy(std::unique_ptr<StrategyBase> strategy) {
+bool StrategyRegistry::register_strategy(std::unique_ptr<StrategyBase> strategy) {
     auto& logger = utils::Logger::getInstance();
     
     if (!strategy) {
@@ -40,7 +40,7 @@ bool StrategyRegistry::registerStrategy(std::unique_ptr<StrategyBase> strategy) 
         return false;
     }
     
-    std::string name = strategy->getName();
+    std::string name = strategy->get_name();
     
     if (strategies_.find(name) != strategies_.end()) {
         logger.warning("Strategy with name '" + name + "' already registered");
@@ -59,13 +59,13 @@ bool StrategyRegistry::registerStrategy(std::unique_ptr<StrategyBase> strategy) 
     strategies_[name] = std::move(strategy);
     
     // Enable the strategy by default
-    enabledStrategies_[name] = true;
+    enabled_strategies_[name] = true;
     
     logger.info("Strategy registered successfully: " + name);
     return true;
 }
 
-StrategyBase* StrategyRegistry::getStrategy(const std::string& name) const {
+StrategyBase* StrategyRegistry::get_strategy(const std::string& name) const {
     auto it = strategies_.find(name);
     if (it == strategies_.end()) {
         return nullptr;
@@ -74,7 +74,7 @@ StrategyBase* StrategyRegistry::getStrategy(const std::string& name) const {
     return it->second.get();
 }
 
-std::vector<StrategyBase*> StrategyRegistry::getAllStrategies() const {
+std::vector<StrategyBase*> StrategyRegistry::get_all_strategies() const {
     std::vector<StrategyBase*> result;
     result.reserve(strategies_.size());
     
@@ -85,7 +85,7 @@ std::vector<StrategyBase*> StrategyRegistry::getAllStrategies() const {
     return result;
 }
 
-bool StrategyRegistry::executeStrategies() {
+bool StrategyRegistry::execute_strategies() {
     auto& logger = utils::Logger::getInstance();
     logger.debug("Executing strategies");
     
@@ -100,7 +100,7 @@ bool StrategyRegistry::executeStrategies() {
     return true;
 }
 
-bool StrategyRegistry::enableStrategy(const std::string& name) {
+bool StrategyRegistry::enable_strategy(const std::string& name) {
     auto& logger = utils::Logger::getInstance();
     
     auto it = strategies_.find(name);
@@ -109,12 +109,12 @@ bool StrategyRegistry::enableStrategy(const std::string& name) {
         return false;
     }
     
-    enabledStrategies_[name] = true;
+    enabled_strategies_[name] = true;
     logger.info("Strategy enabled: " + name);
     return true;
 }
 
-bool StrategyRegistry::disableStrategy(const std::string& name) {
+bool StrategyRegistry::disable_strategy(const std::string& name) {
     auto& logger = utils::Logger::getInstance();
     
     auto it = strategies_.find(name);
@@ -123,21 +123,21 @@ bool StrategyRegistry::disableStrategy(const std::string& name) {
         return false;
     }
     
-    enabledStrategies_[name] = false;
+    enabled_strategies_[name] = false;
     logger.info("Strategy disabled: " + name);
     return true;
 }
 
-bool StrategyRegistry::isStrategyEnabled(const std::string& name) const {
-    auto it = enabledStrategies_.find(name);
-    if (it == enabledStrategies_.end()) {
+bool StrategyRegistry::is_strategy_enabled(const std::string& name) const {
+    auto it = enabled_strategies_.find(name);
+    if (it == enabled_strategies_.end()) {
         return false;
     }
     
     return it->second;
 }
 
-void StrategyRegistry::loadStrategiesFromConfig() {
+void StrategyRegistry::load_strategies_from_config() {
     auto& logger = utils::Logger::getInstance();
     
     // Check if there are enabled strategies in the configuration
@@ -150,15 +150,15 @@ void StrategyRegistry::loadStrategiesFromConfig() {
     // In a real implementation, you would use a proper JSON library to parse the array
     
     // For now, we'll just add some default strategies
-    std::vector<std::string> enabledStrategies = {"BlackScholesArbitrage"};
+    std::vector<std::string> enabled_strategies = {"BlackScholes"};
     
-    logger.info("Loading " + std::to_string(enabledStrategies.size()) + " strategies from configuration");
+    logger.info("Loading " + std::to_string(enabled_strategies.size()) + " strategies from configuration");
     
     // Register each enabled strategy
-    for (const auto& strategyName : enabledStrategies) {
-        if (strategyName == "BlackScholesArbitrage") {
-            auto strategy = std::make_unique<BlackScholesArbitrage>(config_);
-            registerStrategy(std::move(strategy));
+    for (const auto& strategy_name : enabled_strategies) {
+        if (strategy_name == "BlackScholes") {
+            auto strategy = std::make_unique<BlackScholes>(config_);
+            register_strategy(std::move(strategy));
         }
         // Add more strategy types here as they are implemented
     }
