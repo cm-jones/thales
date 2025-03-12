@@ -42,7 +42,7 @@ set(THALES_MODELS_SOURCES
 set(THALES_STRATEGIES_SOURCES
     src/strategies/strategy_base.cpp
     src/strategies/strategy_registry.cpp
-    src/strategies/black_scholes_arbitrage.cpp
+    src/strategies/black_scholes.cpp
 )
 
 set(THALES_UTILS_SOURCES
