@@ -1,4 +1,4 @@
-name: build
+name: Build and Test
 
 on:
   push:
@@ -6,13 +6,39 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        build_type: [Debug, Release]
+        
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
+    
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libboost-all-dev
+    
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew update
+        brew install cmake boost
+    
+    - name: Configure and build
+      run: |
+        chmod +x scripts/build.sh
+        ./scripts/build.sh --type ${{ matrix.build_type }} --clean --test
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: thales-${{ matrix.os }}-${{ matrix.build_type }}
+        path: |
+          build/thales
+          build/thales.exe
+        if-no-files-found: ignore
