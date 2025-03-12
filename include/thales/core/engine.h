@@ -55,29 +55,23 @@ public:
      * @brief Check if the engine is running
      * @return true if the engine is running, false otherwise
      */
-    bool isRunning() const;
+    bool is_running() const;
 
 private:
     // Configuration
     utils::Config config_;
     
     // Components
-    std::unique_ptr<strategies::StrategyRegistry> strategyRegistry_;
+    std::unique_ptr<strategies::StrategyRegistry> strategy_registry_;
     
     // Engine state
     std::atomic<bool> running_;
     
     // Private methods
-    void mainLoop();
-    void processSignals();
-    void executeOrders();
-    void updatePortfolio();
-};
-
-} // namespace core
-} // namespace thales
-
-#endif // THALES_CORE_ENGINE_H
+    void main_loop();
+    void process_signals();
+    void execute_orders();
+    void update_portfolio();
 };
 
 } // namespace core

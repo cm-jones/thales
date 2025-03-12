@@ -21,8 +21,8 @@ bool Engine::initialize() {
     try {
         // Initialize strategy registry
         logger.info("Initializing strategy registry...");
-        strategyRegistry_ = std::make_unique<strategies::StrategyRegistry>(config_);
-        if (!strategyRegistry_->initialize()) {
+        strategy_registry_ = std::make_unique<strategies::StrategyRegistry>(config_);
+        if (!strategy_registry_->initialize()) {
             logger.error("Failed to initialize strategy registry");
             return false;
         }
@@ -45,7 +45,7 @@ void Engine::run() {
     running_ = true;
     
     try {
-        mainLoop();
+        main_loop();
     } catch (const std::exception& e) {
         logger.error("Exception in main loop: " + std::string(e.what()));
     } catch (...) {
@@ -64,11 +64,11 @@ void Engine::stop() {
     }
 }
 
-bool Engine::isRunning() const {
+bool Engine::is_running() const {
     return running_;
 }
 
-void Engine::mainLoop() {
+void Engine::main_loop() {
     auto& logger = utils::Logger::getInstance();
     
     // Get the loop interval from configuration
@@ -78,32 +78,32 @@ void Engine::mainLoop() {
     
     while (running_) {
         // Process signals from strategies
-        processSignals();
+        process_signals();
         
         // Execute orders
-        executeOrders();
+        execute_orders();
         
         // Update portfolio
-        updatePortfolio();
+        update_portfolio();
         
         // Sleep for the configured interval
         std::this_thread::sleep_for(std::chrono::milliseconds(loopIntervalMs));
     }
 }
 
-void Engine::processSignals() {
+void Engine::process_signals() {
     // Execute strategies to generate signals
-    if (strategyRegistry_) {
-        strategyRegistry_->executeStrategies();
+    if (strategy_registry_) {
+        strategy_registry_->execute_strategies();
     }
 }
 
-void Engine::executeOrders() {
+void Engine::execute_orders() {
     // Execute orders based on signals and risk constraints
     // This is a placeholder for the actual implementation
 }
 
-void Engine::updatePortfolio() {
+void Engine::update_portfolio() {
     // Update portfolio with latest market data
     // This is a placeholder for the actual implementation
 }
