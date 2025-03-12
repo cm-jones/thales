@@ -1,6 +1,6 @@
-# Thales: Options Trading Bot
+# Thales
 
-Thales is a high-frequency, algorithmic trading bot designed for trading options contracts, named after the Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
+Thales is a high-frequency, algorithmic trading bot designed for options contracts, named after the Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
 
 ## Features
 
@@ -19,13 +19,13 @@ Thales is a high-frequency, algorithmic trading bot designed for trading options
 - Boost libraries (for networking and datetime handling)
 - nlohmann/json (for configuration parsing)
 
-## Building from Source
+## Build
 
 ### Linux/macOS
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/thales.git
+git clone https://github.com/cm-jones/thales.git
 cd thales
 
 # Create a build directory
@@ -43,7 +43,7 @@ make
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/thales.git
+git clone https://github.com/cm-jones/thales.git
 cd thales
 
 # Create a build directory
@@ -69,40 +69,40 @@ Thales is configured through a JSON file located in the `config` directory. The 
 ### Configuration Options
 
 - **Engine**: General settings for the trading engine
-  - `loopIntervalMs`: Main loop interval in milliseconds
-  - `maxThreads`: Maximum number of threads to use
+  - `loop_interval_ms`: Main loop interval in milliseconds
+  - `max_threads`: Maximum number of threads to use
 
 - **Risk**: Risk management settings
-  - `maxPositionSize`: Maximum position size in dollars
-  - `maxDrawdown`: Maximum allowed drawdown as a fraction of portfolio value
-  - `maxLeverage`: Maximum allowed leverage
-  - `maxRiskPerTrade`: Maximum risk per trade as a fraction of portfolio value
-  - `maxDailyLoss`: Maximum allowed daily loss as a fraction of portfolio value
+  - `max_position_size`: Maximum position size in dollars
+  - `max_drawdown`: Maximum allowed drawdown as a fraction of portfolio value
+  - `max_leverage`: Maximum allowed leverage
+  - `max_risk_per_trade`: Maximum risk per trade as a fraction of portfolio value
+  - `max_daily_loss`: Maximum allowed daily loss as a fraction of portfolio value
 
 - **Data**: Market data settings
-  - `ibHost`: Interactive Brokers TWS/Gateway host
-  - `ibPort`: Interactive Brokers TWS/Gateway port
-  - `ibClientId`: Interactive Brokers client ID
-  - `ibAccount`: Interactive Brokers account ID
+  - `ib_host`: Interactive Brokers TWS/Gateway host
+  - `ib_port`: Interactive Brokers TWS/Gateway port
+  - `ib_client_id`: Interactive Brokers client ID
+  - `ib_account`: Interactive Brokers account ID
   - `symbols`: List of symbols to trade
-  - `barSizes`: List of bar sizes to request
-  - `historyDays`: Number of days of historical data to request
+  - `bar_sizes`: List of bar sizes to request
+  - `history_days`: Number of days of historical data to request
 
 - **Strategies**: Trading strategy settings
   - `enabled`: List of enabled strategies
   - Strategy-specific settings
 
 - **Logging**: Logging settings
-  - `logToFile`: Whether to log to a file
-  - `logFilePath`: Path to the log file
-  - `consoleLogLevel`: Minimum log level for console output
-  - `fileLogLevel`: Minimum log level for file output
+  - `log_to_file`: Whether to log to a file
+  - `log_file_path`: Path to the log file
+  - `console_log_level`: Minimum log level for console output
+  - `file_log_level`: Minimum log level for file output
 
 - **Backtesting**: Backtesting settings
   - `enabled`: Whether to run in backtesting mode
-  - `startDate`: Start date for backtesting
-  - `endDate`: End date for backtesting
-  - `initialCapital`: Initial capital for backtesting
+  - `start_date`: Start date for backtesting
+  - `end_date`: End date for backtesting
+  - `initial_capital`: Initial capital for backtesting
   - `commission`: Commission rate for backtesting
   - `slippage`: Slippage rate for backtesting
 
