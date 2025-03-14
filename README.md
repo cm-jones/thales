@@ -1,8 +1,6 @@
 # Thales
 
-[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml)
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Thales is a high-frequency, algorithmic trading bot designed for options contracts, named after the Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
 
