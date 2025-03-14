@@ -11,6 +11,22 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
+# Add option for Address Sanitizer
+option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
+
+# Configure Address Sanitizer
+if(ENABLE_ASAN)
+    message(STATUS "Building with Address Sanitizer")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        set(ASAN_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ASAN_FLAGS}")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ASAN_FLAGS}")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${ASAN_FLAGS}")
+    else()
+        message(WARNING "Address Sanitizer is only supported with GCC and Clang")
+    endif()
+endif()
+
 # Compiler flags
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
@@ -23,6 +39,19 @@ enable_testing()
 
 # Find dependencies
 find_package(Threads REQUIRED)
+
+# Find PostgreSQL and libpqxx (optional)
+find_package(PostgreSQL)
+find_package(libpqxx)
+
+# Define compile definitions based on available packages
+if(PostgreSQL_FOUND AND libpqxx_FOUND)
+    message(STATUS "PostgreSQL and libpqxx found, enabling database logging")
+    add_compile_definitions(ENABLE_DB_LOGGER=1)
+else()
+    message(STATUS "PostgreSQL or libpqxx not found, database logging will be disabled")
+    add_compile_definitions(ENABLE_DB_LOGGER=0)
+endif()
 
 # Include directories
 include_directories(
@@ -50,6 +79,11 @@ set(THALES_UTILS_SOURCES
     src/utils/config.cpp
 )
 
+# Add database logger if PostgreSQL and libpqxx are available
+if(PostgreSQL_FOUND AND libpqxx_FOUND)
+    list(APPEND THALES_UTILS_SOURCES src/utils/db_logger.cpp)
+endif()
+
 # Combine all sources
 set(THALES_SOURCES
     ${THALES_CORE_SOURCES}
@@ -68,6 +102,14 @@ target_link_libraries(thales_lib PRIVATE
     Threads::Threads
 )
 
+# Link PostgreSQL and libpqxx if available
+if(PostgreSQL_FOUND AND libpqxx_FOUND)
+    target_include_directories(thales_lib PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+    target_include_directories(thales_lib PRIVATE ${LIBPQXX_INCLUDE_DIRS})
+    target_link_libraries(thales_lib PRIVATE ${PostgreSQL_LIBRARIES})
+    target_link_libraries(thales_lib PRIVATE ${LIBPQXX_LIBRARIES})
+endif()
+
 # Create the main executable
 add_executable(thales src/main.cpp)
 target_link_libraries(thales PRIVATE thales_lib)
@@ -78,6 +120,10 @@ add_subdirectory(tests)
 # Examples
 add_executable(black_scholes_example examples/black_scholes_example.cpp)
 target_link_libraries(black_scholes_example PRIVATE thales_lib)
+
+# Memory issues example for Address Sanitizer testing
+add_executable(memory_issues_example examples/memory_issues_example.cpp)
+target_link_libraries(memory_issues_example PRIVATE thales_lib)
 
 # Install targets
 install(TARGETS thales thales_lib
@@ -101,4 +147,7 @@ message(STATUS "  CMake version:       ${CMAKE_VERSION}")
 message(STATUS "  C++ Compiler:        ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "  Build type:          ${CMAKE_BUILD_TYPE}")
 message(STATUS "  Install prefix:      ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "  PostgreSQL support:  ${PostgreSQL_FOUND}")
+message(STATUS "  libpqxx support:     ${libpqxx_FOUND}")
+message(STATUS "  Address Sanitizer:   ${ENABLE_ASAN}")
 message(STATUS "")
