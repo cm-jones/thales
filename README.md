@@ -1,5 +1,9 @@
 # Thales
 
+[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Thales is a high-frequency, algorithmic trading bot designed for options contracts, named after the Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
 
 ## Features
@@ -9,6 +13,7 @@ Thales is a high-frequency, algorithmic trading bot designed for options contrac
 - **Multiple Trading Strategies**: Implement and test various options trading strategies
 - **Risk Management**: Sophisticated risk controls to protect your capital
 - **Backtesting**: Test strategies against historical data
+- **PostgreSQL Database Logging**: Log trade executions to a PostgreSQL database for analysis and reporting
 - **Extensible Architecture**: Easily add new strategies and components
 
 ## Requirements
@@ -18,10 +23,12 @@ Thales is a high-frequency, algorithmic trading bot designed for options contrac
 - Interactive Brokers TWS or IB Gateway
 - Boost libraries (for networking and datetime handling)
 - nlohmann/json (for configuration parsing)
+- PostgreSQL 10+ (optional, for database logging)
+- libpqxx (optional, for PostgreSQL connectivity)
 
 ## Build
 
-### Linux/macOS
+### Unix
 
 ```bash
 # Clone the repository
@@ -97,6 +104,15 @@ Thales is configured through a JSON file located in the `config` directory. The 
   - `log_file_path`: Path to the log file
   - `console_log_level`: Minimum log level for console output
   - `file_log_level`: Minimum log level for file output
+  - `database`: Database logging settings
+    - `enabled`: Whether to enable database logging
+    - `host`: Database host
+    - `port`: Database port
+    - `name`: Database name
+    - `user`: Database user
+    - `password`: Database password
+    - `max_queue_size`: Maximum size of the log queue
+    - `batch_size`: Number of logs to insert in a batch
 
 - **Backtesting**: Backtesting settings
   - `enabled`: Whether to run in backtesting mode
@@ -122,9 +138,16 @@ Thales is configured through a JSON file located in the `config` directory. The 
 - **tests/**: Unit and integration tests
 - **config/**: Configuration files
 - **scripts/**: Build and utility scripts
+  - **setup_postgres.sh**: Script to set up PostgreSQL database
+  - **setup_database.sql**: SQL script to create database tables and functions
+  - **install_libpqxx.sh**: Script to install libpqxx library
+  - **build_with_asan.sh**: Script to build with Address Sanitizer
+  - **run_with_asan.sh**: Script to run with Address Sanitizer
+  - **run_tests_with_asan.sh**: Script to run tests with Address Sanitizer
 - **third_party/**: Third-party dependencies
 - **examples/**: Example usage and sample strategies
 - **docs/**: Documentation
+  - **address_sanitizer.md**: Documentation for using Address Sanitizer
 
 ## Adding a New Strategy
 
@@ -170,6 +193,89 @@ private:
 
 #endif // THALES_STRATEGIES_MY_STRATEGY_H
 ```
+
+## Database Logging
+
+Thales can log trade executions to a PostgreSQL database for analysis and reporting. The database will be created automatically when the bot starts if it doesn't exist.
+
+### Quick Setup
+
+1. Install PostgreSQL and libpqxx:
+   ```bash
+   # Install PostgreSQL
+   ./scripts/setup_postgres.sh
+   
+   # Install libpqxx
+   ./scripts/install_libpqxx.sh
+   ```
+
+2. Configure database logging in `config/config.json`:
+   ```json
+   "logging": {
+     "database": {
+       "enabled": true,
+       "host": "localhost",
+       "port": 5432,
+       "name": "thales",
+       "user": "thales_user",
+       "password": "your_secure_password"
+     }
+   }
+   ```
+
+3. Rebuild the project:
+   ```bash
+   cd build
+   cmake ..
+   make
+   ```
+
+4. Run the trading bot:
+   ```bash
+   ./thales
+   ```
+
+### Automatic Database Creation
+
+The bot will automatically:
+- Create the database if it doesn't exist
+- Create the necessary tables and indexes
+- Set up views and functions for analysis
+
+This requires:
+- PostgreSQL to be installed and running
+- The configured database user to have permission to create databases
+- The libpqxx library to be installed
+
+If automatic creation fails, you can run the setup script manually:
+```bash
+./scripts/setup_postgres.sh
+```
+
+The database includes the following features:
+- Trade execution logging with detailed information
+- Indexes for efficient querying
+- Views for common queries (e.g., recent trades)
+- Functions for analysis (e.g., calculating daily P&L)
+
+## Memory Safety with Address Sanitizer
+
+Thales includes support for Address Sanitizer (ASan), a memory error detector for C/C++ that can find various memory bugs like use-after-free, heap buffer overflow, stack buffer overflow, memory leaks, etc.
+
+### Building with Address Sanitizer
+
+```bash
+# Build with Address Sanitizer
+./scripts/build_with_asan.sh
+
+# Run with Address Sanitizer
+./scripts/run_with_asan.sh
+
+# Run tests with Address Sanitizer
+./scripts/run_tests_with_asan.sh
+```
+
+For more details, see [docs/address_sanitizer.md](docs/address_sanitizer.md).
 
 ## License
 
