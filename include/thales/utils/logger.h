@@ -83,11 +83,49 @@ public:
      */
     void error(const std::string& message);
     
-    /**
-     * @brief Log a message with FATAL level
-     * @param message The message to log
-     */
-    void fatal(const std::string& message);
+/**
+ * @brief Log a message with FATAL level
+ * @param message The message to log
+ */
+void fatal(const std::string& message);
+
+/**
+ * @brief Log a trade execution
+ * @param strategyName Name of the strategy that generated the trade
+ * @param symbol Trading symbol
+ * @param orderId Order ID
+ * @param executionId Execution ID
+ * @param side Trade side (BUY or SELL)
+ * @param quantity Trade quantity
+ * @param price Trade price
+ * @param commission Trade commission
+ * @param totalValue Total value of the trade
+ * @param executionTime Time of execution
+ * @param accountId Account ID
+ * @param exchange Exchange name
+ * @param orderType Order type
+ * @param isOption Whether the trade is for an option
+ * @param optionData JSON string with option-specific data
+ * @param additionalData JSON string with additional data
+ */
+void logTradeExecution(
+    const std::string& strategy_name,
+    const std::string& symbol,
+    const std::string& order_id,
+    const std::string& execution_id,
+    const std::string& side,
+    double quantity,
+    double price,
+    double commission,
+    double total_value,
+    const std::string& execution_time,
+    const std::string& account_id,
+    const std::string& exchange,
+    const std::string& order_type,
+    bool is_option = false,
+    const std::string& option_data = "{}",
+    const std::string& additional_data = "{}"
+);
     
     /**
      * @brief Set the minimum log level for console output

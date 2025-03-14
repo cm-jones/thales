@@ -5,6 +5,18 @@
 #include <ctime>
 #include <filesystem>
 
+// Forward declaration for DbLogger
+namespace thales {
+namespace utils {
+class DbLogger;
+}
+}
+
+// Include DbLogger header if enabled
+#if ENABLE_DB_LOGGER
+#include <thales/utils/db_logger.h>
+#endif
+
 namespace thales {
 namespace utils {
 
@@ -63,6 +75,58 @@ void Logger::error(const std::string& message) {
 
 void Logger::fatal(const std::string& message) {
     log(LogLevel::FATAL, message);
+}
+
+void Logger::logTradeExecution(
+    const std::string& strategy_name,
+    const std::string& symbol,
+    const std::string& order_id,
+    const std::string& execution_id,
+    const std::string& side,
+    double quantity,
+    double price,
+    double commission,
+    double total_value,
+    const std::string& execution_time,
+    const std::string& account_id,
+    const std::string& exchange,
+    const std::string& order_type,
+    bool is_option,
+    const std::string& option_data,
+    const std::string& additional_data
+) {
+    // Log to console and file
+    std::stringstream ss;
+    ss << "Trade execution: " << strategy_name << ", " << symbol << ", " 
+       << side << ", " << quantity << " @ " << price << ", total: " << total_value;
+    info(ss.str());
+    
+    // Log to database if enabled
+#if ENABLE_DB_LOGGER
+    try {
+        auto& dbLogger = DbLogger::getInstance();
+        dbLogger.log_trade_execution(
+            strategy_name,
+            symbol,
+            order_id,
+            execution_id,
+            side,
+            quantity,
+            price,
+            commission,
+            total_value,
+            execution_time,
+            account_id,
+            exchange,
+            order_type,
+            is_option,
+            option_data,
+            additional_data
+        );
+    } catch (const std::exception& e) {
+        error("Failed to log trade execution to database: " + std::string(e.what()));
+    }
+#endif
 }
 
 void Logger::setConsoleLevel(LogLevel level) {

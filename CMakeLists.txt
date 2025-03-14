@@ -117,14 +117,6 @@ target_link_libraries(thales PRIVATE thales_lib)
 # Tests
 add_subdirectory(tests)
 
-# Examples
-add_executable(black_scholes_example examples/black_scholes_example.cpp)
-target_link_libraries(black_scholes_example PRIVATE thales_lib)
-
-# Memory issues example for Address Sanitizer testing
-add_executable(memory_issues_example examples/memory_issues_example.cpp)
-target_link_libraries(memory_issues_example PRIVATE thales_lib)
-
 # Install targets
 install(TARGETS thales thales_lib
     RUNTIME DESTINATION bin
