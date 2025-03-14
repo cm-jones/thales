@@ -1,5 +1,3 @@
-# Tests CMakeLists.txt
-
 # Find GTest
 find_package(GTest)
 
@@ -22,7 +20,7 @@ set(TEST_SOURCES
     # test_portfolio.cpp
     
     # Models tests
-    # test_black_scholes.cpp
+    test_black_scholes.cpp
     # test_greeks.cpp
     # test_implied_volatility.cpp
     
@@ -44,18 +42,6 @@ set(TEST_SOURCES
     # test_config.cpp
     # test_time_utils.cpp
 )
-
-# Create a placeholder test file if no tests are defined yet
-if(NOT TEST_SOURCES)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/placeholder_test.cpp "
-        #include <gtest/gtest.h>
-        
-        TEST(PlaceholderTest, AlwaysPass) {
-            EXPECT_TRUE(true);
-        }
-    ")
-    set(TEST_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/placeholder_test.cpp)
-endif()
 
 # Add test executable
 add_executable(thales_tests ${TEST_SOURCES})
