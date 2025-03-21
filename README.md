@@ -26,12 +26,15 @@ Thales is a high-frequency, algorithmic trading bot designed for options contrac
 
 ## Build
 
-### Unix
+### Linux/macOS
 
 ```bash
 # Clone the repository
 git clone https://github.com/cm-jones/thales.git
 cd thales
+
+# Install the Interactive Brokers C++ API
+./scripts/install_ibapi.sh
 
 # Create a build directory
 mkdir build && cd build
@@ -51,6 +54,9 @@ make
 git clone https://github.com/cm-jones/thales.git
 cd thales
 
+# Install the Interactive Brokers C++ API
+./scripts/install_ibapi.sh
+
 # Create a build directory
 mkdir build
 cd build
@@ -62,6 +68,37 @@ cmake --build . --config Release
 # Run the trading bot
 Release\thales.exe
 ```
+
+## Setting up Interactive Brokers
+
+Thales integrates with Interactive Brokers for market data and trade execution. To use this feature:
+
+1. **Install TWS or IB Gateway**:
+   - Download and install [Interactive Brokers TWS](https://www.interactivebrokers.com/en/trading/tws.php) or [IB Gateway](https://www.interactivebrokers.com/en/trading/ibgateway.php)
+   - TWS is recommended for manual trading alongside Thales
+   - IB Gateway is more lightweight and suitable for automated trading only
+
+2. **Configure API Settings**:
+   - In TWS/IB Gateway, go to Edit > Global Configuration > API > Settings
+   - Check "Enable ActiveX and Socket Clients"
+   - Set "Socket port" to match the port in your config.json (default: 7496)
+   - Check "Allow connections from localhost only" for security
+   - Uncheck "Read-Only API" to allow trading
+
+3. **Paper Trading**:
+   - Create a paper trading account in TWS/IB Gateway for testing
+   - Go to File > Login > Paper Trading
+   - This allows you to test Thales without risking real money
+
+4. **API Permissions**:
+   - In TWS/IB Gateway, go to Edit > Global Configuration > API > Precautions
+   - Configure which operations you want to allow
+
+5. **Update config.json**:
+   - Set `data.ibHost` to the IP address of your TWS/IB Gateway (usually "127.0.0.1")
+   - Set `data.ibPort` to the socket port you configured (default: 7496)
+   - Set `data.ibClientId` to a unique ID (important if you have multiple applications connecting)
+   - Set `data.ibAccount` to your IB account number
 
 ## Configuration
 
@@ -120,33 +157,6 @@ Thales is configured through a JSON file located in the `config` directory. The 
   - `commission`: Commission rate for backtesting
   - `slippage`: Slippage rate for backtesting
 
-## Project Structure
-
-- **src/**: Source files
-  - **core/**: Core functionality (engine, execution, risk management)
-  - **models/**: Options pricing models (Black-Scholes, etc.)
-  - **strategies/**: Trading strategy implementations
-  - **data/**: Market data handling and IB API integration
-  - **backtesting/**: Backtesting framework
-  - **utils/**: Utility functions and helpers
-
-- **include/thales/**: Header files
-  - Mirrors the src/ structure for clean organization
-
-- **tests/**: Unit and integration tests
-- **config/**: Configuration files
-- **scripts/**: Build and utility scripts
-  - **setup_postgres.sh**: Script to set up PostgreSQL database
-  - **setup_database.sql**: SQL script to create database tables and functions
-  - **install_libpqxx.sh**: Script to install libpqxx library
-  - **build_with_asan.sh**: Script to build with Address Sanitizer
-  - **run_with_asan.sh**: Script to run with Address Sanitizer
-  - **run_tests_with_asan.sh**: Script to run tests with Address Sanitizer
-- **third_party/**: Third-party dependencies
-- **examples/**: Example usage and sample strategies
-- **docs/**: Documentation
-  - **address_sanitizer.md**: Documentation for using Address Sanitizer
-
 ## Adding a New Strategy
 
 To add a new trading strategy:
@@ -192,7 +202,7 @@ private:
 #endif // THALES_STRATEGIES_MY_STRATEGY_H
 ```
 
-## Database Logging
+## Trade Logging
 
 Thales can log trade executions to a PostgreSQL database for analysis and reporting. The database will be created automatically when the bot starts if it doesn't exist.
 
@@ -256,28 +266,9 @@ The database includes the following features:
 - Views for common queries (e.g., recent trades)
 - Functions for analysis (e.g., calculating daily P&L)
 
-## Memory Safety with Address Sanitizer
-
-Thales includes support for Address Sanitizer (ASan), a memory error detector for C/C++ that can find various memory bugs like use-after-free, heap buffer overflow, stack buffer overflow, memory leaks, etc.
-
-### Building with Address Sanitizer
-
-```bash
-# Build with Address Sanitizer
-./scripts/build_with_asan.sh
-
-# Run with Address Sanitizer
-./scripts/run_with_asan.sh
-
-# Run tests with Address Sanitizer
-./scripts/run_tests_with_asan.sh
-```
-
-For more details, see [docs/address_sanitizer.md](docs/address_sanitizer.md).
-
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## Disclaimer
 

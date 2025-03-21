@@ -57,7 +57,17 @@
     "logToFile": true,
     "logFilePath": "logs/thales.log",
     "consoleLogLevel": "INFO",
-    "fileLogLevel": "DEBUG"
+    "fileLogLevel": "DEBUG",
+    "database": {
+      "enabled": true,
+      "host": "localhost",
+      "port": 5432,
+      "name": "thales",
+      "user": "thales_user",
+      "password": "your_secure_password",
+      "max_queue_size": 10000,
+      "batch_size": 100
+    }
   },
   "backtesting": {
     "enabled": false,

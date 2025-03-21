@@ -53,15 +53,45 @@ else()
     add_compile_definitions(ENABLE_DB_LOGGER=0)
 endif()
 
+# Find Interactive Brokers C++ API (optional)
+find_path(IBAPI_INCLUDE_DIRS ibapi/EClient.h
+    PATHS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/ibapi
+    /usr/include
+    /usr/local/include
+    NO_DEFAULT_PATH
+)
+
+if(IBAPI_INCLUDE_DIRS)
+    message(STATUS "Interactive Brokers API found, enabling IB connectivity")
+    add_compile_definitions(ENABLE_IB_CLIENT=1)
+else()
+    message(STATUS "Interactive Brokers API not found, IB connectivity will be disabled")
+    add_compile_definitions(ENABLE_IB_CLIENT=0)
+endif()
+
 # Include directories
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party
 )
 
+if(IBAPI_INCLUDE_DIRS)
+    include_directories(${IBAPI_INCLUDE_DIRS})
+endif()
+
 # Define source files
 set(THALES_CORE_SOURCES
     src/core/engine.cpp
+    src/core/portfolio.cpp
+    src/core/position.cpp
+    src/core/order.cpp
+)
+
+# Data sources
+set(THALES_DATA_SOURCES
+    src/data/data_manager.cpp
+    src/data/ib_client.cpp
 )
 
 set(THALES_MODELS_SOURCES
@@ -87,6 +117,7 @@ endif()
 # Combine all sources
 set(THALES_SOURCES
     ${THALES_CORE_SOURCES}
+    ${THALES_DATA_SOURCES}
     ${THALES_MODELS_SOURCES}
     ${THALES_STRATEGIES_SOURCES}
     ${THALES_UTILS_SOURCES}

@@ -46,21 +46,21 @@ public:
      * @param filePath Path to the configuration file
      * @return true if loading was successful, false otherwise
      */
-    bool loadFromFile(const std::string& filePath);
+    bool load_from_file(const std::string& filePath);
     
     /**
      * @brief Save configuration to a file
      * @param filePath Path to the configuration file
      * @return true if saving was successful, false otherwise
      */
-    bool saveToFile(const std::string& filePath) const;
+    bool save_to_file(const std::string& filePath) const;
     
     /**
      * @brief Check if a configuration key exists
      * @param key The configuration key to check
      * @return true if the key exists, false otherwise
      */
-    bool hasKey(const std::string& key) const;
+    bool has_key(const std::string& key) const;
     
     /**
      * @brief Get a boolean value from the configuration
@@ -68,7 +68,7 @@ public:
      * @param defaultValue The default value to return if the key doesn't exist
      * @return The boolean value
      */
-    bool getBool(const std::string& key, bool defaultValue = false) const;
+    bool get_bool(const std::string& key, bool defaultValue = false) const;
     
     /**
      * @brief Get an integer value from the configuration
@@ -76,7 +76,7 @@ public:
      * @param defaultValue The default value to return if the key doesn't exist
      * @return The integer value
      */
-    int getInt(const std::string& key, int defaultValue = 0) const;
+    int get_int(const std::string& key, int defaultValue = 0) const;
     
     /**
      * @brief Get a double value from the configuration
@@ -84,7 +84,7 @@ public:
      * @param defaultValue The default value to return if the key doesn't exist
      * @return The double value
      */
-    double getDouble(const std::string& key, double defaultValue = 0.0) const;
+    double get_double(const std::string& key, double defaultValue = 0.0) const;
     
     /**
      * @brief Get a string value from the configuration
@@ -92,14 +92,14 @@ public:
      * @param defaultValue The default value to return if the key doesn't exist
      * @return The string value
      */
-    std::string getString(const std::string& key, const std::string& defaultValue = "") const;
+    std::string get_string(const std::string& key, const std::string& defaultValue = "") const;
     
     /**
      * @brief Set a configuration value
      * @param key The configuration key
      * @param value The value to set
      */
-    void setValue(const std::string& key, const ConfigValue& value);
+    void set_value(const std::string& key, const ConfigValue& value);
     
 private:
     std::unordered_map<std::string, ConfigValue> data_;
