@@ -1,11 +1,11 @@
-#ifndef THALES_STRATEGIES_BLACK_SCHOLES_H
-#define THALES_STRATEGIES_BLACK_SCHOLES_H
+#ifndef THALES_STRATEGIES_BLACK_SCHOLES_HPP
+#define THALES_STRATEGIES_BLACK_SCHOLES_HPP
 
-#include <thales/strategies/strategy_base.h>
-#include <thales/models/black_scholes.h>
-#include <vector>
 #include <string>
+#include <thales/models/black_scholes.hpp>
+#include <thales/strategies/strategy_base.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace thales {
 namespace strategies {
@@ -13,30 +13,31 @@ namespace strategies {
 /**
  * @class BlackScholes
  * @brief Strategy based on Black-Scholes pricing model.
- * 
+ *
  * This strategy compares market prices of options with their theoretical prices
- * calculated using the Black-Scholes model. If the market price is significantly
- * different from the theoretical price, it generates a trading signal.
+ * calculated using the Black-Scholes model. If the market price is
+ * significantly different from the theoretical price, it generates a trading
+ * signal.
  */
 class BlackScholes : public StrategyBase {
-public:
+   public:
     /**
      * @brief Constructor
      * @param config The configuration for the strategy
      */
     explicit BlackScholes(const utils::Config& config);
-    
+
     /**
      * @brief Destructor
      */
     ~BlackScholes() override = default;
-    
+
     /**
      * @brief Initialize the strategy
      * @return true if initialization was successful, false otherwise
      */
     bool initialize() override;
-    
+
     /**
      * @brief Execute the strategy
      * @param market_data The market data to use for execution
@@ -45,38 +46,41 @@ public:
      */
     std::vector<Signal> execute(
         const std::vector<data::MarketData>& market_data,
-        const core::Portfolio& portfolio
-    ) override;
-    
+        const core::Portfolio& portfolio) override;
+
     /**
      * @brief Get the symbols that the strategy is interested in
      * @return A vector of symbols
      */
     std::vector<std::string> get_symbols() const override;
 
-private:
+   private:
     // Strategy parameters
     double min_price_discrepancy_;
     double min_volatility_;
     double max_volatility_;
     int min_days_to_expiration_;
     int max_days_to_expiration_;
-    
+
     // Symbols to trade
     std::vector<std::string> symbols_;
-    
+
     // Historical volatility cache
     std::unordered_map<std::string, double> historical_volatility_;
-    
+
     // Private methods
-    double calculate_historical_volatility(const std::vector<data::MarketData>& market_data, const std::string& symbol);
+    double calculate_historical_volatility(
+        const std::vector<data::MarketData>& market_data,
+        const std::string& ticker);
     double calculate_risk_free_rate() const;
-    double calculate_time_to_expiration(const std::string& expiration_date) const;
+    double calculate_time_to_expiration(
+        const std::string& expiration_date) const;
     bool is_option_eligible(const data::OptionData& option) const;
-    Signal generate_signal(const data::OptionData& option, double theoretical_price);
+    Signal generate_signal(const data::OptionData& option,
+                           double theoretical_price);
 };
 
-} // namespace strategies
-} // namespace thales
+}  // namespace strategies
+}  // namespace thales
 
-#endif // THALES_STRATEGIES_BLACK_SCHOLES_H
+#endif  // THALES_STRATEGIES_BLACK_SCHOLES_HPP

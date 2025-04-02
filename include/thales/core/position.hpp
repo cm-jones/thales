@@ -1,5 +1,5 @@
-#ifndef THALES_CORE_POSITION_H
-#define THALES_CORE_POSITION_H
+#ifndef THALES_CORE_POSITION_HPP
+#define THALES_CORE_POSITION_HPP
 
 #include <string>
 
@@ -11,12 +11,12 @@ namespace core {
  * @brief Represents a position in a financial instrument.
  */
 struct Position {
-    std::string symbol;      // Symbol of the instrument
-    int quantity;            // Quantity held
-    double average_price;    // Average entry price
-    double current_price;    // Current market price
-    double unrealized_pnl;   // Unrealized profit/loss
-    double realized_pnl;     // Realized profit/loss
+    std::string ticker;     // Symbol of the instrument
+    int quantity;           // Quantity held
+    double average_price;   // Average entry price
+    double last_price;      // Current market price
+    double unrealized_pnl;  // Unrealized profit/loss
+    double realized_pnl;    // Realized profit/loss
 
     // Constructor
     Position(const std::string& sym = "", int qty = 0, double avg_price = 0.0,
@@ -27,10 +27,10 @@ struct Position {
     double get_value() const;
 
     // Calculate the unrealized profit/loss
-    double calculate_unrealized_pnl() const;
+    double get_unrealized_pnl() const;
 };
 
 }  // namespace core
 }  // namespace thales
 
-#endif  // THALES_CORE_POSITION_H
+#endif  // THALES_CORE_POSITION_HPP

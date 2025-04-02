@@ -1,5 +1,5 @@
-#ifndef THALES_CORE_ORDER_H
-#define THALES_CORE_ORDER_H
+#ifndef THALES_CORE_ORDER_HPP
+#define THALES_CORE_ORDER_HPP
 
 #include <string>
 
@@ -18,14 +18,14 @@ struct Order {
     enum class Status { PENDING, FILLED, PARTIALLY_FILLED, CANCELED, REJECTED };
 
     std::string order_id;       // Unique order ID
-    std::string symbol;         // Symbol of the instrument
+    std::string ticker;         // Ticker of the instrument
     Type type;                  // Order type
     Side side;                  // Buy or sell
-    double quantity;            // Quantity to trade
+    uint16_t quantity;          // Quantity to trade
     double price;               // Limit price (if applicable)
     double stop_price;          // Stop price (if applicable)
     Status status;              // Order status
-    double filled_quantity;     // Quantity that has been filled
+    uint16_t filled_quantity;   // Quantity that has been filled
     double average_fill_price;  // Average fill price
     std::string timestamp;      // Timestamp when the order was created
 
@@ -55,4 +55,4 @@ struct Order {
 }  // namespace core
 }  // namespace thales
 
-#endif  // THALES_CORE_ORDER_H
+#endif  // THALES_CORE_ORDER_HPP

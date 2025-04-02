@@ -1,5 +1,5 @@
-#ifndef THALES_UTILS_LOGGER_H
-#define THALES_UTILS_LOGGER_H
+#ifndef THALES_UTILS_LOGGER_HPP
+#define THALES_UTILS_LOGGER_HPP
 
 #include <fstream>
 #include <memory>
@@ -83,7 +83,7 @@ class Logger {
     /**
      * @brief Log a trade execution
      * @param strategyName Name of the strategy that generated the trade
-     * @param symbol Trading symbol
+     * @param ticker Trading ticker
      * @param orderId Order ID
      * @param executionId Execution ID
      * @param side Trade side (BUY or SELL)
@@ -100,7 +100,7 @@ class Logger {
      * @param additionalData JSON string with additional data
      */
     void logTradeExecution(
-        const std::string& strategy_name, const std::string& symbol,
+        const std::string& strategy_name, const std::string& ticker,
         const std::string& order_id, const std::string& execution_id,
         const std::string& side, double quantity, double price,
         double commission, double total_value,
@@ -161,4 +161,4 @@ class Logger {
 }  // namespace utils
 }  // namespace thales
 
-#endif  // THALES_UTILS_LOGGER_H
+#endif  // THALES_UTILS_LOGGER_HPP

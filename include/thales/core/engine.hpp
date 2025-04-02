@@ -1,14 +1,13 @@
-#ifndef THALES_CORE_ENGINE_H
-#define THALES_CORE_ENGINE_H
-
-#include <thales/core/portfolio.h>
-#include <thales/data/data_manager.h>
-#include <thales/strategies/strategy_registry.h>
-#include <thales/utils/config.h>
+#ifndef THALES_CORE_ENGINE_HPP
+#define THALES_CORE_ENGINE_HPP
 
 #include <atomic>
 #include <memory>
 #include <string>
+#include <thales/core/portfolio.hpp>
+#include <thales/data/data_manager.hpp>
+#include <thales/strategies/strategy_registry.hpp>
+#include <thales/utils/config.hpp>
 
 namespace thales {
 namespace core {
@@ -84,4 +83,4 @@ class Engine {
 }  // namespace core
 }  // namespace thales
 
-#endif  // THALES_CORE_ENGINE_H
+#endif  // THALES_CORE_ENGINE_HPP

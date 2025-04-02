@@ -1,13 +1,12 @@
-#ifndef THALES_CORE_PORTFOLIO_H
-#define THALES_CORE_PORTFOLIO_H
-
-#include <thales/core/order.h>
-#include <thales/core/position.h>
-#include <thales/utils/config.h>
+#ifndef THALES_CORE_PORTFOLIO_HPP
+#define THALES_CORE_PORTFOLIO_HPP
 
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thales/core/order.hpp>
+#include <thales/core/position.hpp>
+#include <thales/utils/config.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -47,11 +46,11 @@ class Portfolio {
     std::vector<Position> get_positions() const;
 
     /**
-     * @brief Get a specific position by symbol
-     * @param symbol The symbol to look up
+     * @brief Get a specific position by ticker
+     * @param ticker The ticker to look up
      * @return The position, or an empty position if not found
      */
-    Position get_position(const std::string& symbol) const;
+    Position get_position(const std::string& ticker) const;
 
     /**
      * @brief Get all open orders
@@ -60,11 +59,11 @@ class Portfolio {
     std::vector<Order> get_open_orders() const;
 
     /**
-     * @brief Get all orders for a specific symbol
-     * @param symbol The symbol to look up
-     * @return A vector of orders for the symbol
+     * @brief Get all orders for a specific ticker
+     * @param ticker The ticker to look up
+     * @return A vector of orders for the ticker
      */
-    std::vector<Order> get_orders(const std::string& symbol) const;
+    std::vector<Order> get_orders(const std::string& ticker) const;
 
     /**
      * @brief Get the total portfolio value
@@ -86,10 +85,10 @@ class Portfolio {
 
     /**
      * @brief Update a position with new market data
-     * @param symbol The symbol to update
-     * @param current_price The current market price
+     * @param ticker The ticker to update
+     * @param last_price The current market price
      */
-    void update_position(const std::string& symbol, double current_price);
+    void update_position(const std::string& ticker, double last_price);
 
     /**
      * @brief Add a new position to the portfolio
@@ -139,4 +138,4 @@ class Portfolio {
 }  // namespace core
 }  // namespace thales
 
-#endif  // THALES_CORE_PORTFOLIO_H
+#endif  // THALES_CORE_PORTFOLIO_HPP

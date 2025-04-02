@@ -1,5 +1,5 @@
-#ifndef THALES_MODELS_BLACK_SCHOLES_H
-#define THALES_MODELS_BLACK_SCHOLES_H
+#ifndef THALES_MODELS_BLACK_SCHOLES_HPP
+#define THALES_MODELS_BLACK_SCHOLES_HPP
 
 #include <string>
 
@@ -9,12 +9,12 @@ namespace models {
 /**
  * @class BlackScholes
  * @brief Implementation of the Black-Scholes option pricing model.
- * 
+ *
  * This class provides methods for calculating option prices and Greeks
  * using the Black-Scholes formula.
  */
 class BlackScholes {
-public:
+   public:
     /**
      * @brief Calculate the price of a European call option
      * @param S The current price of the underlying asset
@@ -24,8 +24,9 @@ public:
      * @param T The time to expiration in years
      * @return The price of the call option
      */
-    static double call_price(double S, double K, double r, double sigma, double T);
-    
+    static double call_price(double S, double K, double r, double sigma,
+                             double T);
+
     /**
      * @brief Calculate the price of a European put option
      * @param S The current price of the underlying asset
@@ -35,8 +36,9 @@ public:
      * @param T The time to expiration in years
      * @return The price of the put option
      */
-    static double put_price(double S, double K, double r, double sigma, double T);
-    
+    static double put_price(double S, double K, double r, double sigma,
+                            double T);
+
     /**
      * @brief Calculate the delta of a European call option
      * @param S The current price of the underlying asset
@@ -46,8 +48,9 @@ public:
      * @param T The time to expiration in years
      * @return The delta of the call option
      */
-    static double call_delta(double S, double K, double r, double sigma, double T);
-    
+    static double call_delta(double S, double K, double r, double sigma,
+                             double T);
+
     /**
      * @brief Calculate the delta of a European put option
      * @param S The current price of the underlying asset
@@ -57,8 +60,9 @@ public:
      * @param T The time to expiration in years
      * @return The delta of the put option
      */
-    static double put_delta(double S, double K, double r, double sigma, double T);
-    
+    static double put_delta(double S, double K, double r, double sigma,
+                            double T);
+
     /**
      * @brief Calculate the gamma of an option
      * @param S The current price of the underlying asset
@@ -69,7 +73,7 @@ public:
      * @return The gamma of the option
      */
     static double gamma(double S, double K, double r, double sigma, double T);
-    
+
     /**
      * @brief Calculate the vega of an option
      * @param S The current price of the underlying asset
@@ -80,7 +84,7 @@ public:
      * @return The vega of the option
      */
     static double vega(double S, double K, double r, double sigma, double T);
-    
+
     /**
      * @brief Calculate the theta of a European call option
      * @param S The current price of the underlying asset
@@ -90,8 +94,9 @@ public:
      * @param T The time to expiration in years
      * @return The theta of the call option
      */
-    static double call_theta(double S, double K, double r, double sigma, double T);
-    
+    static double call_theta(double S, double K, double r, double sigma,
+                             double T);
+
     /**
      * @brief Calculate the theta of a European put option
      * @param S The current price of the underlying asset
@@ -101,8 +106,9 @@ public:
      * @param T The time to expiration in years
      * @return The theta of the put option
      */
-    static double put_theta(double S, double K, double r, double sigma, double T);
-    
+    static double put_theta(double S, double K, double r, double sigma,
+                            double T);
+
     /**
      * @brief Calculate the rho of a European call option
      * @param S The current price of the underlying asset
@@ -112,8 +118,9 @@ public:
      * @param T The time to expiration in years
      * @return The rho of the call option
      */
-    static double call_rho(double S, double K, double r, double sigma, double T);
-    
+    static double call_rho(double S, double K, double r, double sigma,
+                           double T);
+
     /**
      * @brief Calculate the rho of a European put option
      * @param S The current price of the underlying asset
@@ -124,7 +131,7 @@ public:
      * @return The rho of the put option
      */
     static double put_rho(double S, double K, double r, double sigma, double T);
-    
+
     /**
      * @brief Calculate the implied volatility of a European call option
      * @param price The market price of the call option
@@ -136,11 +143,11 @@ public:
      * @param maxIterations The maximum number of iterations
      * @return The implied volatility
      */
-    static double call_implied_volatility(
-        double price, double S, double K, double r, double T,
-        double epsilon = 0.0001, int max_iterations = 100
-    );
-    
+    static double call_implied_volatility(double price, double S, double K,
+                                          double r, double T,
+                                          double epsilon = 0.0001,
+                                          int max_iterations = 100);
+
     /**
      * @brief Calculate the implied volatility of a European put option
      * @param price The market price of the put option
@@ -152,12 +159,12 @@ public:
      * @param maxIterations The maximum number of iterations
      * @return The implied volatility
      */
-    static double put_implied_volatility(
-        double price, double S, double K, double r, double T,
-        double epsilon = 0.0001, int max_iterations = 100
-    );
+    static double put_implied_volatility(double price, double S, double K,
+                                         double r, double T,
+                                         double epsilon = 0.0001,
+                                         int max_iterations = 100);
 
-private:
+   private:
     // Helper functions
     static double d1(double S, double K, double r, double sigma, double T);
     static double d2(double S, double K, double r, double sigma, double T);
@@ -165,7 +172,7 @@ private:
     static double normal_pdf(double x);
 };
 
-} // namespace models
-} // namespace thales
+}  // namespace models
+}  // namespace thales
 
-#endif // THALES_MODELS_BLACK_SCHOLES_H
+#endif  // THALES_MODELS_BLACK_SCHOLES_HPP

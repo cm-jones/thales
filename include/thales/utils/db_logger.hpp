@@ -1,5 +1,5 @@
-#ifndef THALES_UTILS_DB_LOGGER_H
-#define THALES_UTILS_DB_LOGGER_H
+#ifndef THALES_UTILS_DB_LOGGER_HPP
+#define THALES_UTILS_DB_LOGGER_HPP
 
 #include <atomic>
 #include <condition_variable>
@@ -49,7 +49,7 @@ class DbLogger {
     /**
      * @brief Log a trade execution to the database
      * @param strategyName Name of the strategy that generated the trade
-     * @param symbol Trading symbol
+     * @param ticker Trading ticker
      * @param orderId Order ID
      * @param executionId Execution ID
      * @param side Trade side (BUY or SELL)
@@ -67,7 +67,7 @@ class DbLogger {
      * @return true if the log was queued successfully, false otherwise
      */
     bool log_trade_execution(
-        const std::string& strategy_name, const std::string& symbol,
+        const std::string& strategy_name, const std::string& ticker,
         const std::string& order_id, const std::string& execution_id,
         const std::string& side, double quantity, double price,
         double commission, double total_value,
@@ -115,7 +115,7 @@ class DbLogger {
     // Structure to hold a trade execution log
     struct TradeExecutionLog {
         std::string strategy_name;
-        std::string symbol;
+        std::string ticker;
         std::string order_id;
         std::string execution_id;
         std::string side;
@@ -189,4 +189,4 @@ class DbLogger {
 }  // namespace utils
 }  // namespace thales
 
-#endif  // THALES_UTILS_DB_LOGGER_H
+#endif  // THALES_UTILS_DB_LOGGER_HPP
