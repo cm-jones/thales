@@ -1,12 +1,17 @@
-#include <thales/core/engine.h>
-#include <thales/utils/config.h>
-#include <thales/utils/logger.h>
+#include <unistd.h>
 
-#include <iostream>
+#include <print>
 #include <stdexcept>
 #include <string>
+#include <thales/core/engine.hpp>
+#include <thales/data/ib_client.hpp>
+#include <thales/utils/config.hpp>
+#include <thales/utils/logger.hpp>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
+    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
+    std::println("Number of available cores: {}", std::to_string(num_cores));
+
     // Load configuration
     std::string config_path = "config/config.json";
     if (argc > 1) {
@@ -15,8 +20,8 @@ int main(int argc, char* argv[]) {
 
     thales::utils::Config config;
     if (!config.load_from_file(config_path)) {
-        std::cerr << "Failed to load configuration from: " << config_path
-                  << std::endl;
+        std::println(stderr, "Failed to load configuration from: {}",
+                     config_path);
         return EXIT_FAILURE;
     }
 
@@ -51,7 +56,45 @@ int main(int argc, char* argv[]) {
     auto& logger = thales::utils::Logger::get_instance();
     logger.info("Trading Bot starting...");
 
-    // Initialize trading engine
+    // Test IB connection directly
+    logger.info("Testing connection to Interactive Brokers...");
+    thales::data::IBClient ib_client(config);
+
+    // Set up a simple callback to log market data updates
+    ib_client.setMarketDataCallback(
+        [&logger](const thales::data::MarketData& data) {
+            logger.info("Market data received: " + data.ticker +
+                        " - Price: " + std::to_string(data.price));
+        });
+
+    // Connect to IB Gateway
+    if (ib_client.connect()) {
+        logger.info("Successfully connected to Interactive Brokers");
+
+        // Subscribe to a test symbol
+        std::string test_symbol = "SPY";
+        if (ib_client.subscribeMarketData(test_symbol)) {
+            logger.info("Successfully subscribed to " + test_symbol);
+
+            // Wait a moment to receive some data
+            logger.info("Waiting for market data...");
+            sleep(3);
+
+            // Get the latest market data
+            auto market_data = ib_client.getLatestMarketData(test_symbol);
+            logger.info("Latest price for " + test_symbol + ": " +
+                        std::to_string(market_data.price));
+        }
+
+        // Disconnect when done testing
+        ib_client.disconnect();
+        logger.info("Disconnected from Interactive Brokers");
+    } else {
+        logger.error("Failed to connect to Interactive Brokers");
+        // Continue anyway, as the engine will try to connect again
+    }
+
+    // Instantiate trading engine
     thales::core::Engine engine(config);
 
     // Start the engine
