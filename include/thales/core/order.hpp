@@ -1,5 +1,4 @@
-#ifndef THALES_CORE_ORDER_HPP
-#define THALES_CORE_ORDER_HPP
+#pragma once
 
 #include <string>
 
@@ -54,5 +53,3 @@ struct Order {
 
 }  // namespace core
 }  // namespace thales
-
-#endif  // THALES_CORE_ORDER_HPP

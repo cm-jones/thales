@@ -1,5 +1,4 @@
-#ifndef THALES_CORE_RISK_MANAGER_HPP
-#define THALES_CORE_RISK_MANAGER_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -85,5 +84,3 @@ class RiskManager {
 
 }  // namespace core
 }  // namespace thales
-
-#endif  // THALES_CORE_RISK_MANAGER_HPP

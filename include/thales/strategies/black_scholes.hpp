@@ -1,5 +1,4 @@
-#ifndef THALES_STRATEGIES_BLACK_SCHOLES_HPP
-#define THALES_STRATEGIES_BLACK_SCHOLES_HPP
+#pragma once
 
 #include <string>
 #include <thales/models/black_scholes.hpp>
@@ -82,5 +81,3 @@ class BlackScholes : public StrategyBase {
 
 }  // namespace strategies
 }  // namespace thales
-
-#endif  // THALES_STRATEGIES_BLACK_SCHOLES_HPP

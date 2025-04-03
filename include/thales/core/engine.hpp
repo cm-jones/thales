@@ -1,5 +1,4 @@
-#ifndef THALES_CORE_ENGINE_HPP
-#define THALES_CORE_ENGINE_HPP
+#pragma once
 
 #include <atomic>
 #include <memory>
@@ -82,5 +81,3 @@ class Engine {
 
 }  // namespace core
 }  // namespace thales
-
-#endif  // THALES_CORE_ENGINE_HPP

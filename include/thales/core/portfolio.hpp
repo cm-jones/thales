@@ -1,5 +1,4 @@
-#ifndef THALES_CORE_PORTFOLIO_HPP
-#define THALES_CORE_PORTFOLIO_HPP
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -137,5 +136,3 @@ class Portfolio {
 
 }  // namespace core
 }  // namespace thales
-
-#endif  // THALES_CORE_PORTFOLIO_HPP

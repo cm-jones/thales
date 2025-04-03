@@ -1,5 +1,4 @@
-#ifndef THALES_STRATEGIES_STRATEGY_REGISTRY_HPP
-#define THALES_STRATEGIES_STRATEGY_REGISTRY_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -100,5 +99,3 @@ class StrategyRegistry {
 
 }  // namespace strategies
 }  // namespace thales
-
-#endif  // THALES_STRATEGIES_STRATEGY_REGISTRY_HPP

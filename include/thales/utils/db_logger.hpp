@@ -1,5 +1,4 @@
-#ifndef THALES_UTILS_DB_LOGGER_HPP
-#define THALES_UTILS_DB_LOGGER_HPP
+#pragma once
 
 #include <atomic>
 #include <condition_variable>
@@ -188,5 +187,3 @@ class DbLogger {
 
 }  // namespace utils
 }  // namespace thales
-
-#endif  // THALES_UTILS_DB_LOGGER_HPP

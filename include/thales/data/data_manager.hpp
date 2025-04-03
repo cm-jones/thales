@@ -1,5 +1,4 @@
-#ifndef THALES_DATA_DATA_MANAGER_HPP
-#define THALES_DATA_DATA_MANAGER_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -108,5 +107,3 @@ class DataManager {
 
 }  // namespace data
 }  // namespace thales
-
-#endif  // THALES_DATA_DATA_MANAGER_HPP

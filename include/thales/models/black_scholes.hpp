@@ -1,5 +1,4 @@
-#ifndef THALES_MODELS_BLACK_SCHOLES_HPP
-#define THALES_MODELS_BLACK_SCHOLES_HPP
+#pragma once
 
 #include <string>
 
@@ -174,5 +173,3 @@ class BlackScholes {
 
 }  // namespace models
 }  // namespace thales
-
-#endif  // THALES_MODELS_BLACK_SCHOLES_HPP

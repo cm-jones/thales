@@ -1,5 +1,4 @@
-#ifndef THALES_DATA_MARKET_DATA_HPP
-#define THALES_DATA_MARKET_DATA_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -117,5 +116,3 @@ struct Bar {
 
 }  // namespace data
 }  // namespace thales
-
-#endif  // THALES_DATA_MARKET_DATA_HPP

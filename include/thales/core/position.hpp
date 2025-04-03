@@ -1,5 +1,4 @@
-#ifndef THALES_CORE_POSITION_HPP
-#define THALES_CORE_POSITION_HPP
+#pragma once
 
 #include <string>
 
@@ -32,5 +31,3 @@ struct Position {
 
 }  // namespace core
 }  // namespace thales
-
-#endif  // THALES_CORE_POSITION_HPP

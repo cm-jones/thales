@@ -1,5 +1,4 @@
-#ifndef THALES_UTILS_LOGGER_HPP
-#define THALES_UTILS_LOGGER_HPP
+#pragma once
 
 #include <fstream>
 #include <memory>
@@ -160,5 +159,3 @@ class Logger {
 
 }  // namespace utils
 }  // namespace thales
-
-#endif  // THALES_UTILS_LOGGER_HPP

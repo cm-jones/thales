@@ -1,5 +1,4 @@
-#ifndef THALES_UTILS_CONFIG_HPP
-#define THALES_UTILS_CONFIG_HPP
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -102,5 +101,3 @@ class Config {
 
 }  // namespace utils
 }  // namespace thales
-
-#endif  // THALES_UTILS_CONFIG_HPP

@@ -1,5 +1,4 @@
-#ifndef THALES_DATA_IB_CLIENT_HPP
-#define THALES_DATA_IB_CLIENT_HPP
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -179,5 +178,3 @@ class IBClient {
 
 }  // namespace data
 }  // namespace thales
-
-#endif  // THALES_DATA_IB_CLIENT_HPP
