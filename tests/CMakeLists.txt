@@ -1,14 +1,17 @@
 # Find GTest
-find_package(GTest)
+find_package(GTest QUIET)
 
+# Use FetchContent as a fallback if GTest is not found
 if(NOT GTEST_FOUND)
-    # If GTest is not found, fetch it
+    message(STATUS "System GTest not found, fetching from source")
     include(FetchContent)
     FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG release-1.12.1
     )
+    # Prevent overriding parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 endif()
 
@@ -47,19 +50,19 @@ set(TEST_SOURCES
 add_executable(thales_tests ${TEST_SOURCES})
 
 # Link against the library and GTest
+target_link_libraries(thales_tests PRIVATE thales_lib)
+
+# Link against the appropriate GTest libraries
 if(GTEST_FOUND)
-    target_link_libraries(thales_tests PRIVATE
-        thales_lib
-        ${GTEST_BOTH_LIBRARIES}
-    )
+    target_link_libraries(thales_tests PRIVATE ${GTEST_BOTH_LIBRARIES})
     target_include_directories(thales_tests PRIVATE ${GTEST_INCLUDE_DIRS})
 else()
-    target_link_libraries(thales_tests PRIVATE
-        thales_lib
-        gtest
-        gtest_main
-    )
+    target_link_libraries(thales_tests PRIVATE gtest gtest_main)
 endif()
+
+# Add pthread if needed (usually required on Unix-like systems)
+find_package(Threads REQUIRED)
+target_link_libraries(thales_tests PRIVATE Threads::Threads)
 
 # Add the test
 add_test(NAME thales_tests COMMAND thales_tests)
