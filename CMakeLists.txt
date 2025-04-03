@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 project(thales VERSION 0.1.0 LANGUAGES CXX)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -13,6 +13,9 @@ endif()
 
 # Add option for Address Sanitizer
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
+
+# Use all available cores
+set(CMAKE_BUILD_PARALLEL_LEVEL "")
 
 # Configure Address Sanitizer
 if(ENABLE_ASAN)
@@ -54,7 +57,7 @@ else()
 endif()
 
 # Find Interactive Brokers C++ API (optional)
-find_path(IBAPI_INCLUDE_DIRS ibapi/EClient.h
+find_path(IBAPI_INCLUDE_DIRS EClient.h
     PATHS 
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/ibapi
     /usr/include
@@ -165,7 +168,7 @@ add_custom_target(docs
 
 # Print configuration summary
 message(STATUS "")
-message(STATUS "Thales Options Trading Bot Configuration:")
+message(STATUS "Thales Configuration:")
 message(STATUS "  CMake version:       ${CMAKE_VERSION}")
 message(STATUS "  C++ Compiler:        ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "  Build type:          ${CMAKE_BUILD_TYPE}")
