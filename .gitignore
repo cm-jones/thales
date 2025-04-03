@@ -94,3 +94,6 @@ coverage/
 # Temporary files
 temp/
 tmp/
+
+# Third party libraries
+third_party/
