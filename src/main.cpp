@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     // Set up a simple callback to log market data updates
     ib_client.setMarketDataCallback(
         [&logger](const thales::data::MarketData& data) {
-            logger.info("Market data received: " + data.ticker +
+            logger.info("Market data received: " + data.symbol +
                         " - Price: " + std::to_string(data.price));
         });
 

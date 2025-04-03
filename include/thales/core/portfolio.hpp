@@ -46,11 +46,11 @@ class Portfolio {
     std::vector<Position> get_positions() const;
 
     /**
-     * @brief Get a specific position by ticker
-     * @param ticker The ticker to look up
+     * @brief Get a specific position by symbol
+     * @param symbol The symbol to look up
      * @return The position, or an empty position if not found
      */
-    Position get_position(const std::string& ticker) const;
+    Position get_position(const std::string& symbol) const;
 
     /**
      * @brief Get all open orders
@@ -59,11 +59,11 @@ class Portfolio {
     std::vector<Order> get_open_orders() const;
 
     /**
-     * @brief Get all orders for a specific ticker
-     * @param ticker The ticker to look up
-     * @return A vector of orders for the ticker
+     * @brief Get all orders for a specific symbol
+     * @param symbol The symbol to look up
+     * @return A vector of orders for the symbol
      */
-    std::vector<Order> get_orders(const std::string& ticker) const;
+    std::vector<Order> get_orders(const std::string& symbol) const;
 
     /**
      * @brief Get the total portfolio value
@@ -85,10 +85,10 @@ class Portfolio {
 
     /**
      * @brief Update a position with new market data
-     * @param ticker The ticker to update
+     * @param symbol The symbol to update
      * @param last_price The current market price
      */
-    void update_position(const std::string& ticker, double last_price);
+    void update_position(const std::string& symbol, double last_price);
 
     /**
      * @brief Add a new position to the portfolio

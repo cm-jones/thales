@@ -1,11 +1,10 @@
-#include <thales/strategies/black_scholes.h>
-#include <thales/utils/logger.h>
-
 #include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
+#include <thales/strategies/black_scholes.hpp>
+#include <thales/utils/logger.hpp>
 
 namespace thales {
 namespace strategies {

@@ -1,10 +1,9 @@
-#include <thales/utils/config.h>
-#include <thales/utils/logger.h>
-
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <thales/utils/config.hpp>
+#include <thales/utils/logger.hpp>
 
 // Include a JSON library for parsing
 // For this example, we'll use a simple placeholder implementation
@@ -206,7 +205,7 @@ double Config::get_double(const std::string& key, double defaultValue) const {
 }
 
 std::string Config::get_string(const std::string& key,
-                              const std::string& defaultValue) const {
+                               const std::string& defaultValue) const {
     auto it = data_.find(key);
     if (it == data_.end()) {
         return defaultValue;

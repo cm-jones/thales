@@ -123,7 +123,7 @@ void Engine::execute_orders() {
     for (const auto& order : open_orders) {
         // In real implementation, this would check for fill status, etc.
         logger.info("Processing order: " + order.order_id + ", " +
-                    order.ticker + ", " + order.side_to_string() + ", " +
+                    order.symbol + ", " + order.side_to_string() + ", " +
                     order.type_to_string());
     }
 }
@@ -139,8 +139,8 @@ void Engine::update_portfolio() {
 
     // Update each position with latest market data
     for (const auto& position : positions) {
-        auto market_data = data_manager_->getLatestMarketData(position.ticker);
-        portfolio_->update_position(position.ticker, market_data.price);
+        auto market_data = data_manager_->getLatestMarketData(position.symbol);
+        portfolio_->update_position(position.symbol, market_data.price);
     }
 
     // Log portfolio value

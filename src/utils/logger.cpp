@@ -1,10 +1,9 @@
-#include <thales/utils/logger.h>
-
 #include <chrono>
 #include <ctime>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
+#include <thales/utils/logger.hpp>
 
 // Forward declaration for DbLogger
 namespace thales {
@@ -34,6 +33,7 @@ Logger& Logger::get_instance() {
     if (!instance_) {
         initialize();
     }
+
     return *instance_;
 }
 

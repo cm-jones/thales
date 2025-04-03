@@ -71,7 +71,7 @@ class BlackScholes : public StrategyBase {
     // Private methods
     double calculate_historical_volatility(
         const std::vector<data::MarketData>& market_data,
-        const std::string& ticker);
+        const std::string& symbol);
     double calculate_risk_free_rate() const;
     double calculate_time_to_expiration(
         const std::string& expiration_date) const;

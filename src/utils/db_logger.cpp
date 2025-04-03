@@ -1,9 +1,8 @@
-#include <thales/utils/db_logger.h>
-#include <thales/utils/logger.h>
-
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <thales/utils/db_logger.hpp>
+#include <thales/utils/logger.hpp>
 #include <vector>
 
 // Include libpqxx for PostgreSQL connectivity

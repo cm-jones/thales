@@ -11,7 +11,7 @@ namespace core {
  * @brief Represents a position in a financial instrument.
  */
 struct Position {
-    std::string ticker;     // Symbol of the instrument
+    std::string symbol;     // Symbol of the instrument
     int quantity;           // Quantity held
     double average_price;   // Average entry price
     double last_price;      // Current market price

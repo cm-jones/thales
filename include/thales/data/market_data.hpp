@@ -13,7 +13,7 @@ namespace data {
  */
 struct MarketData {
     virtual ~MarketData() = default;
-    std::string ticker;     // Symbol of the instrument
+    std::string symbol;     // Symbol of the instrument
     std::string timestamp;  // Timestamp of the data
     double price;           // Last trade price
     double open;            // Opening price
@@ -31,7 +31,7 @@ struct MarketData {
                double p = 0.0, double o = 0.0, double h = 0.0, double l = 0.0,
                double c = 0.0, double v = 0.0, double b = 0.0, double a = 0.0,
                double bs = 0.0, double as = 0.0)
-        : ticker(sym),
+        : symbol(sym),
           timestamp(ts),
           price(p),
           open(o),
@@ -92,7 +92,7 @@ struct OptionData : public MarketData {
  * @brief Represents a time-based bar (OHLCV) for a financial instrument.
  */
 struct Bar {
-    std::string ticker;     // Symbol of the instrument
+    std::string symbol;     // Symbol of the instrument
     std::string timestamp;  // Timestamp of the bar
     std::string interval;   // Bar interval (e.g., "1min", "1hour", "1day")
     double open;            // Opening price
@@ -105,7 +105,7 @@ struct Bar {
     Bar(const std::string& sym = "", const std::string& ts = "",
         const std::string& intv = "", double o = 0.0, double h = 0.0,
         double l = 0.0, double c = 0.0, double v = 0.0)
-        : ticker(sym),
+        : symbol(sym),
           timestamp(ts),
           interval(intv),
           open(o),

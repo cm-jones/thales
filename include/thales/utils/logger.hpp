@@ -83,7 +83,7 @@ class Logger {
     /**
      * @brief Log a trade execution
      * @param strategyName Name of the strategy that generated the trade
-     * @param ticker Trading ticker
+     * @param symbol Trading symbol
      * @param orderId Order ID
      * @param executionId Execution ID
      * @param side Trade side (BUY or SELL)
@@ -100,7 +100,7 @@ class Logger {
      * @param additionalData JSON string with additional data
      */
     void logTradeExecution(
-        const std::string& strategy_name, const std::string& ticker,
+        const std::string& strategy_name, const std::string& symbol,
         const std::string& order_id, const std::string& execution_id,
         const std::string& side, double quantity, double price,
         double commission, double total_value,

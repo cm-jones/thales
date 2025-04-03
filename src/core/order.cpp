@@ -1,4 +1,4 @@
-#include <thales/core/order.h>
+#include <thales/core/order.hpp>
 
 namespace thales {
 namespace core {

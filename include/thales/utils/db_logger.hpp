@@ -49,7 +49,7 @@ class DbLogger {
     /**
      * @brief Log a trade execution to the database
      * @param strategyName Name of the strategy that generated the trade
-     * @param ticker Trading ticker
+     * @param symbol Trading symbol
      * @param orderId Order ID
      * @param executionId Execution ID
      * @param side Trade side (BUY or SELL)
@@ -67,7 +67,7 @@ class DbLogger {
      * @return true if the log was queued successfully, false otherwise
      */
     bool log_trade_execution(
-        const std::string& strategy_name, const std::string& ticker,
+        const std::string& strategy_name, const std::string& symbol,
         const std::string& order_id, const std::string& execution_id,
         const std::string& side, double quantity, double price,
         double commission, double total_value,
@@ -115,7 +115,7 @@ class DbLogger {
     // Structure to hold a trade execution log
     struct TradeExecutionLog {
         std::string strategy_name;
-        std::string ticker;
+        std::string symbol;
         std::string order_id;
         std::string execution_id;
         std::string side;

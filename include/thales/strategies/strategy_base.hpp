@@ -18,7 +18,7 @@ namespace strategies {
 struct Signal {
     enum class Type { BUY, SELL, HOLD };
 
-    std::string ticker;     // Symbol of the instrument
+    std::string symbol;     // Symbol of the instrument
     Type type;              // Signal type
     double strength;        // Signal strength (0.0 to 1.0)
     double target_price;    // Target price
@@ -31,7 +31,7 @@ struct Signal {
     Signal(const std::string& sym = "", Type t = Type::HOLD, double str = 0.0,
            double target = 0.0, double stop = 0.0, const std::string& ts = "",
            const std::string& strat = "")
-        : ticker(sym),
+        : symbol(sym),
           type(t),
           strength(str),
           target_price(target),

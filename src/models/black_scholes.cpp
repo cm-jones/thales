@@ -1,13 +1,12 @@
-#include <thales/models/black_scholes.h>
-
 #include <cmath>
 #include <stdexcept>
+#include <thales/models/black_scholes.hpp>
 
 namespace thales {
 namespace models {
 
 double BlackScholes::call_price(double S, double K, double r, double sigma,
-                               double T) {
+                                double T) {
     if (T <= 0) {
         // For expired options, return intrinsic value
         return std::max(0.0, S - K);
@@ -20,7 +19,7 @@ double BlackScholes::call_price(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::put_price(double S, double K, double r, double sigma,
-                              double T) {
+                               double T) {
     if (T <= 0) {
         // For expired options, return intrinsic value
         return std::max(0.0, K - S);
@@ -33,7 +32,7 @@ double BlackScholes::put_price(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::call_delta(double S, double K, double r, double sigma,
-                               double T) {
+                                double T) {
     if (T <= 0) {
         // For expired options, delta is either 0 or 1
         return (S > K) ? 1.0 : 0.0;
@@ -43,7 +42,7 @@ double BlackScholes::call_delta(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::put_delta(double S, double K, double r, double sigma,
-                              double T) {
+                               double T) {
     if (T <= 0) {
         // For expired options, delta is either -1 or 0
         return (S < K) ? -1.0 : 0.0;
@@ -79,7 +78,7 @@ double BlackScholes::vega(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::call_theta(double S, double K, double r, double sigma,
-                               double T) {
+                                double T) {
     if (T <= 0) {
         // For expired options, theta is 0
         return 0.0;
@@ -95,7 +94,7 @@ double BlackScholes::call_theta(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::put_theta(double S, double K, double r, double sigma,
-                              double T) {
+                               double T) {
     if (T <= 0) {
         // For expired options, theta is 0
         return 0.0;
@@ -111,7 +110,7 @@ double BlackScholes::put_theta(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::call_rho(double S, double K, double r, double sigma,
-                             double T) {
+                              double T) {
     if (T <= 0) {
         // For expired options, rho is 0
         return 0.0;
@@ -125,7 +124,7 @@ double BlackScholes::call_rho(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::put_rho(double S, double K, double r, double sigma,
-                            double T) {
+                             double T) {
     if (T <= 0) {
         // For expired options, rho is 0
         return 0.0;
@@ -139,8 +138,8 @@ double BlackScholes::put_rho(double S, double K, double r, double sigma,
 }
 
 double BlackScholes::call_implied_volatility(double price, double S, double K,
-                                           double r, double T, double epsilon,
-                                           int max_iterations) {
+                                             double r, double T, double epsilon,
+                                             int max_iterations) {
     if (T <= 0) {
         throw std::invalid_argument("Time to expiration must be positive");
     }
@@ -188,8 +187,8 @@ double BlackScholes::call_implied_volatility(double price, double S, double K,
 }
 
 double BlackScholes::put_implied_volatility(double price, double S, double K,
-                                          double r, double T, double epsilon,
-                                          int max_iterations) {
+                                            double r, double T, double epsilon,
+                                            int max_iterations) {
     if (T <= 0) {
         throw std::invalid_argument("Time to expiration must be positive");
     }

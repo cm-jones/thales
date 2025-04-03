@@ -39,29 +39,29 @@ class DataManager {
     bool initialize();
 
     /**
-     * @brief Subscribe to market data for a ticker
-     * @param ticker The ticker to subscribe to
+     * @brief Subscribe to market data for a symbol
+     * @param symbol The symbol to subscribe to
      * @return true if the subscription was successful, false otherwise
      */
-    bool subscribeMarketData(const std::string& ticker);
+    bool subscribeMarketData(const std::string& symbol);
 
     /**
-     * @brief Unsubscribe from market data for a ticker
-     * @param ticker The ticker to unsubscribe from
+     * @brief Unsubscribe from market data for a symbol
+     * @param symbol The symbol to unsubscribe from
      * @return true if the unsubscription was successful, false otherwise
      */
-    bool unsubscribeMarketData(const std::string& ticker);
+    bool unsubscribeMarketData(const std::string& symbol);
 
     /**
-     * @brief Get the latest market data for a ticker
-     * @param ticker The ticker to get data for
-     * @return The latest market data for the ticker
+     * @brief Get the latest market data for a symbol
+     * @param symbol The symbol to get data for
+     * @return The latest market data for the symbol
      */
-    MarketData getLatestMarketData(const std::string& ticker) const;
+    MarketData getLatestMarketData(const std::string& symbol) const;
 
     /**
-     * @brief Get historical market data for a ticker
-     * @param ticker The ticker to get data for
+     * @brief Get historical market data for a symbol
+     * @param symbol The symbol to get data for
      * @param startTime The start time for the historical data
      * @param endTime The end time for the historical data
      * @param interval The interval for the historical data (e.g., "1min",
@@ -69,17 +69,17 @@ class DataManager {
      * @return A vector of historical market data
      */
     std::vector<MarketData> getHistoricalMarketData(
-        const std::string& ticker, const std::string& startTime,
+        const std::string& symbol, const std::string& startTime,
         const std::string& endTime, const std::string& interval) const;
 
     /**
-     * @brief Get option chain data for a ticker
-     * @param ticker The underlying ticker
+     * @brief Get option chain data for a symbol
+     * @param symbol The underlying symbol
      * @param expirationDate The expiration date (empty for all expirations)
-     * @return A map of option data, keyed by option ticker
+     * @return A map of option data, keyed by option symbol
      */
     std::unordered_map<std::string, OptionData> getOptionChain(
-        const std::string& ticker,
+        const std::string& symbol,
         const std::string& expirationDate = "") const;
 
     /**

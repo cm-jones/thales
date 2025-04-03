@@ -1,6 +1,6 @@
-#include <thales/strategies/black_scholes.h>
-#include <thales/strategies/strategy_registry.h>
-#include <thales/utils/logger.h>
+#include <thales/strategies/black_scholes.hpp>
+#include <thales/strategies/strategy_registry.hpp>
+#include <thales/utils/logger.hpp>
 
 namespace thales {
 namespace strategies {

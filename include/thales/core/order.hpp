@@ -18,7 +18,7 @@ struct Order {
     enum class Status { PENDING, FILLED, PARTIALLY_FILLED, CANCELED, REJECTED };
 
     std::string order_id;       // Unique order ID
-    std::string ticker;         // Ticker of the instrument
+    std::string symbol;         // symbol of the instrument
     Type type;                  // Order type
     Side side;                  // Buy or sell
     uint16_t quantity;          // Quantity to trade

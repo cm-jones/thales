@@ -1,5 +1,5 @@
-#include <thales/strategies/strategy_base.h>
-#include <thales/utils/logger.h>
+#include <thales/strategies/strategy_base.hpp>
+#include <thales/utils/logger.hpp>
 
 namespace thales {
 namespace strategies {

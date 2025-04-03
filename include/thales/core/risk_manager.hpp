@@ -45,12 +45,12 @@ class RiskManager {
     bool isOrderAllowed(const Order& order, const Portfolio& portfolio) const;
 
     /**
-     * @brief Get the maximum allowed position size for a ticker
-     * @param ticker The ticker to check
+     * @brief Get the maximum allowed position size for a symbol
+     * @param symbol The symbol to check
      * @param portfolio The current portfolio
      * @return The maximum allowed position size
      */
-    double getMaxPositionSize(const std::string& ticker,
+    double getMaxPositionSize(const std::string& symbol,
                               const Portfolio& portfolio) const;
 
     /**
@@ -78,7 +78,7 @@ class RiskManager {
     double maxDailyLoss_;
 
     // Private methods
-    double calculatePositionRisk(const std::string& ticker, double quantity,
+    double calculatePositionRisk(const std::string& symbol, double quantity,
                                  const Portfolio& portfolio) const;
     double calculatePortfolioRisk(const Portfolio& portfolio) const;
 };
