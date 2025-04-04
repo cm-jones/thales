@@ -2,7 +2,9 @@
 
 [![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Thales is a low-latency, multi-threaded, and extensible algorithmic trading bot solely designed for trading options contracts (NOT equities or any other securities). It is named after the ancient Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
+Thales is a low-latency, multi-threaded, and extensible algorithmic trading bot designed solely for trading options contracts, not equities or any other securities.
+
+It is named after the ancient Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
 
 *Disclaimer: Trading options involves significant risk of loss and is not suitable for all investors. Past performance is not indicative of future results. This software is for educational and informational purposes only and should not be considered investment advice.*
 
@@ -270,4 +272,4 @@ The database includes the following features:
 
 ## License
 
-This project is licensed under the MIT License. See 
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
