@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace thales {
 namespace models {
 
@@ -12,7 +10,7 @@ namespace models {
  * This class provides methods for calculating option prices and Greeks
  * using the Black-Scholes formula.
  */
-class BlackScholes {
+class BlackScholesModel {
    public:
     /**
      * @brief Calculate the price of a European call option
