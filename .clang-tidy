@@ -1,13 +1,13 @@
-Checks: '-*,bugprone-*,performance-*'
+Checks: '-*,bugprone-*,performance-*,readability-identifier-naming'
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
 
-Checks: "-*,readability-identifier-naming"
 CheckOptions:
-  # Options for static (or all) functions
+  # Options for all functions
   readability-identifier-naming.FunctionCase: lower_case
-  readability-identifier-naming.FunctionPrefix: 'static_'
+  # Options for all classes
+  readability-identifier-naming.ClassCase: CamelCase
   # Options for extern funtions
   readability-identifier-naming.GlobalFunctionCase: CamelCase
   readability-identifier-naming.GlobalFunctionPrefix: 'extern_'
