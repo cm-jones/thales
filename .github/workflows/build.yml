@@ -42,3 +42,41 @@ jobs:
           build/thales
           build/thales.exe
         if-no-files-found: ignore
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libboost-all-dev lcov
+    
+    - name: Configure with coverage
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug ..
+    
+    - name: Build
+      run: |
+        cd build
+        make
+    
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+    
+    - name: Generate coverage report
+      run: |
+        cd build
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./build/coverage.info
+        fail_ci_if_error: true
