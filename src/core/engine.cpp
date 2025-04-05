@@ -76,10 +76,10 @@ void Engine::main_loop() {
     auto& logger = utils::Logger::get_instance();
 
     // Get the loop interval from configuration
-    int loopIntervalMs = config_.get_int("engine.loopIntervalMs", 1000);
+    int loop_interval_ms = config_.get_int("engine.loopIntervalMs", 1000);
 
     logger.info("Main loop started with interval: " +
-                std::to_string(loopIntervalMs) + "ms");
+                std::to_string(loop_interval_ms) + "ms");
 
     while (running_) {
         // Process signals from strategies
@@ -92,7 +92,8 @@ void Engine::main_loop() {
         update_portfolio();
 
         // Sleep for the configured interval
-        std::this_thread::sleep_for(std::chrono::milliseconds(loopIntervalMs));
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(loop_interval_ms));
     }
 }
 
@@ -122,9 +123,10 @@ void Engine::execute_orders() {
     // Execute orders through the IB client
     for (const auto& order : open_orders) {
         // In real implementation, this would check for fill status, etc.
-        logger.info("Processing order: " + order.order_id + ", " +
-                    order.symbol + ", " + order.side_to_string() + ", " +
-                    order.type_to_string());
+        std::string symbol =
+            utils::SymbolLookup::get_symbol(order.symbol_id) logger.info(
+                "Processing order: " + order.order_id + ", " + order.symbol +
+                ", " + order.side_to_string() + ", " + order.type_to_string());
     }
 }
 
@@ -139,7 +141,8 @@ void Engine::update_portfolio() {
 
     // Update each position with latest market data
     for (const auto& position : positions) {
-        auto market_data = data_manager_->getLatestMarketData(position.symbol);
+        auto market_data =
+            data_manager_->get_latest_market_data(position.symbol);
         portfolio_->update_position(position.symbol, market_data.price);
     }
 
