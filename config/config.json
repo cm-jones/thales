@@ -35,8 +35,7 @@
   },
   "strategies": {
     "enabled": [
-      "BlackScholesArbitrage",
-      "VolatilityMean"
+      "BlackScholesArbitrage"
     ],
     "BlackScholesArbitrage": {
       "minPriceDiscrepancy": 0.05,
@@ -45,13 +44,6 @@
       "minDaysToExpiration": 7,
       "maxDaysToExpiration": 45
     },
-    "VolatilityMean": {
-      "lookbackDays": 30,
-      "meanReversionStrength": 0.7,
-      "volatilityThreshold": 0.2,
-      "minDaysToExpiration": 14,
-      "maxDaysToExpiration": 60
-    }
   },
   "logging": {
     "logToFile": true,
