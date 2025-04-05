@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
-#include <thales/models/black_scholes.hpp>
+#include <thales/models/black_scholes_model.hpp>
 
 using namespace thales::models;
 
