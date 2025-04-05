@@ -1,15 +1,16 @@
 #include <unistd.h>
 
 #include <print>
-#include <stdexcept>
 #include <string>
 #include <thales/core/engine.hpp>
 #include <thales/data/ib_client.hpp>
 #include <thales/utils/config.hpp>
 #include <thales/utils/logger.hpp>
+#include <thales/utils/symbol_lookup.hpp>
+#include <vector>
 
 int main(int argc, char** argv) {
-    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
+    long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
     std::println("Number of available cores: {}", std::to_string(num_cores));
 
     // Load configuration
@@ -25,13 +26,31 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    // Extract symbols from config
+    std::vector<std::string> symbols = config.get_string_vector("data.symbols");
+    if (symbols.empty()) {
+        std::println(stderr, "No symbols found in configuration");
+        return EXIT_FAILURE;
+    }
+
+    // Initialize symbol lookup table
+    thales::utils::SymbolLookup symbol_lookup(symbols);
+
+    // Log the symbols and their IDs
+    std::println("Initialized symbol lookup table with {} symbols:",
+                 symbols.size());
+    for (const auto& symbol : symbols) {
+        auto id = symbol_lookup.get_id(symbol);
+        std::println("  Symbol: {}, ID: {}", symbol, id);
+    }
+
     // Initialize logger
     bool log_to_file = config.get_bool("logging.log_to_file", true);
     std::string log_file_path =
         config.get_string("logging.log_file_path", "logs/thales.log");
     std::string console_log_level_str =
-        config.get_string("logging.consoleLogLevel", "INFO");
-    std::string fileLogLevelStr =
+        config.get_string("logging.console_log_level", "INFO");
+    std::string file_log_level_str =
         config.get_string("logging.file_log_level", "DEBUG");
 
     // Convert log level strings to enum values
@@ -49,7 +68,7 @@ int main(int argc, char** argv) {
     thales::utils::LogLevel console_log_level =
         string_to_log_level(console_log_level_str);
     thales::utils::LogLevel file_log_level =
-        string_to_log_level(fileLogLevelStr);
+        string_to_log_level(file_log_level_str);
 
     thales::utils::Logger::initialize(log_to_file, log_file_path,
                                       console_log_level, file_log_level);
@@ -68,31 +87,31 @@ int main(int argc, char** argv) {
         });
 
     // Connect to IB Gateway
-    if (ib_client.connect()) {
-        logger.info("Successfully connected to Interactive Brokers");
-
-        // Subscribe to a test symbol
-        std::string test_symbol = "SPY";
-        if (ib_client.subscribeMarketData(test_symbol)) {
-            logger.info("Successfully subscribed to " + test_symbol);
-
-            // Wait a moment to receive some data
-            logger.info("Waiting for market data...");
-            sleep(3);
-
-            // Get the latest market data
-            auto market_data = ib_client.getLatestMarketData(test_symbol);
-            logger.info("Latest price for " + test_symbol + ": " +
-                        std::to_string(market_data.price));
-        }
-
-        // Disconnect when done testing
-        ib_client.disconnect();
-        logger.info("Disconnected from Interactive Brokers");
-    } else {
+    if (!ib_client.connect()) {
         logger.error("Failed to connect to Interactive Brokers");
         // Continue anyway, as the engine will try to connect again
     }
+
+    logger.info("Successfully connected to Interactive Brokers");
+
+    // Subscribe to a test symbol
+    std::string test_symbol = "SPY";
+    if (ib_client.subscribeMarketData(test_symbol)) {
+        logger.info("Successfully subscribed to " + test_symbol);
+
+        // Wait a moment to receive some data
+        logger.info("Waiting for market data...");
+        sleep(3);
+
+        // Get the latest market data
+        auto market_data = ib_client.getLatestMarketData(test_symbol);
+        logger.info("Latest price for " + test_symbol + ": " +
+                    std::to_string(market_data.price));
+    }
+
+    // Disconnect when done testing
+    ib_client.disconnect();
+    logger.info("Disconnected from Interactive Brokers");
 
     // Instantiate trading engine
     thales::core::Engine engine(config);
