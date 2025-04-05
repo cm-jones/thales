@@ -1,6 +1,6 @@
 # Thales
 
-[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml) [![CodeFactor](https://www.codefactor.io/repository/github/cm-jones/thales/badge)](https://www.codefactor.io/repository/github/cm-jones/thales) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/cm-jones/thales/branch/main/graph/badge.svg)](https://codecov.io/gh/cm-jones/thales) [![CodeFactor](https://www.codefactor.io/repository/github/cm-jones/thales/badge)](https://www.codefactor.io/repository/github/cm-jones/thales) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Thales is a low-latency, multi-threaded, and extensible algorithmic trading bot designed solely for trading options contracts, not equities or any other securities.
 
