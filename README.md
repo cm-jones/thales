@@ -1,6 +1,6 @@
 # Thales
 
-[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yml) [![CodeFactor](https://www.codefactor.io/repository/github/cm-jones/thales/badge)](https://www.codefactor.io/repository/github/cm-jones/thales) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Thales is a low-latency, multi-threaded, and extensible algorithmic trading bot designed solely for trading options contracts, not equities or any other securities.
 
@@ -176,8 +176,7 @@ Example:
 
 ```cpp
 // include/thales/strategies/my_strategy.h
-#ifndef THALES_STRATEGIES_MY_STRATEGY_H
-#define THALES_STRATEGIES_MY_STRATEGY_H
+#pragma once
 
 #include <thales/strategies/strategy_base.h>
 
@@ -205,6 +204,35 @@ private:
 
 #endif // THALES_STRATEGIES_MY_STRATEGY_H
 ```
+
+## Performance Benchmarks
+
+Thales includes performance benchmarks for critical components using Google Benchmark. These benchmarks help measure and optimize the performance of key algorithms, particularly the Black-Scholes model implementation.
+
+### Running Benchmarks
+
+```bash
+# Run the benchmarks
+./scripts/run_benchmarks.sh
+```
+
+This will build the benchmarks in Release mode and execute them, providing detailed performance metrics for various operations.
+
+The benchmarks include:
+- Option pricing (call and put)
+- Greeks calculation (delta, gamma, theta, vega, rho)
+- Implied volatility calculation
+- Performance across different moneyness levels, volatility values, and expiration times
+
+### Interpreting Results
+
+The benchmark results show:
+- Time per iteration (lower is better)
+- CPU time consumed
+- Number of iterations performed
+- Comparisons between different parameter sets
+
+Use these benchmarks to identify performance bottlenecks and validate optimizations.
 
 ## Trade Logging
 
