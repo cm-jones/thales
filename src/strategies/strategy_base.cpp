@@ -32,17 +32,10 @@ void StrategyBase::load_symbols() {
     auto& logger = utils::Logger::get_instance();
 
     // Try to load symbols from the configuration
-    std::string configKey = "data.symbols";
+    std::string config_key = "data.symbols";
 
-    if (config_.has_key(configKey)) {
-        // This is a placeholder for loading symbols from the configuration
-        // In a real implementation, you would use a proper JSON library to
-        // parse the array
-
-        // For now, we'll just add some default symbols
-        symbols_ = {"SPY",  "QQQ",   "AAPL", "MSFT",
-                    "AMZN", "GOOGL", "FB",   "TSLA"};
-
+    if (config_.has_key(config_key)) {
+        symbols_ = config_.get_string_vector(config_key);
         logger.info("Loaded " + std::to_string(symbols_.size()) +
                     " symbols for strategy " + name_);
     } else {
