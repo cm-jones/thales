@@ -8,8 +8,8 @@ DataManager::DataManager(const utils::Config& config) : config_(config) {}
 
 DataManager::~DataManager() {
     // Clean up resources
-    for (const auto& symbol : subscribedSymbols_) {
-        unsubscribeMarketData(symbol);
+    for (const auto& symbol : subscribed_symbols_) {
+        unsubscribe_market_data(symbol);
     }
 }
 
@@ -20,8 +20,8 @@ bool DataManager::initialize() {
     try {
 #ifdef ENABLE_IB_CLIENT
         // Initialize IB client if enabled
-        ibClient_ = std::make_unique<IBClient>(config_);
-        if (!ibClient_->connect()) {
+        ib_client_ = std::make_unique<IBClient>(config_);
+        if (!ib_client_->connect()) {
             logger.error("Failed to connect to IB client");
             return false;
         }
@@ -31,7 +31,7 @@ bool DataManager::initialize() {
 #endif
 
         // Initialize market data cache
-        latestMarketData_.clear();
+        latest_market_data_.clear();
 
         logger.info("Data manager initialized successfully");
         return true;
@@ -45,21 +45,21 @@ bool DataManager::initialize() {
     }
 }
 
-bool DataManager::subscribeMarketData(const std::string& symbol) {
+bool DataManager::subscribe_market_data(const std::string& symbol) {
     auto& logger = utils::Logger::get_instance();
     logger.info("Subscribing to market data for " + symbol);
 
     // Check if already subscribed
-    if (std::find(subscribedSymbols_.begin(), subscribedSymbols_.end(),
-                  symbol) != subscribedSymbols_.end()) {
+    if (std::find(subscribed_symbols_.begin(), subscribed_symbols_.end(),
+                  symbol) != subscribed_symbols_.end()) {
         logger.info("Already subscribed to " + symbol);
         return true;
     }
 
 #ifdef ENABLE_IB_CLIENT
     // Subscribe through IB client
-    if (ibClient_ && ibClient_->subscribeMarketData(symbol)) {
-        subscribedSymbols_.push_back(symbol);
+    if (ib_client_ && ib_client_->subscribeMarketData(symbol)) {
+        subscribed_symbols_.push_back(symbol);
         logger.info("Successfully subscribed to " + symbol);
         return true;
     } else {
@@ -81,21 +81,21 @@ bool DataManager::subscribeMarketData(const std::string& symbol) {
 #endif
 }
 
-bool DataManager::unsubscribeMarketData(const std::string& symbol) {
+bool DataManager::unsubscribe_market_data(const std::string& symbol) {
     auto& logger = utils::Logger::get_instance();
     logger.info("Unsubscribing from market data for " + symbol);
 
-    auto it =
-        std::find(subscribedSymbols_.begin(), subscribedSymbols_.end(), symbol);
-    if (it == subscribedSymbols_.end()) {
+    auto it = std::find(subscribed_symbols_.begin(), subscribed_symbols_.end(),
+                        symbol);
+    if (it == subscribed_symbols_.end()) {
         logger.info("Not subscribed to " + symbol);
         return true;
     }
 
 #ifdef ENABLE_IB_CLIENT
     // Unsubscribe through IB client
-    if (ibClient_ && ibClient_->unsubscribeMarketData(symbol)) {
-        subscribedSymbols_.erase(it);
+    if (ib_client_ && ib_client_->unsubscribeMarketData(symbol)) {
+        subscribed_symbols_.erase(it);
         logger.info("Successfully unsubscribed from " + symbol);
         return true;
     } else {
@@ -110,9 +110,10 @@ bool DataManager::unsubscribeMarketData(const std::string& symbol) {
 #endif
 }
 
-MarketData DataManager::getLatestMarketData(const std::string& symbol) const {
-    auto it = latestMarketData_.find(symbol);
-    if (it != latestMarketData_.end()) {
+MarketData DataManager::get_latest_market_data(
+    const std::string& symbol) const {
+    auto it = latest_market_data_.find(symbol);
+    if (it != latest_market_data_.end()) {
         return it->second;
     }
 
@@ -126,31 +127,31 @@ MarketData DataManager::getLatestMarketData(const std::string& symbol) const {
     return emptyData;
 }
 
-std::vector<MarketData> DataManager::getHistoricalMarketData(
+std::vector<MarketData> DataManager::get_historical_market_data(
     const std::string& symbol, const std::string& startTime,
     const std::string& endTime, const std::string& interval) const {
     // For the stub implementation, return an empty vector
     return {};
 }
 
-std::unordered_map<std::string, OptionData> DataManager::getOptionChain(
+std::unordered_map<std::string, OptionData> DataManager::get_option_chain(
     const std::string& symbol, const std::string& expirationDate) const {
     // For the stub implementation, return an empty map
     return {};
 }
 
-void DataManager::processMarketData(const MarketData& data) {
-    cacheMarketData(data);
+void DataManager::process_market_data(const MarketData& data) {
+    cache_market_data(data);
 
     // In a real implementation, this would notify subscribers, update
     // analytics, etc.
 }
 
-bool DataManager::connectToDataSources() {
+bool DataManager::connect_to_data_sources() {
 #ifdef ENABLE_IB_CLIENT
     // Connect to IB
-    if (ibClient_) {
-        return ibClient_->connect();
+    if (ib_client_) {
+        return ib_client_->connect();
     }
 #endif
 
@@ -158,8 +159,8 @@ bool DataManager::connectToDataSources() {
     return true;
 }
 
-void DataManager::cacheMarketData(const MarketData& data) {
-    latestMarketData_[data.symbol] = data;
+void DataManager::cache_market_data(const MarketData& data) {
+    latest_market_data_[data.symbol] = data;
 }
 
 }  // namespace data
