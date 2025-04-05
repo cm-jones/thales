@@ -23,7 +23,7 @@ set(TEST_SOURCES
     # test_portfolio.cpp
     
     # Models tests
-    test_black_scholes.cpp
+    test_black_scholes_model.cpp
     # test_greeks.cpp
     # test_implied_volatility.cpp
     
