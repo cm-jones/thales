@@ -120,15 +120,17 @@ class Portfolio {
     bool cancel_order(const std::string& order_id);
 
    private:
-    // Configuration
-    utils::Config config_;
-
     // Positions and orders
-    std::unordered_map<std::string, Position> positions_;
-    std::unordered_map<std::string, Order> orders_;
+    std::unordered_map<std::string, Position>
+        positions_;  // Map of positions (56-64 bytes)
+    std::unordered_map<std::string, Order>
+        orders_;  // Map of orders (56-64 bytes)
+
+    // Configuration
+    utils::Config config_;  // Configuration object (varies, likely >32 bytes)
 
     // Mutex for thread safety
-    mutable std::mutex mutex_;
+    mutable std::mutex mutex_;  // Mutex for thread safety (40-48 bytes)
 
     // Private methods
     void update_position_from_order(const Order& order);
