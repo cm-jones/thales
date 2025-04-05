@@ -53,6 +53,11 @@ bool Config::load_from_file(const std::string& file_path) {
         set_value("data.ibClientId", 1);
         set_value("data.ibAccount", std::string("DU12345"));
 
+        // Add the symbols from config.json
+        std::vector<std::string> symbols = {"SPY",  "QQQ",   "AAPL", "MSFT",
+                                            "AMZN", "GOOGL", "FB",   "TSLA"};
+        set_value("data.symbols", symbols);
+
         logger.info("Configuration loaded successfully");
         return true;
     } catch (const std::exception& e) {
@@ -213,6 +218,21 @@ std::string Config::get_string(const std::string& key,
 
     try {
         return std::get<std::string>(it->second);
+    } catch (const std::bad_variant_access&) {
+        return defaultValue;
+    }
+}
+
+std::vector<std::string> Config::get_string_vector(
+    const std::string& key,
+    const std::vector<std::string>& defaultValue) const {
+    auto it = data_.find(key);
+    if (it == data_.end()) {
+        return defaultValue;
+    }
+
+    try {
+        return std::get<std::vector<std::string>>(it->second);
     } catch (const std::bad_variant_access&) {
         return defaultValue;
     }
