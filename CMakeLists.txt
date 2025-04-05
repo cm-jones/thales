@@ -98,7 +98,7 @@ set(THALES_DATA_SOURCES
 )
 
 set(THALES_MODELS_SOURCES
-    src/models/black_scholes.cpp
+    src/models/black_scholes_model.cpp
 )
 
 set(THALES_STRATEGIES_SOURCES
@@ -110,6 +110,7 @@ set(THALES_STRATEGIES_SOURCES
 set(THALES_UTILS_SOURCES
     src/utils/logger.cpp
     src/utils/config.cpp
+    src/utils/symbol_lookup.cpp
 )
 
 # Add database logger if PostgreSQL and libpqxx are available
@@ -150,6 +151,9 @@ target_link_libraries(thales PRIVATE thales_lib)
 
 # Tests
 add_subdirectory(tests)
+
+# Benchmarks
+add_subdirectory(benchmarks)
 
 # Install targets
 install(TARGETS thales thales_lib
