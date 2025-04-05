@@ -14,6 +14,9 @@ endif()
 # Add option for Address Sanitizer
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
 
+# Add option for code coverage
+option(ENABLE_COVERAGE "Enable code coverage reporting" OFF)
+
 # Use all available cores
 set(CMAKE_BUILD_PARALLEL_LEVEL "")
 
@@ -27,6 +30,17 @@ if(ENABLE_ASAN)
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${ASAN_FLAGS}")
     else()
         message(WARNING "Address Sanitizer is only supported with GCC and Clang")
+    endif()
+endif()
+
+# Configure code coverage
+if(ENABLE_COVERAGE)
+    message(STATUS "Building with code coverage")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    else()
+        message(WARNING "Code coverage is only supported with GCC and Clang")
     endif()
 endif()
 
