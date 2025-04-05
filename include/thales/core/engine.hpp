@@ -62,15 +62,16 @@ class Engine {
 
    private:
     // Configuration
-    utils::Config config_;
+    utils::Config config_;  // Configuration object (varies, likely >32 bytes)
 
     // Components
-    std::unique_ptr<data::DataManager> data_manager_;
-    std::unique_ptr<Portfolio> portfolio_;
-    std::unique_ptr<strategies::StrategyRegistry> strategy_registry_;
+    std::unique_ptr<data::DataManager> data_manager_;  // Data manager (8 bytes)
+    std::unique_ptr<Portfolio> portfolio_;             // Portfolio (8 bytes)
+    std::unique_ptr<strategies::StrategyRegistry>
+        strategy_registry_;  // Strategy registry (8 bytes)
 
     // Engine state
-    std::atomic<bool> running_;
+    std::atomic<bool> running_;  // Running flag (1-8 bytes)
 
     // Private methods
     void main_loop();
