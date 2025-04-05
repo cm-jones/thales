@@ -1,38 +1,39 @@
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
-#include <thales/models/black_scholes.hpp>
+#include <thales/models/black_scholes_model.hpp>
 
 namespace thales {
 namespace models {
 
-double BlackScholes::call_price(double S, double K, double r, double sigma,
-                                double T) {
+double BlackScholesModel::call_price(double S, double K, double r, double sigma,
+                                     double T) {
     if (T <= 0) {
         // For expired options, return intrinsic value
         return std::max(0.0, S - K);
     }
 
-    double d1Val = d1(S, K, r, sigma, T);
-    double d2Val = d2(S, K, r, sigma, T);
+    double d1_val = d1(S, K, r, sigma, T);
+    double d2_val = d2(S, K, r, sigma, T);
 
-    return S * normal_cdf(d1Val) - K * std::exp(-r * T) * normal_cdf(d2Val);
+    return S * normal_cdf(d1_val) - K * std::exp(-r * T) * normal_cdf(d2_val);
 }
 
-double BlackScholes::put_price(double S, double K, double r, double sigma,
-                               double T) {
+double BlackScholesModel::put_price(double S, double K, double r, double sigma,
+                                    double T) {
     if (T <= 0) {
         // For expired options, return intrinsic value
         return std::max(0.0, K - S);
     }
 
-    double d1Val = d1(S, K, r, sigma, T);
-    double d2Val = d2(S, K, r, sigma, T);
+    double d1_val = d1(S, K, r, sigma, T);
+    double d2_val = d2(S, K, r, sigma, T);
 
-    return K * std::exp(-r * T) * normal_cdf(-d2Val) - S * normal_cdf(-d1Val);
+    return K * std::exp(-r * T) * normal_cdf(-d2_val) - S * normal_cdf(-d1_val);
 }
 
-double BlackScholes::call_delta(double S, double K, double r, double sigma,
-                                double T) {
+double BlackScholesModel::call_delta(double S, double K, double r, double sigma,
+                                     double T) {
     if (T <= 0) {
         // For expired options, delta is either 0 or 1
         return (S > K) ? 1.0 : 0.0;
@@ -41,8 +42,8 @@ double BlackScholes::call_delta(double S, double K, double r, double sigma,
     return normal_cdf(d1(S, K, r, sigma, T));
 }
 
-double BlackScholes::put_delta(double S, double K, double r, double sigma,
-                               double T) {
+double BlackScholesModel::put_delta(double S, double K, double r, double sigma,
+                                    double T) {
     if (T <= 0) {
         // For expired options, delta is either -1 or 0
         return (S < K) ? -1.0 : 0.0;
@@ -51,95 +52,96 @@ double BlackScholes::put_delta(double S, double K, double r, double sigma,
     return normal_cdf(d1(S, K, r, sigma, T)) - 1.0;
 }
 
-double BlackScholes::gamma(double S, double K, double r, double sigma,
-                           double T) {
+double BlackScholesModel::gamma(double S, double K, double r, double sigma,
+                                double T) {
     if (T <= 0) {
         // For expired options, gamma is 0
         return 0.0;
     }
 
-    double d1Val = d1(S, K, r, sigma, T);
+    double d1_val = d1(S, K, r, sigma, T);
 
-    return normal_pdf(d1Val) / (S * sigma * std::sqrt(T));
+    return normal_pdf(d1_val) / (S * sigma * std::sqrt(T));
 }
 
-double BlackScholes::vega(double S, double K, double r, double sigma,
-                          double T) {
+double BlackScholesModel::vega(double S, double K, double r, double sigma,
+                               double T) {
     if (T <= 0) {
         // For expired options, vega is 0
         return 0.0;
     }
 
-    double d1Val = d1(S, K, r, sigma, T);
+    double d1_val = d1(S, K, r, sigma, T);
 
-    return S * std::sqrt(T) * normal_pdf(d1Val) /
+    return S * std::sqrt(T) * normal_pdf(d1_val) /
            100.0;  // Divided by 100 to get the change per 1% change in
                    // volatility
 }
 
-double BlackScholes::call_theta(double S, double K, double r, double sigma,
-                                double T) {
+double BlackScholesModel::call_theta(double S, double K, double r, double sigma,
+                                     double T) {
     if (T <= 0) {
         // For expired options, theta is 0
         return 0.0;
     }
 
-    double d1Val = d1(S, K, r, sigma, T);
-    double d2Val = d2(S, K, r, sigma, T);
+    double d1_val = d1(S, K, r, sigma, T);
+    double d2_val = d2(S, K, r, sigma, T);
 
-    double term1 = -S * sigma * normal_pdf(d1Val) / (2.0 * std::sqrt(T));
-    double term2 = -r * K * std::exp(-r * T) * normal_cdf(d2Val);
+    double term1 = -S * sigma * normal_pdf(d1_val) / (2.0 * std::sqrt(T));
+    double term2 = -r * K * std::exp(-r * T) * normal_cdf(d2_val);
 
     return (term1 + term2) / 365.0;  // Divided by 365 to get the daily theta
 }
 
-double BlackScholes::put_theta(double S, double K, double r, double sigma,
-                               double T) {
+double BlackScholesModel::put_theta(double S, double K, double r, double sigma,
+                                    double T) {
     if (T <= 0) {
         // For expired options, theta is 0
         return 0.0;
     }
 
-    double d1Val = d1(S, K, r, sigma, T);
-    double d2Val = d2(S, K, r, sigma, T);
+    double d1_val = d1(S, K, r, sigma, T);
+    double d2_val = d2(S, K, r, sigma, T);
 
-    double term1 = -S * sigma * normal_pdf(d1Val) / (2.0 * std::sqrt(T));
-    double term2 = r * K * std::exp(-r * T) * normal_cdf(-d2Val);
+    double term1 = -S * sigma * normal_pdf(d1_val) / (2.0 * std::sqrt(T));
+    double term2 = r * K * std::exp(-r * T) * normal_cdf(-d2_val);
 
     return (term1 + term2) / 365.0;  // Divided by 365 to get the daily theta
 }
 
-double BlackScholes::call_rho(double S, double K, double r, double sigma,
-                              double T) {
+double BlackScholesModel::call_rho(double S, double K, double r, double sigma,
+                                   double T) {
     if (T <= 0) {
         // For expired options, rho is 0
         return 0.0;
     }
 
-    double d2Val = d2(S, K, r, sigma, T);
+    double d2_val = d2(S, K, r, sigma, T);
 
-    return K * T * std::exp(-r * T) * normal_cdf(d2Val) /
+    return K * T * std::exp(-r * T) * normal_cdf(d2_val) /
            100.0;  // Divided by 100 to get the change per 1% change in interest
                    // rate
 }
 
-double BlackScholes::put_rho(double S, double K, double r, double sigma,
-                             double T) {
+double BlackScholesModel::put_rho(double S, double K, double r, double sigma,
+                                  double T) {
     if (T <= 0) {
         // For expired options, rho is 0
         return 0.0;
     }
 
-    double d2Val = d2(S, K, r, sigma, T);
+    double d2_val = d2(S, K, r, sigma, T);
 
-    return -K * T * std::exp(-r * T) * normal_cdf(-d2Val) /
+    return -K * T * std::exp(-r * T) * normal_cdf(-d2_val) /
            100.0;  // Divided by 100 to get the change per 1% change in interest
                    // rate
 }
 
-double BlackScholes::call_implied_volatility(double price, double S, double K,
-                                             double r, double T, double epsilon,
-                                             int max_iterations) {
+double BlackScholesModel::call_implied_volatility(double price, double S,
+                                                  double K, double r, double T,
+                                                  double epsilon,
+                                                  int max_iterations) {
     if (T <= 0) {
         throw std::invalid_argument("Time to expiration must be positive");
     }
@@ -155,21 +157,21 @@ double BlackScholes::call_implied_volatility(double price, double S, double K,
 
     // Newton-Raphson method
     for (int i = 0; i < max_iterations; ++i) {
-        double priceEstimate = call_price(S, K, r, sigma, T);
-        double diff = price - priceEstimate;
+        double price_estimate = call_price(S, K, r, sigma, T);
+        double diff = price - price_estimate;
 
         if (std::abs(diff) < epsilon) {
             return sigma;
         }
 
-        double vegaEstimate = vega(S, K, r, sigma, T);
-        if (vegaEstimate == 0.0) {
+        double vega_estimate = vega(S, K, r, sigma, T);
+        if (vega_estimate == 0.0) {
             throw std::runtime_error(
                 "Vega is zero, cannot calculate implied volatility");
         }
 
         sigma +=
-            diff / (vegaEstimate *
+            diff / (vega_estimate *
                     100.0);  // Multiply by 100 because vega is per 1% change
 
         // Ensure sigma stays within reasonable bounds
@@ -186,9 +188,10 @@ double BlackScholes::call_implied_volatility(double price, double S, double K,
         "iterations");
 }
 
-double BlackScholes::put_implied_volatility(double price, double S, double K,
-                                            double r, double T, double epsilon,
-                                            int max_iterations) {
+double BlackScholesModel::put_implied_volatility(double price, double S,
+                                                 double K, double r, double T,
+                                                 double epsilon,
+                                                 int max_iterations) {
     if (T <= 0) {
         throw std::invalid_argument("Time to expiration must be positive");
     }
@@ -204,21 +207,21 @@ double BlackScholes::put_implied_volatility(double price, double S, double K,
 
     // Newton-Raphson method
     for (int i = 0; i < max_iterations; ++i) {
-        double priceEstimate = put_price(S, K, r, sigma, T);
-        double diff = price - priceEstimate;
+        double price_estimate = put_price(S, K, r, sigma, T);
+        double diff = price - price_estimate;
 
         if (std::abs(diff) < epsilon) {
             return sigma;
         }
 
-        double vegaEstimate = vega(S, K, r, sigma, T);
-        if (vegaEstimate == 0.0) {
+        double vega_estimate = vega(S, K, r, sigma, T);
+        if (vega_estimate == 0.0) {
             throw std::runtime_error(
                 "Vega is zero, cannot calculate implied volatility");
         }
 
         sigma +=
-            diff / (vegaEstimate *
+            diff / (vega_estimate *
                     100.0);  // Multiply by 100 because vega is per 1% change
 
         // Ensure sigma stays within reasonable bounds
@@ -235,18 +238,20 @@ double BlackScholes::put_implied_volatility(double price, double S, double K,
         "iterations");
 }
 
-double BlackScholes::d1(double S, double K, double r, double sigma, double T) {
+double BlackScholesModel::d1(double S, double K, double r, double sigma,
+                             double T) {
     return (std::log(S / K) + (r + sigma * sigma / 2.0) * T) /
            (sigma * std::sqrt(T));
 }
 
-double BlackScholes::d2(double S, double K, double r, double sigma, double T) {
+double BlackScholesModel::d2(double S, double K, double r, double sigma,
+                             double T) {
     return d1(S, K, r, sigma, T) - sigma * std::sqrt(T);
 }
 
-double BlackScholes::normal_cdf(double x) {
+double BlackScholesModel::normal_cdf(double x) {
     // Approximation of the cumulative distribution function of the standard
-    // normal distribution This is the Abramowitz and Stegun approximation
+    // normal distribution. This is the Abramowitz and Stegun approximation.
 
     const double b1 = 0.31938153;
     const double b2 = -0.356563782;
@@ -267,7 +272,7 @@ double BlackScholes::normal_cdf(double x) {
     }
 }
 
-double BlackScholes::normal_pdf(double x) {
+double BlackScholesModel::normal_pdf(double x) {
     // Probability density function of the standard normal distribution
     return (1.0 / std::sqrt(2.0 * M_PI)) * std::exp(-0.5 * x * x);
 }
