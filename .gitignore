@@ -97,3 +97,5 @@ tmp/
 
 # Third party libraries
 third_party/
+
+.cache/
