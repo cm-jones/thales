@@ -298,6 +298,10 @@ The database includes the following features:
 - Views for common queries (e.g., recent trades)
 - Functions for analysis (e.g., calculating daily P&L)
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
