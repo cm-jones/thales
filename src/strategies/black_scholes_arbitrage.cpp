@@ -1,6 +1,11 @@
 #include <thales/strategies/black_scholes_arbitrage.hpp>
 #include <thales/utils/logger.hpp>
 #include <algorithm>
+#include <cmath>       // For std::log, std::sqrt
+#include <iomanip>     // For std::get_time, std::put_time
+#include <sstream>     // For std::stringstream, std::istringstream
+#include <chrono>      // For std::chrono
+#include <ctime>       // For std::mktime, std::localtime
 
 namespace thales {
 namespace strategies {
