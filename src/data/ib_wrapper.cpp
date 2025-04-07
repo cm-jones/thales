@@ -91,7 +91,7 @@ void IBWrapper::error(int id, int errorCode, const std::string& errorString) {
 }
 
 // Market data methods
-void IBWrapper::tickPrice(int tickerId, int field, double price, const IB::TagValueList* attribs) {
+void IBWrapper::tickPrice(int tickerId, int field, double price, [[maybe_unused]] const IB::TagValueList* attribs) {
     auto& logger = utils::Logger::get_instance();
     
     // Find the symbol for this ticker ID
@@ -222,23 +222,23 @@ MarketData IBWrapper::convertToMarketData(int tickerId, double price, int size, 
 }
 
 // Minimal implementation of required methods to avoid compilation errors
-void IBWrapper::tickString(int tickerId, int tickType, const std::string& value) {}
-void IBWrapper::tickGeneric(int tickerId, int tickType, double value) {}
-void IBWrapper::tickEFP(int tickerId, int tickType, double basisPoints, const std::string& formattedBasisPoints,
-                      double totalDividends, int holdDays, const std::string& futureLastTradeDate, double dividendImpact,
-                      double dividendsToLastTradeDate) {}
-void IBWrapper::tickOptionComputation(int tickerId, int field, double impliedVol, double delta,
-                                    double optPrice, double pvDividend, double gamma, double vega, double theta, double undPrice) {}
-void IBWrapper::tickSnapshotEnd(int reqId) {}
-void IBWrapper::marketDataType(int reqId, int marketDataType) {}
-void IBWrapper::realtimeBar(int reqId, long time, double open, double high, double low, double close,
-                          long volume, double wap, int count) {}
-void IBWrapper::historicalData(int reqId, const std::string& date, double open, double high,
-                             double low, double close, long volume, int barCount, double WAP, int hasGaps) {}
-void IBWrapper::historicalDataEnd(int reqId, const std::string& startDateStr, const std::string& endDateStr) {}
-void IBWrapper::orderStatus(int orderId, const std::string& status, double filled,
-                          double remaining, double avgFillPrice, int permId, int parentId,
-                          double lastFillPrice, int clientId, const std::string& whyHeld, double mktCapPrice) {}
+void IBWrapper::tickString([[maybe_unused]] int tickerId, [[maybe_unused]] int tickType, [[maybe_unused]] const std::string& value) {}
+void IBWrapper::tickGeneric([[maybe_unused]] int tickerId, [[maybe_unused]] int tickType, [[maybe_unused]] double value) {}
+void IBWrapper::tickEFP([[maybe_unused]] int tickerId, [[maybe_unused]] int tickType, [[maybe_unused]] double basisPoints, [[maybe_unused]] const std::string& formattedBasisPoints,
+                      [[maybe_unused]] double totalDividends, [[maybe_unused]] int holdDays, [[maybe_unused]] const std::string& futureLastTradeDate, [[maybe_unused]] double dividendImpact,
+                      [[maybe_unused]] double dividendsToLastTradeDate) {}
+void IBWrapper::tickOptionComputation([[maybe_unused]] int tickerId, [[maybe_unused]] int field, [[maybe_unused]] double impliedVol, [[maybe_unused]] double delta,
+                                    [[maybe_unused]] double optPrice, [[maybe_unused]] double pvDividend, [[maybe_unused]] double gamma, [[maybe_unused]] double vega, [[maybe_unused]] double theta, [[maybe_unused]] double undPrice) {}
+void IBWrapper::tickSnapshotEnd([[maybe_unused]] int reqId) {}
+void IBWrapper::marketDataType([[maybe_unused]] int reqId, [[maybe_unused]] int marketDataType) {}
+void IBWrapper::realtimeBar([[maybe_unused]] int reqId, [[maybe_unused]] long time, [[maybe_unused]] double open, [[maybe_unused]] double high, [[maybe_unused]] double low, [[maybe_unused]] double close,
+                          [[maybe_unused]] long volume, [[maybe_unused]] double wap, [[maybe_unused]] int count) {}
+void IBWrapper::historicalData([[maybe_unused]] int reqId, [[maybe_unused]] const std::string& date, [[maybe_unused]] double open, [[maybe_unused]] double high,
+                             [[maybe_unused]] double low, [[maybe_unused]] double close, [[maybe_unused]] long volume, [[maybe_unused]] int barCount, [[maybe_unused]] double WAP, [[maybe_unused]] int hasGaps) {}
+void IBWrapper::historicalDataEnd([[maybe_unused]] int reqId, [[maybe_unused]] const std::string& startDateStr, [[maybe_unused]] const std::string& endDateStr) {}
+void IBWrapper::orderStatus([[maybe_unused]] int orderId, [[maybe_unused]] const std::string& status, [[maybe_unused]] double filled,
+                          [[maybe_unused]] double remaining, [[maybe_unused]] double avgFillPrice, [[maybe_unused]] int permId, [[maybe_unused]] int parentId,
+                          [[maybe_unused]] double lastFillPrice, [[maybe_unused]] int clientId, [[maybe_unused]] const std::string& whyHeld, [[maybe_unused]] double mktCapPrice) {}
 void IBWrapper::openOrderEnd() {}
 void IBWrapper::managedAccounts(const std::string& accountsList) {
     // Store the managed accounts in the client
@@ -251,26 +251,26 @@ void IBWrapper::nextValidId(int orderId) {
 
 // Placeholder implementations for other methods
 // These would be implemented as needed for the specific requirements of the trading bot
-void IBWrapper::historicalDataUpdate(int reqId, const IB::Bar& bar) {}
-void IBWrapper::openOrder(int orderId, const IBContract& contract, const IBOrder& order, const IBOrderState& orderState) {}
-void IBWrapper::completedOrder(const IBContract& contract, const IBOrder& order, const IBOrderState& orderState) {}
-void IBWrapper::execDetails(int reqId, const IBContract& contract, const IBExecution& execution) {}
-void IBWrapper::execDetailsEnd(int reqId) {}
-void IBWrapper::updateAccountValue(const std::string& key, const std::string& val,
-                                 const std::string& currency, const std::string& accountName) {}
-void IBWrapper::updatePortfolio(const IBContract& contract, double position,
-                              double marketPrice, double marketValue, double averageCost,
-                              double unrealizedPNL, double realizedPNL, const std::string& accountName) {}
-void IBWrapper::updateAccountTime(const std::string& timeStamp) {}
-void IBWrapper::accountDownloadEnd(const std::string& accountName) {}
-void IBWrapper::position(const std::string& account, const IBContract& contract, double pos, double avgCost) {}
+void IBWrapper::historicalDataUpdate([[maybe_unused]] int reqId, [[maybe_unused]] const IB::Bar& bar) {}
+void IBWrapper::openOrder([[maybe_unused]] int orderId, [[maybe_unused]] const IBContract& contract, [[maybe_unused]] const IBOrder& order, [[maybe_unused]] const IBOrderState& orderState) {}
+void IBWrapper::completedOrder([[maybe_unused]] const IBContract& contract, [[maybe_unused]] const IBOrder& order, [[maybe_unused]] const IBOrderState& orderState) {}
+void IBWrapper::execDetails([[maybe_unused]] int reqId, [[maybe_unused]] const IBContract& contract, [[maybe_unused]] const IBExecution& execution) {}
+void IBWrapper::execDetailsEnd([[maybe_unused]] int reqId) {}
+void IBWrapper::updateAccountValue([[maybe_unused]] const std::string& key, [[maybe_unused]] const std::string& val,
+                                 [[maybe_unused]] const std::string& currency, [[maybe_unused]] const std::string& accountName) {}
+void IBWrapper::updatePortfolio([[maybe_unused]] const IBContract& contract, [[maybe_unused]] double position,
+                              [[maybe_unused]] double marketPrice, [[maybe_unused]] double marketValue, [[maybe_unused]] double averageCost,
+                              [[maybe_unused]] double unrealizedPNL, [[maybe_unused]] double realizedPNL, [[maybe_unused]] const std::string& accountName) {}
+void IBWrapper::updateAccountTime([[maybe_unused]] const std::string& timeStamp) {}
+void IBWrapper::accountDownloadEnd([[maybe_unused]] const std::string& accountName) {}
+void IBWrapper::position([[maybe_unused]] const std::string& account, [[maybe_unused]] const IBContract& contract, [[maybe_unused]] double pos, [[maybe_unused]] double avgCost) {}
 void IBWrapper::positionEnd() {}
-void IBWrapper::accountSummary(int reqId, const std::string& account, const std::string& tag,
-                             const std::string& value, const std::string& currency) {}
-void IBWrapper::accountSummaryEnd(int reqId) {}
-void IBWrapper::contractDetails(int reqId, const IBContractDetails& contractDetails) {}
-void IBWrapper::contractDetailsEnd(int reqId) {}
-void IBWrapper::bondContractDetails(int reqId, const IBContractDetails& contractDetails) {}
+void IBWrapper::accountSummary([[maybe_unused]] int reqId, [[maybe_unused]] const std::string& account, [[maybe_unused]] const std::string& tag,
+                             [[maybe_unused]] const std::string& value, [[maybe_unused]] const std::string& currency) {}
+void IBWrapper::accountSummaryEnd([[maybe_unused]] int reqId) {}
+void IBWrapper::contractDetails([[maybe_unused]] int reqId, [[maybe_unused]] const IBContractDetails& contractDetails) {}
+void IBWrapper::contractDetailsEnd([[maybe_unused]] int reqId) {}
+void IBWrapper::bondContractDetails([[maybe_unused]] int reqId, [[maybe_unused]] const IBContractDetails& contractDetails) {}
 
 } // namespace data
 } // namespace thales

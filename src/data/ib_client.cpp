@@ -197,7 +197,7 @@ bool IBClient::initializeClient() {
     return true;
 }
 
-bool IBClient::connectToTWS(const std::string& host, int port, int client_id) {
+bool IBClient::connectToTWS(const std::string& host, int port, [[maybe_unused]] int client_id) {
     // In a real implementation:
     // return client_->eConnect(host.c_str(), port, client_id);
     

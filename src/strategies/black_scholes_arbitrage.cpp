@@ -1,5 +1,6 @@
 #include <thales/strategies/black_scholes_arbitrage.hpp>
 #include <thales/utils/logger.hpp>
+#include <algorithm>
 
 namespace thales {
 namespace strategies {

@@ -128,14 +128,17 @@ MarketData DataManager::get_latest_market_data(
 }
 
 std::vector<MarketData> DataManager::get_historical_market_data(
-    const std::string& symbol, const std::string& startTime,
-    const std::string& endTime, const std::string& interval) const {
+    [[maybe_unused]] const std::string& symbol, 
+    [[maybe_unused]] const std::string& startTime,
+    [[maybe_unused]] const std::string& endTime, 
+    [[maybe_unused]] const std::string& interval) const {
     // For the stub implementation, return an empty vector
     return {};
 }
 
 std::unordered_map<std::string, OptionData> DataManager::get_option_chain(
-    const std::string& symbol, const std::string& expirationDate) const {
+    [[maybe_unused]] const std::string& symbol, 
+    [[maybe_unused]] const std::string& expirationDate) const {
     // For the stub implementation, return an empty map
     return {};
 }
