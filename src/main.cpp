@@ -1,7 +1,7 @@
 #include <unistd.h>
 
 #include <cstdlib>
-#include <print>
+#include <iostream>
 #include <string>
 #include <thales/core/engine.hpp>
 #include <thales/data/ib_client.hpp>
@@ -12,7 +12,7 @@
 
 int main(int argc, char** argv) {
     long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-    std::println("Number of available cores: {}", std::to_string(num_cores));
+    std::cout << "Number of available cores: " << num_cores << "\n";
 
     // Load configuration
     std::string config_path = "config/config.json";
@@ -31,15 +31,14 @@ int main(int argc, char** argv) {
 
     thales::utils::Config config;
     if (!config.load_from_file(config_path)) {
-        std::println(stderr, "Failed to load configuration from: {}",
-                     config_path);
+        std::cerr << "Failed to load configuration from: " << config_path << "\n";
         return EXIT_FAILURE;
     }
 
     // Extract symbols from config
     std::vector<std::string> symbols = config.get_string_vector("data.symbols");
     if (symbols.empty()) {
-        std::println(stderr, "No symbols found in configuration");
+        std::cerr << "No symbols found in configuration" << "\n";
         return EXIT_FAILURE;
     }
 
