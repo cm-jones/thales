@@ -51,6 +51,18 @@ make
 ./thales
 ```
 
+### Running Tests
+
+```bash
+# Run all tests
+./scripts/test.sh
+
+# Run tests with coverage reporting
+./scripts/test_coverage.sh
+```
+
+The coverage report will be generated in `build/coverage_report/index.html`. Open this file in a browser to view the detailed coverage report.
+
 ### Windows
 
 ```bash

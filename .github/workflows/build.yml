@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for proper coverage reporting
     
     - name: Install dependencies
       run: |
@@ -72,11 +74,31 @@ jobs:
     - name: Generate coverage report
       run: |
         cd build
-        lcov --capture --directory . --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+        lcov --directory . --capture --output-file coverage.info
+        # Show coverage file details for debugging
+        ls -la coverage.info
+        echo "Coverage file size: $(du -h coverage.info | cut -f1)"
+        
+        # Remove system headers from coverage report
+        lcov --remove coverage.info '/usr/*' '/opt/*' '*/third_party/*' '*/tests/*' --output-file filtered_coverage.info
+        # Show filtered coverage file details
+        ls -la filtered_coverage.info
+        echo "Filtered coverage file size: $(du -h filtered_coverage.info | cut -f1)"
+        
+        # Generate HTML report for artifact upload
+        mkdir -p coverage_report
+        genhtml filtered_coverage.info --output-directory coverage_report
+    
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: build/coverage_report
+        if-no-files-found: error
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        files: ./build/coverage.info
-        fail_ci_if_error: true
+        files: ./build/filtered_coverage.info
+        fail_ci_if_error: false
+        verbose: true
