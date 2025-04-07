@@ -25,9 +25,9 @@ std::unique_ptr<Logger> Logger::instance_ = nullptr;
 
 Logger::Logger()
     : logToFile_(false),
-      logFilePath_("logs/thales.log"),
-      consoleLevel_(LogLevel::INFO),
-      fileLevel_(LogLevel::TRACE) {}
+      log_file_path_("logs/thales.log"),
+      console_level_(LogLevel::INFO),
+      file_level_(LogLevel::TRACE) {}
 
 Logger& Logger::get_instance() {
     if (!instance_) {
@@ -37,16 +37,16 @@ Logger& Logger::get_instance() {
     return *instance_;
 }
 
-bool Logger::initialize(bool logToFile, const std::string& logFilePath,
-                        LogLevel consoleLevel, LogLevel fileLevel) {
+bool Logger::initialize(bool log_to_file, const std::string& log_file_path,
+                        LogLevel console_level, LogLevel file_level) {
     if (!instance_) {
         instance_ = std::unique_ptr<Logger>(new Logger());
     }
 
-    instance_->consoleLevel_ = consoleLevel;
-    instance_->fileLevel_ = fileLevel;
+    instance_->console_level_ = console_level;
+    instance_->file_level_ = file_level;
 
-    return instance_->setFileLogging(logToFile, logFilePath);
+    return instance_->set_file_logging(log_to_file, log_file_path);
 }
 
 void Logger::trace(const std::string& message) {
@@ -71,7 +71,7 @@ void Logger::fatal(const std::string& message) {
     log(LogLevel::FATAL, message);
 }
 
-void Logger::logTradeExecution(
+void Logger::log_trade_execution(
     const std::string& strategy_name, const std::string& symbol,
     const std::string& order_id, const std::string& execution_id,
     const std::string& side, double quantity, double price, double commission,
@@ -87,36 +87,35 @@ void Logger::logTradeExecution(
 
     // Log to database if enabled
 #if ENABLE_DB_LOGGER
-    try {
-        auto& dbLogger = DbLogger::get_instance();
-        dbLogger.log_trade_execution(
-            strategy_name, symbol, order_id, execution_id, side, quantity,
-            price, commission, total_value, execution_time, account_id,
-            exchange, order_type, is_option, option_data, additional_data);
-    } catch (const std::exception& e) {
-        error("Failed to log trade execution to database: " +
-              std::string(e.what()));
+    auto& dbLogger = DbLogger::get_instance();
+    bool success = dbLogger.log_trade_execution(
+        strategy_name, symbol, order_id, execution_id, side, quantity,
+        price, commission, total_value, execution_time, account_id,
+        exchange, order_type, is_option, option_data, additional_data);
+    
+    if (!success) {
+        error("Failed to log trade execution to database");
     }
 #endif
 }
 
-void Logger::setConsoleLevel(LogLevel level) {
+void Logger::set_console_level(LogLevel level) {
     std::lock_guard<std::mutex> lock(mutex_);
-    consoleLevel_ = level;
+    console_level_ = level;
 }
 
-void Logger::setFileLevel(LogLevel level) {
+void Logger::set_file_level(LogLevel level) {
     std::lock_guard<std::mutex> lock(mutex_);
-    fileLevel_ = level;
+    file_level_ = level;
 }
 
-bool Logger::setFileLogging(bool enable, const std::string& logFilePath) {
+bool Logger::set_file_logging(bool enable, const std::string& log_file_path) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Close the current log file if it's open
-    if (logFile_) {
-        logFile_->close();
-        logFile_.reset();
+    if (log_file_) {
+        log_file_->close();
+        log_file_.reset();
     }
 
     logToFile_ = enable;
@@ -126,19 +125,19 @@ bool Logger::setFileLogging(bool enable, const std::string& logFilePath) {
     }
 
     // Update the log file path if provided
-    if (!logFilePath.empty()) {
-        logFilePath_ = logFilePath;
+    if (!log_file_path.empty()) {
+        log_file_path_ = log_file_path;
     }
 
     // Create the directory if it doesn't exist
-    std::filesystem::path path(logFilePath_);
+    std::filesystem::path path(log_file_path_);
     std::filesystem::create_directories(path.parent_path());
 
     // Open the log file
-    logFile_ = std::make_unique<std::ofstream>(logFilePath_, std::ios::app);
+    log_file_ = std::make_unique<std::ofstream>(log_file_path_, std::ios::app);
 
-    if (!logFile_->is_open()) {
-        std::cerr << "Failed to open log file: " << logFilePath_ << std::endl;
+    if (!log_file_->is_open()) {
+        std::cerr << "Failed to open log file: " << log_file_path_ << '\n';
         logToFile_ = false;
         return false;
     }
@@ -149,20 +148,20 @@ bool Logger::setFileLogging(bool enable, const std::string& logFilePath) {
 void Logger::log(LogLevel level, const std::string& message) {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    std::string timestamp = getCurrentTimestamp();
+    std::string timestamp = get_current_timestamp();
     std::string levelStr = levelToString(level);
 
     // Log to console if the level is high enough
-    if (level >= consoleLevel_) {
+    if (level >= console_level_) {
         std::cout << timestamp << " [" << levelStr << "] " << message
-                  << std::endl;
+                  << '\n';
     }
 
     // Log to file if enabled and the level is high enough
-    if (logToFile_ && logFile_ && level >= fileLevel_) {
-        *logFile_ << timestamp << " [" << levelStr << "] " << message
-                  << std::endl;
-        logFile_->flush();
+    if (logToFile_ && log_file_ && level >= file_level_) {
+        *log_file_ << timestamp << " [" << levelStr << "] " << message
+                  << '\n';
+        log_file_->flush();
     }
 }
 
@@ -185,7 +184,7 @@ std::string Logger::levelToString(LogLevel level) {
     }
 }
 
-std::string Logger::getCurrentTimestamp() {
+std::string Logger::get_current_timestamp() {
     auto now = std::chrono::system_clock::now();
     auto time = std::chrono::system_clock::to_time_t(now);
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(

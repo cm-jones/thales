@@ -57,6 +57,14 @@ enable_testing()
 # Find dependencies
 find_package(Threads REQUIRED)
 
+# Find Boost (required for stable_vector)
+find_package(Boost 1.74 REQUIRED COMPONENTS container)
+if(Boost_FOUND)
+    message(STATUS "Boost found: ${Boost_VERSION}")
+else()
+    message(FATAL_ERROR "Boost not found. Please install Boost 1.74 or later.")
+endif()
+
 # Find PostgreSQL and libpqxx (optional)
 find_package(PostgreSQL)
 find_package(libpqxx)
@@ -109,6 +117,9 @@ set(THALES_CORE_SOURCES
 set(THALES_DATA_SOURCES
     src/data/data_manager.cpp
     src/data/ib_client.cpp
+    src/data/ib_contract.cpp
+    src/data/ib_order.cpp
+    src/data/ib_wrapper.cpp
 )
 
 set(THALES_MODELS_SOURCES
@@ -118,7 +129,7 @@ set(THALES_MODELS_SOURCES
 set(THALES_STRATEGIES_SOURCES
     src/strategies/strategy_base.cpp
     src/strategies/strategy_registry.cpp
-    src/strategies/black_scholes.cpp
+    src/strategies/black_scholes_arbitrage.cpp
 )
 
 set(THALES_UTILS_SOURCES
@@ -149,6 +160,7 @@ target_include_directories(thales_lib PUBLIC
 )
 target_link_libraries(thales_lib PRIVATE
     Threads::Threads
+    Boost::container
 )
 
 # Link PostgreSQL and libpqxx if available

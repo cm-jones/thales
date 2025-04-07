@@ -1,4 +1,4 @@
-#include <thales/strategies/black_scholes.hpp>
+#include <thales/strategies/black_scholes_arbitrage.hpp>
 #include <thales/strategies/strategy_registry.hpp>
 #include <thales/utils/logger.hpp>
 
@@ -160,7 +160,7 @@ void StrategyRegistry::load_strategies_from_config() {
     // Register each enabled strategy
     for (const auto& strategy_name : enabled_strategies) {
         if (strategy_name == "BlackScholes") {
-            auto strategy = std::make_unique<BlackScholes>(config_);
+            auto strategy = std::make_unique<BlackScholesArbitrage>(config_);
             register_strategy(std::move(strategy));
         }
         // Add more strategy types here as they are implemented

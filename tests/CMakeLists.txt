@@ -18,32 +18,36 @@ endif()
 # Define test sources
 set(TEST_SOURCES
     # Core tests
-    # test_engine.cpp
-    # test_risk_manager.cpp
-    # test_portfolio.cpp
-    
+    core/test_order.cpp
+    core/test_position.cpp
+    core/test_contract.cpp
+    core/test_portfolio.cpp
+    # core/test_engine.cpp
+    # core/test_risk_manager.cpp
+
     # Models tests
-    test_black_scholes_model.cpp
-    # test_greeks.cpp
-    # test_implied_volatility.cpp
-    
+    models/test_black_scholes_model.cpp
+    models/test_black_scholes_model_greeks.cpp
+    # models/test_implied_volatility.cpp
+
     # Strategies tests
-    # test_strategy_base.cpp
-    # test_strategy_registry.cpp
-    
+    # strategies/test_strategy_base.cpp
+    # strategies/test_strategy_registry.cpp
+
     # Data tests
-    # test_market_data.cpp
-    # test_ib_client.cpp
-    # test_data_manager.cpp
-    
+    data/test_ib_client.cpp
+    # data/test_market_data.cpp
+    # data/test_data_manager.cpp
+
     # Backtesting tests
-    # test_backtest_engine.cpp
-    # test_performance_metrics.cpp
-    
+    # backtesting/test_backtest_engine.cpp
+    # backtesting/test_performance_metrics.cpp
+
     # Utils tests
-    # test_logger.cpp
-    # test_config.cpp
-    # test_time_utils.cpp
+    utils/test_symbol_lookup.cpp
+    # utils/test_logger.cpp
+    # utils/test_config.cpp
+    # utils/test_time_utils.cpp
 )
 
 # Add test executable

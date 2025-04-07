@@ -1,5 +1,6 @@
 #include <unistd.h>
 
+#include <cstdlib>
 #include <print>
 #include <string>
 #include <thales/core/engine.hpp>
@@ -15,8 +16,17 @@ int main(int argc, char** argv) {
 
     // Load configuration
     std::string config_path = "config/config.json";
-    if (argc > 1) {
-        config_path = argv[1];
+    
+    // Parse command line arguments for --config flag
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--config" && i + 1 < argc) {
+            config_path = argv[i + 1];
+            break;
+        } else if (arg.starts_with("--config=")) {
+            config_path = arg.substr(9); // Extract path after --config=
+            break;
+        }
     }
 
     thales::utils::Config config;
@@ -34,15 +44,7 @@ int main(int argc, char** argv) {
     }
 
     // Initialize symbol lookup table
-    thales::utils::SymbolLookup symbol_lookup(symbols);
-
-    // Log the symbols and their IDs
-    std::println("Initialized symbol lookup table with {} symbols:",
-                 symbols.size());
-    for (const auto& symbol : symbols) {
-        auto id = symbol_lookup.get_id(symbol);
-        std::println("  Symbol: {}, ID: {}", symbol, id);
-    }
+    thales::utils::SymbolLookup::initialize(symbols);
 
     // Initialize logger
     bool log_to_file = config.get_bool("logging.log_to_file", true);
@@ -75,8 +77,7 @@ int main(int argc, char** argv) {
     auto& logger = thales::utils::Logger::get_instance();
     logger.info("Trading Bot starting...");
 
-    // Test IB connection directly
-    logger.info("Testing connection to Interactive Brokers...");
+    // Instantiate the IBClient
     thales::data::IBClient ib_client(config);
 
     // Set up a simple callback to log market data updates
@@ -89,29 +90,22 @@ int main(int argc, char** argv) {
     // Connect to IB Gateway
     if (!ib_client.connect()) {
         logger.error("Failed to connect to Interactive Brokers");
-        // Continue anyway, as the engine will try to connect again
+        return EXIT_FAILURE;
     }
 
     logger.info("Successfully connected to Interactive Brokers");
 
-    // Subscribe to a test symbol
-    std::string test_symbol = "SPY";
-    if (ib_client.subscribeMarketData(test_symbol)) {
-        logger.info("Successfully subscribed to " + test_symbol);
+    for (const auto& symbol : symbols) {
+        logger.info("Subscribing to symbol: " + symbol);
+        if (!ib_client.subscribe_market_data(symbol)) {
+            logger.error("Failed to subscribe to market data for " + symbol);
+            return EXIT_FAILURE;
+        }
 
-        // Wait a moment to receive some data
-        logger.info("Waiting for market data...");
-        sleep(3);
-
-        // Get the latest market data
-        auto market_data = ib_client.getLatestMarketData(test_symbol);
-        logger.info("Latest price for " + test_symbol + ": " +
-                    std::to_string(market_data.price));
+        auto market_data = ib_client.get_latest_market_data(symbol);
+        logger.info("Latest price for " + symbol + ": " +
+            std::to_string(market_data.price));
     }
-
-    // Disconnect when done testing
-    ib_client.disconnect();
-    logger.info("Disconnected from Interactive Brokers");
 
     // Instantiate trading engine
     thales::core::Engine engine(config);
@@ -126,6 +120,9 @@ int main(int argc, char** argv) {
 
     // Run the engine
     engine.run();
+
+    ib_client.disconnect();
+    logger.info("Disconnected from Interactive Brokers");
 
     return EXIT_SUCCESS;
 }

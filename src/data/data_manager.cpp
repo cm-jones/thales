@@ -58,7 +58,7 @@ bool DataManager::subscribe_market_data(const std::string& symbol) {
 
 #ifdef ENABLE_IB_CLIENT
     // Subscribe through IB client
-    if (ib_client_ && ib_client_->subscribeMarketData(symbol)) {
+    if (ib_client_ && ib_client_->subscribe_market_data(symbol)) {
         subscribed_symbols_.push_back(symbol);
         logger.info("Successfully subscribed to " + symbol);
         return true;
@@ -94,7 +94,7 @@ bool DataManager::unsubscribe_market_data(const std::string& symbol) {
 
 #ifdef ENABLE_IB_CLIENT
     // Unsubscribe through IB client
-    if (ib_client_ && ib_client_->unsubscribeMarketData(symbol)) {
+    if (ib_client_ && ib_client_->unsubscribe_market_data(symbol)) {
         subscribed_symbols_.erase(it);
         logger.info("Successfully unsubscribed from " + symbol);
         return true;

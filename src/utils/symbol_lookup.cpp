@@ -3,6 +3,18 @@
 namespace thales {
 namespace utils {
 
+SymbolLookup& SymbolLookup::get_instance() {
+    static SymbolLookup instance;
+    return instance;
+}
+
+void SymbolLookup::initialize(const std::vector<std::string>& symbols) {
+    SymbolLookup& instance = get_instance();
+    for (const auto& symbol : symbols) {
+        instance.add_symbol(symbol);
+    }
+}
+
 SymbolLookup::SymbolLookup(const std::vector<std::string>& symbols) {
     for (const auto& symbol : symbols) {
         add_symbol(symbol);
@@ -25,17 +37,21 @@ SymbolLookup::symbol_id_t SymbolLookup::add_symbol(const std::string& symbol) {
 SymbolLookup::symbol_id_t SymbolLookup::get_id(
     const std::string& symbol) const {
     auto it = symbol_to_id_.find(symbol);
+
     if (it != symbol_to_id_.end()) {
         return it->second;
     }
+
     return INVALID_SYMBOL_ID;
 }
 
 std::string SymbolLookup::get_symbol(symbol_id_t id) const {
     auto it = id_to_symbol_.find(id);
+
     if (it != id_to_symbol_.end()) {
         return it->second;
     }
+
     return "";
 }
 

@@ -6,8 +6,10 @@
 using namespace thales::models;
 
 // Helper function to compare floating point values with a tolerance
-bool isClose(double a, double b, double tolerance = 0.0001) {
+namespace {
+inline bool isClose(double a, double b, double tolerance = 0.0001) {
     return std::abs(a - b) < tolerance;
+}
 }
 
 TEST(BlackScholesTest, CallPriceTest) {
@@ -18,7 +20,7 @@ TEST(BlackScholesTest, CallPriceTest) {
     double sigma = 0.2;  // Volatility (20%)
     double T = 1.0;      // Time to expiration (1 year)
 
-    double callPrice = BlackScholes::call_price(S, K, r, sigma, T);
+    double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
 
     // Expected price calculated using a reference implementation
     double expectedPrice = 10.45;
@@ -29,7 +31,7 @@ TEST(BlackScholesTest, CallPriceTest) {
     S = 110.0;
     K = 100.0;
 
-    callPrice = BlackScholes::call_price(S, K, r, sigma, T);
+    callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
     expectedPrice = 18.10;
 
     EXPECT_TRUE(isClose(callPrice, expectedPrice, 0.01));
@@ -38,7 +40,7 @@ TEST(BlackScholesTest, CallPriceTest) {
     S = 90.0;
     K = 100.0;
 
-    callPrice = BlackScholes::call_price(S, K, r, sigma, T);
+    callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
     expectedPrice = 4.78;
 
     EXPECT_TRUE(isClose(callPrice, expectedPrice, 0.01));
@@ -52,7 +54,7 @@ TEST(BlackScholesTest, PutPriceTest) {
     double sigma = 0.2;  // Volatility (20%)
     double T = 1.0;      // Time to expiration (1 year)
 
-    double putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    double putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
 
     // Expected price calculated using a reference implementation
     double expectedPrice = 5.57;
@@ -63,7 +65,7 @@ TEST(BlackScholesTest, PutPriceTest) {
     S = 90.0;
     K = 100.0;
 
-    putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
     expectedPrice = 9.89;
 
     EXPECT_TRUE(isClose(putPrice, expectedPrice, 0.01));
@@ -72,7 +74,7 @@ TEST(BlackScholesTest, PutPriceTest) {
     S = 110.0;
     K = 100.0;
 
-    putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
     expectedPrice = 2.34;
 
     EXPECT_TRUE(isClose(putPrice, expectedPrice, 0.01));
@@ -86,8 +88,8 @@ TEST(BlackScholesTest, GreeksTest) {
     double T = 1.0;      // Time to expiration (1 year)
 
     // Test Delta
-    double callDelta = BlackScholes::call_delta(S, K, r, sigma, T);
-    double putDelta = BlackScholes::put_delta(S, K, r, sigma, T);
+    double callDelta = BlackScholesModel::call_delta(S, K, r, sigma, T);
+    double putDelta = BlackScholesModel::put_delta(S, K, r, sigma, T);
 
     // Expected values
     double expectedCallDelta = 0.63;
@@ -97,20 +99,20 @@ TEST(BlackScholesTest, GreeksTest) {
     EXPECT_TRUE(isClose(putDelta, expectedPutDelta, 0.01));
 
     // Test Gamma (same for call and put)
-    double gamma = BlackScholes::gamma(S, K, r, sigma, T);
+    double gamma = BlackScholesModel::gamma(S, K, r, sigma, T);
     double expectedGamma = 0.019;
 
     EXPECT_TRUE(isClose(gamma, expectedGamma, 0.001));
 
     // Test Vega (same for call and put, but scaled by 0.01)
-    double vega = BlackScholes::vega(S, K, r, sigma, T);
+    double vega = BlackScholesModel::vega(S, K, r, sigma, T);
     double expectedVega = 0.39;
 
     EXPECT_TRUE(isClose(vega, expectedVega, 0.01));
 
     // Test Theta
-    double callTheta = BlackScholes::call_theta(S, K, r, sigma, T);
-    double putTheta = BlackScholes::put_theta(S, K, r, sigma, T);
+    double callTheta = BlackScholesModel::call_theta(S, K, r, sigma, T);
+    double putTheta = BlackScholesModel::put_theta(S, K, r, sigma, T);
 
     // Expected values (daily theta)
     double expectedCallTheta = -0.05;
@@ -120,8 +122,8 @@ TEST(BlackScholesTest, GreeksTest) {
     EXPECT_TRUE(isClose(putTheta, expectedPutTheta, 0.01));
 
     // Test Rho
-    double callRho = BlackScholes::call_rho(S, K, r, sigma, T);
-    double putRho = BlackScholes::put_rho(S, K, r, sigma, T);
+    double callRho = BlackScholesModel::call_rho(S, K, r, sigma, T);
+    double putRho = BlackScholesModel::put_rho(S, K, r, sigma, T);
 
     // Expected values (scaled by 0.01)
     double expectedCallRho = 0.50;
@@ -139,17 +141,17 @@ TEST(BlackScholesTest, ImpliedVolatilityTest) {
 
     // Test call implied volatility
     double sigma = 0.2;  // True volatility (20%)
-    double callPrice = BlackScholes::call_price(S, K, r, sigma, T);
+    double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
 
     double impliedVol =
-        BlackScholes::call_implied_volatility(callPrice, S, K, r, T);
+        BlackScholesModel::call_implied_volatility(callPrice, S, K, r, T);
 
     EXPECT_TRUE(isClose(impliedVol, sigma, 0.0001));
 
     // Test put implied volatility
-    double putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    double putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
 
-    impliedVol = BlackScholes::put_implied_volatility(putPrice, S, K, r, T);
+    impliedVol = BlackScholesModel::put_implied_volatility(putPrice, S, K, r, T);
 
     EXPECT_TRUE(isClose(impliedVol, sigma, 0.0001));
 }
@@ -161,8 +163,8 @@ TEST(BlackScholesTest, PutCallParityTest) {
     double sigma = 0.2;  // Volatility (20%)
     double T = 1.0;      // Time to expiration (1 year)
 
-    double callPrice = BlackScholes::call_price(S, K, r, sigma, T);
-    double putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
+    double putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
 
     // Put-Call Parity: C - P = S - K * exp(-r * T)
     double leftSide = callPrice - putPrice;
@@ -181,22 +183,22 @@ TEST(BlackScholesTest, ExpiredOptionsTest) {
     // For expired options, the price should be the intrinsic value
 
     // At-the-money call (intrinsic value = 0)
-    double callPrice = BlackScholes::call_price(S, K, r, sigma, T);
+    double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
     EXPECT_DOUBLE_EQ(callPrice, 0.0);
 
     // At-the-money put (intrinsic value = 0)
-    double putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    double putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
     EXPECT_DOUBLE_EQ(putPrice, 0.0);
 
     // In-the-money call (intrinsic value = S - K)
     S = 110.0;
     K = 100.0;
-    callPrice = BlackScholes::call_price(S, K, r, sigma, T);
+    callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
     EXPECT_DOUBLE_EQ(callPrice, 10.0);
 
     // In-the-money put (intrinsic value = K - S)
     S = 90.0;
     K = 100.0;
-    putPrice = BlackScholes::put_price(S, K, r, sigma, T);
+    putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
     EXPECT_DOUBLE_EQ(putPrice, 10.0);
 }

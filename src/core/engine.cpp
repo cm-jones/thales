@@ -3,6 +3,17 @@
 #include <thales/utils/logger.hpp>
 #include <thread>
 
+
+#if defined(__linux__)
+    #include <sched.h>
+    #include <pthread.h>
+#elif defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+#elif defined(__APPLE__) || defined(__MACH__)
+    #include <mach/thread_policy.h>
+    #include <mach/thread_act.h>
+#endif
+
 namespace thales {
 namespace core {
 
@@ -49,14 +60,8 @@ void Engine::run() {
     logger.info("Starting trading engine...");
 
     running_ = true;
-
-    try {
-        main_loop();
-    } catch (const std::exception& e) {
-        logger.error("Exception in main loop: " + std::string(e.what()));
-    } catch (...) {
-        logger.error("Unknown exception in main loop");
-    }
+    
+    main_loop();
 
     running_ = false;
     logger.info("Trading engine stopped");
@@ -74,12 +79,40 @@ bool Engine::is_running() const { return running_; }
 
 void Engine::main_loop() {
     auto& logger = utils::Logger::get_instance();
-
+    
     // Get the loop interval from configuration
     int loop_interval_ms = config_.get_int("engine.loopIntervalMs", 1000);
 
-    logger.info("Main loop started with interval: " +
-                std::to_string(loop_interval_ms) + "ms");
+#if defined(__linux__)
+    int current_core = sched_getcpu();
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(current_core, &cpuset);
+    
+    int result = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+    if (result != 0) {
+        logger.warning("Failed to set thread affinity for main loop");
+    }
+
+    logger.info("Main loop thread pinned to core: " + std::to_string(current_core));
+#elif defined(_WIN32) || defined(_WIN64)
+    HANDLE thread = GetCurrentThread();
+    DWORD_PTR current_mask = SetThreadAffinityMask(thread, GetThreadAffinityMask(thread));
+    if (current_mask != 0) {
+        logger.info("Main loop thread affinity preserved on Windows");
+    } else {
+        logger.warning("Failed to set thread affinity on Windows: " + std::to_string(GetLastError()));
+    }
+#elif defined(__APPLE__) || defined(__MACH__)
+    // macOS thread affinity is very limited
+    logger.info("Thread pinning not fully supported on macOS");
+    // macOS doesn't provide API for thread-to-core pinning in user space
+    // You could use thread_policy_set() but it's not reliable for strict pinning
+#else
+    logger.info("Thread pinning not implemented for this platform");
+#endif
+
+    logger.info("Main loop started with interval: " + std::to_string(loop_interval_ms) + "ms");
 
     while (running_) {
         // Process signals from strategies
@@ -123,15 +156,17 @@ void Engine::execute_orders() {
     // Execute orders through the IB client
     for (const auto& order : open_orders) {
         // In real implementation, this would check for fill status, etc.
-        std::string symbol =
-            utils::SymbolLookup::get_symbol(order.symbol_id) logger.info(
-                "Processing order: " + order.order_id + ", " + order.symbol +
-                ", " + order.side_to_string() + ", " + order.type_to_string());
+        std::string symbol = utils::SymbolLookup::get_instance().get_symbol(order.symbol_id);
+        logger.info(
+            "Processing order: " + order.order_id + ", " + symbol +
+            ", " + order.side_to_string() + ", " + order.type_to_string());
     }
 }
 
 void Engine::update_portfolio() {
     if (!portfolio_ || !data_manager_) return;
+
+    auto& symbol_lookup = utils::SymbolLookup::get_instance();
 
     auto& logger = utils::Logger::get_instance();
     logger.debug("Updating portfolio...");
@@ -141,9 +176,10 @@ void Engine::update_portfolio() {
 
     // Update each position with latest market data
     for (const auto& position : positions) {
+        std::string symbol = symbol_lookup.get_symbol(position.contract.symbol_id);
         auto market_data =
-            data_manager_->get_latest_market_data(position.symbol);
-        portfolio_->update_position(position.symbol, market_data.price);
+            data_manager_->get_latest_market_data(symbol);
+        portfolio_->update_position(symbol, market_data.price);
     }
 
     // Log portfolio value

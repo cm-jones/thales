@@ -291,7 +291,7 @@ bool DbLogger::log_trade_execution(
     log.exchange = exchange;
     log.order_type = order_type;
     log.is_option = is_option;
-    log.option_data = option_data;
+    logcontract_data = option_data;
     log.additional_data = additional_data;
     log.timestamp = get_current_timestamp();
 
@@ -432,7 +432,7 @@ bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
                               log.execution_id, log.side, log.quantity,
                               log.price, log.commission, log.total_value,
                               log.execution_time, log.account_id, log.exchange,
-                              log.order_type, log.is_option, log.option_data,
+                              log.order_type, log.is_option, logcontract_data,
                               log.additional_data);
         }
 

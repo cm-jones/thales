@@ -19,7 +19,7 @@ std::vector<Position> Portfolio::get_positions() const {
     std::vector<Position> result;
     result.reserve(positions_.size());
 
-    for (const auto& [_, position] : positions_) {
+    for (const auto& position : positions_) {
         result.push_back(position);
     }
 
@@ -29,9 +29,14 @@ std::vector<Position> Portfolio::get_positions() const {
 Position Portfolio::get_position(const std::string& symbol) const {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto it = positions_.find(symbol);
-    if (it != positions_.end()) {
-        return it->second;
+    // Convert symbol string to symbol_id using SymbolLookup
+    utils::SymbolLookup::symbol_id_t symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
+    
+    // Find position by symbol_id
+    for (const auto& position : positions_) {
+        if (position.contract.symbol_id == symbol_id) {
+            return position;
+        }
     }
 
     return Position();  // Return an empty position if not found
@@ -41,7 +46,7 @@ std::vector<Order> Portfolio::get_open_orders() const {
     std::lock_guard<std::mutex> lock(mutex_);
     std::vector<Order> result;
 
-    for (const auto& [_, order] : orders_) {
+    for (const auto& order : orders_) {
         if (order.is_active()) {
             result.push_back(order);
         }
@@ -54,8 +59,9 @@ std::vector<Order> Portfolio::get_orders(const std::string& symbol) const {
     std::lock_guard<std::mutex> lock(mutex_);
     std::vector<Order> result;
 
-    for (const auto& [_, order] : orders_) {
-        if (order.symbol == symbol) {
+    for (const auto& order : orders_) {
+        std::string order_symbol = utils::SymbolLookup::get_instance().get_symbol(order.symbol_id);
+        if (order_symbol == symbol) {
             result.push_back(order);
         }
     }
@@ -67,7 +73,7 @@ double Portfolio::get_total_value() const {
     std::lock_guard<std::mutex> lock(mutex_);
     double total = 0.0;
 
-    for (const auto& [_, position] : positions_) {
+    for (const auto& position : positions_) {
         total += position.get_value();
     }
 
@@ -78,7 +84,7 @@ double Portfolio::get_total_unrealized_pnl() const {
     std::lock_guard<std::mutex> lock(mutex_);
     double total = 0.0;
 
-    for (const auto& [_, position] : positions_) {
+    for (const auto& position : positions_) {
         total += position.unrealized_pnl;
     }
 
@@ -89,7 +95,7 @@ double Portfolio::get_total_realized_pnl() const {
     std::lock_guard<std::mutex> lock(mutex_);
     double total = 0.0;
 
-    for (const auto& [_, position] : positions_) {
+    for (const auto& position : positions_) {
         total += position.realized_pnl;
     }
 
@@ -99,16 +105,34 @@ double Portfolio::get_total_realized_pnl() const {
 void Portfolio::update_position(const std::string& symbol, double last_price) {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto it = positions_.find(symbol);
-    if (it != positions_.end()) {
-        it->second.last_price = last_price;
-        it->second.unrealized_pnl = it->second.get_unrealized_pnl();
+    // Convert symbol string to symbol_id using SymbolLookup
+    utils::SymbolLookup::symbol_id_t symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
+    
+    // Find position by symbol_id and update it
+    for (auto& position : positions_) {
+        if (position.contract.symbol_id == symbol_id) {
+            position.last_price = last_price;
+            position.unrealized_pnl = position.get_unrealized_pnl();
+            break;
+        }
     }
 }
 
 void Portfolio::add_position(const Position& position) {
     std::lock_guard<std::mutex> lock(mutex_);
-    positions_[position.symbol] = position;
+    // Find if position already exists
+    auto it = std::find_if(positions_.begin(), positions_.end(), 
+                          [&symbol_id = position.contract.symbol_id](const Position& p) {
+                              return p.contract.symbol_id == symbol_id;
+                          });
+    
+    if (it != positions_.end()) {
+        // Update existing position
+        *it = position;
+    } else {
+        // Add new position
+        positions_.push_back(position);
+    }
 }
 
 void Portfolio::update_order(const std::string& order_id, Order::Status status,
@@ -116,9 +140,13 @@ void Portfolio::update_order(const std::string& order_id, Order::Status status,
                              double average_fill_price) {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto it = orders_.find(order_id);
+    auto it = std::find_if(orders_.begin(), orders_.end(),
+                          [&order_id](const Order& o) {
+                              return o.order_id == order_id;
+                          });
+    
     if (it != orders_.end()) {
-        Order& order = it->second;
+        Order& order = *it;
         order.status = status;
 
         if (filled_quantity > 0) {
@@ -137,7 +165,7 @@ void Portfolio::update_order(const std::string& order_id, Order::Status status,
                 order.average_fill_price = average_fill_price;
             }
 
-            order.filled_quantity = new_filled;
+            order.filled_quantity = static_cast<uint16_t>(new_filled);
 
             // Update the position based on the filled order
             update_position_from_order(order);
@@ -147,15 +175,31 @@ void Portfolio::update_order(const std::string& order_id, Order::Status status,
 
 void Portfolio::add_order(const Order& order) {
     std::lock_guard<std::mutex> lock(mutex_);
-    orders_[order.order_id] = order;
+    // Find if order already exists
+    auto it = std::find_if(orders_.begin(), orders_.end(),
+                          [&order_id = order.order_id](const Order& o) {
+                              return o.order_id == order_id;
+                          });
+    
+    if (it != orders_.end()) {
+        // Update existing order
+        *it = order;
+    } else {
+        // Add new order
+        orders_.push_back(order);
+    }
 }
 
 bool Portfolio::cancel_order(const std::string& order_id) {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto it = orders_.find(order_id);
-    if (it != orders_.end() && it->second.is_active()) {
-        it->second.status = Order::Status::CANCELED;
+    auto it = std::find_if(orders_.begin(), orders_.end(),
+                          [&order_id](const Order& o) {
+                              return o.order_id == order_id;
+                          });
+    
+    if (it != orders_.end() && it->is_active()) {
+        it->status = Order::Status::CANCELED;
         return true;
     }
 
@@ -169,12 +213,18 @@ void Portfolio::update_position_from_order(const Order& order) {
         return;
     }
 
-    auto it = positions_.find(order.symbol);
+    // Find or create position
+    // Find position by symbol
+    auto it = std::find_if(positions_.begin(), positions_.end(),
+                          [&symbol_id = order.symbol_id](const Position& p) {
+                              return p.contract.symbol_id == symbol_id;
+                          });
+    
     if (it == positions_.end()) {
         // Create a new position if we don't have one
-        Position position(order.symbol);
-        positions_[order.symbol] = position;
-        it = positions_.find(order.symbol);
+        Position position(order.symbol_id);
+        positions_.push_back(position);
+        it = positions_.end() - 1;  // Point to the newly added position
     }
 
     // Calculate the filled quantity (positive for buys, negative for sells)
@@ -184,9 +234,9 @@ void Portfolio::update_position_from_order(const Order& order) {
     }
 
     // Update the position
-    Position& position = it->second;
+    Position& position = *it;
     int old_quantity = position.quantity;
-    position.quantity += filled;
+    position.quantity += static_cast<uint16_t>(filled);
 
     // Update average price (only for buys that increase position)
     if (filled > 0) {

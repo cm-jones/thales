@@ -3,20 +3,23 @@
 namespace thales {
 namespace core {
 
-Order::Order(const std::string& id, const std::string& sym, Type t, Side s,
-             double qty, double p, double stop_p, Status stat,
-             double filled_qty, double avg_fill_price, const std::string& ts)
+Order::Order(const std::string& id,
+             utils::SymbolLookup::symbol_id_t sym_id,
+             Type t, Side s, double qty,
+             double p, double stop_p, Status stat,
+             double filled_qty, double avg_fill_price,
+             const std::string& ts)
     : order_id(id),
-      symbol(sym),
-      type(t),
-      side(s),
-      quantity(qty),
+      timestamp(ts),
       price(p),
       stop_price(stop_p),
-      status(stat),
-      filled_quantity(filled_qty),
       average_fill_price(avg_fill_price),
-      timestamp(ts) {}
+      quantity(static_cast<uint16_t>(qty)),
+      filled_quantity(static_cast<uint16_t>(filled_qty)),
+      symbol_id(sym_id),
+      type(t),
+      side(s),
+      status(stat) {}
 
 double Order::get_remaining_quantity() const {
     return quantity - filled_quantity;
