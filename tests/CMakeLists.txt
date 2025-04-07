@@ -1,5 +1,6 @@
-# Find GTest
+# Find GTest and GMock
 find_package(GTest QUIET)
+find_package(GMock QUIET)
 
 # Use FetchContent as a fallback if GTest is not found
 if(NOT GTEST_FOUND)
@@ -56,12 +57,25 @@ add_executable(thales_tests ${TEST_SOURCES})
 # Link against the library and GTest
 target_link_libraries(thales_tests PRIVATE thales_lib)
 
-# Link against the appropriate GTest libraries
+# Link against the appropriate GTest and GMock libraries
 if(GTEST_FOUND)
     target_link_libraries(thales_tests PRIVATE ${GTEST_BOTH_LIBRARIES})
     target_include_directories(thales_tests PRIVATE ${GTEST_INCLUDE_DIRS})
+    
+    # Try to find GMock as part of GTest
+    if(EXISTS "${GTEST_INCLUDE_DIRS}/gmock/gmock.h")
+        # GMock headers are in the same directory as GTest
+        # Try to find the library
+        find_library(GMOCK_LIBRARY gmock PATHS ${GTEST_LIBRARY_DIRS})
+        find_library(GMOCK_MAIN_LIBRARY gmock_main PATHS ${GTEST_LIBRARY_DIRS})
+        
+        if(GMOCK_LIBRARY AND GMOCK_MAIN_LIBRARY)
+            target_link_libraries(thales_tests PRIVATE ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY})
+        endif()
+    endif()
 else()
-    target_link_libraries(thales_tests PRIVATE gtest gtest_main)
+    # When using FetchContent, link against both GTest and GMock
+    target_link_libraries(thales_tests PRIVATE gtest gtest_main gmock gmock_main)
 endif()
 
 # Add pthread if needed (usually required on Unix-like systems)
