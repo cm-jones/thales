@@ -1,0 +1,36 @@
+services:
+  thales:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: thales:latest
+    container_name: thales
+    restart: unless-stopped
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../config:/app/config
+    environment:
+      - HOST_IP=${HOST_IP}
+      - IB_GATEWAY_PORT=4001
+      - LOG_LEVEL=INFO
+    network_mode: "host"
+    command: "/entrypoint.sh"
+
+  # Add PostgreSQL for logging and data storage
+  postgres:
+    image: postgres:15
+    container_name: thales-postgres
+    restart: unless-stopped
+    volumes:
+      - thales-postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=thales
+      - POSTGRES_USER=thales
+      - POSTGRES_DB=thales
+    ports:
+      - "5432:5432"
+
+volumes:
+  thales-postgres-data:
+    driver: local
