@@ -1,0 +1,125 @@
+name: License Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  check-licenses:
+    name: Check License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.19'
+      
+      - name: Install license-checker
+        run: |
+          go install github.com/google/go-licenses@latest
+      
+      - name: Check project license
+        run: |
+          mkdir -p license-report
+          
+          # Create license report
+          echo "# License Compliance Report" > license-report/report.md
+          echo "" >> license-report/report.md
+          
+          # Check if main LICENSE file exists
+          if [ -f "LICENSE" ]; then
+            echo "## Main Project License" >> license-report/report.md
+            echo "" >> license-report/report.md
+            echo "\`\`\`" >> license-report/report.md
+            head -n 15 LICENSE >> license-report/report.md
+            echo "..." >> license-report/report.md
+            echo "\`\`\`" >> license-report/report.md
+            echo "" >> license-report/report.md
+            
+            LICENSE_TYPE=$(cat LICENSE | grep -E "Apache License|MIT License|GNU General Public License|BSD" | head -n 1)
+            if [ -n "$LICENSE_TYPE" ]; then
+              echo "Detected license: $LICENSE_TYPE" >> license-report/report.md
+            else
+              echo "License type not automatically detected. Please verify manually." >> license-report/report.md
+            fi
+            echo "" >> license-report/report.md
+          else
+            echo "⚠️ **WARNING: No LICENSE file found in project root!**" >> license-report/report.md
+            echo "" >> license-report/report.md
+          fi
+      
+      - name: Scan for third-party licenses
+        run: |
+          echo "## Third-Party Licenses" >> license-report/report.md
+          echo "" >> license-report/report.md
+          
+          # Check third_party directory if it exists
+          if [ -d "third_party" ]; then
+            echo "Found third_party directory. Checking for licenses within..." >> license-report/report.md
+            echo "" >> license-report/report.md
+            
+            # Find and report on all LICENSE files in third_party
+            find third_party -type f -name "LICENSE*" -o -name "COPYING*" | while read license_file; do
+              DIR_NAME=$(dirname "$license_file")
+              echo "### $(basename "$DIR_NAME")" >> license-report/report.md
+              echo "" >> license-report/report.md
+              echo "License file: \`$license_file\`" >> license-report/report.md
+              echo "" >> license-report/report.md
+              echo "\`\`\`" >> license-report/report.md
+              head -n 10 "$license_file" >> license-report/report.md
+              echo "..." >> license-report/report.md
+              echo "\`\`\`" >> license-report/report.md
+              echo "" >> license-report/report.md
+            done
+          else
+            echo "No third_party directory found. Skipping third-party license scan." >> license-report/report.md
+            echo "" >> license-report/report.md
+          fi
+          
+          # Check for embedded license headers in source files
+          echo "## License Headers in Source Files" >> license-report/report.md
+          echo "" >> license-report/report.md
+          echo "Sampling source files for license headers:" >> license-report/report.md
+          echo "" >> license-report/report.md
+          
+          # Sample a few source files to check for license headers
+          find src include -type f -name "*.cpp" -o -name "*.hpp" | head -n 5 | while read source_file; do
+            echo "### $source_file" >> license-report/report.md
+            echo "" >> license-report/report.md
+            
+            # Check first 20 lines for copyright or license information
+            head -n 20 "$source_file" | grep -i -E "copyright|license" > /dev/null
+            if [ $? -eq 0 ]; then
+              echo "✅ Contains license/copyright header" >> license-report/report.md
+              echo "" >> license-report/report.md
+              echo "\`\`\`cpp" >> license-report/report.md
+              head -n 20 "$source_file" | grep -i -E "copyright|license" -A 5 -B 5 >> license-report/report.md
+              echo "\`\`\`" >> license-report/report.md
+            else
+              echo "⚠️ No license/copyright header detected" >> license-report/report.md
+            fi
+            echo "" >> license-report/report.md
+          done
+          
+          # Summary and recommendations
+          echo "## Summary and Recommendations" >> license-report/report.md
+          echo "" >> license-report/report.md
+          echo "- Ensure all dependencies are compatible with your project's license" >> license-report/report.md
+          echo "- Add license headers to source files if missing" >> license-report/report.md
+          echo "- Maintain a complete list of third-party licenses in documentation" >> license-report/report.md
+          echo "" >> license-report/report.md
+          
+          cat license-report/report.md
+      
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-compliance-report
+          path: license-report
+          if-no-files-found: warn
