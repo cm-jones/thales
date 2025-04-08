@@ -1,0 +1,147 @@
+name: Clang Tidy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libboost-all-dev clang-tidy
+    
+    - name: Check for .clang-tidy file
+      id: check_clang_tidy
+      run: |
+        if [ -f ".clang-tidy" ]; then
+          echo "Found .clang-tidy file"
+          echo "has_clang_tidy=true" >> $GITHUB_OUTPUT
+        else
+          echo "No .clang-tidy file found, will use default checks"
+          echo "has_clang_tidy=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Configure
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+    
+    - name: Run clang-tidy with custom configuration
+      if: steps.check_clang_tidy.outputs.has_clang_tidy == 'true'
+      run: |
+        # Find all C++ source files
+        SOURCES=$(find ./src ./include -name "*.cpp" -o -name "*.hpp" -o -name "*.cc" -o -name "*.h" 2>/dev/null)
+        if [ -z "$SOURCES" ]; then
+          echo "No source files found"
+          exit 0
+        fi
+        
+        # Create a script to run clang-tidy
+        echo '#!/bin/bash
+        SOURCES="$@"
+        mkdir -p clang-tidy-results
+        WARNINGS=0
+        
+        for file in $SOURCES; do
+          echo "Analyzing $file"
+          clang-tidy -p=build $file > clang-tidy-results/$(basename $file).txt
+          if [ $? -ne 0 ]; then
+            WARNINGS=1
+          fi
+        done
+        
+        if [ $WARNINGS -ne 0 ]; then
+          echo "Warnings found. Check the artifacts for details."
+        else
+          echo "No warnings found."
+        fi' > run_clang_tidy.sh
+        chmod +x run_clang_tidy.sh
+        
+        # Use the script
+        ./run_clang_tidy.sh $SOURCES
+      continue-on-error: true
+    
+    - name: Run clang-tidy with default configuration
+      if: steps.check_clang_tidy.outputs.has_clang_tidy == 'false'
+      run: |
+        # Find all C++ source files
+        SOURCES=$(find ./src ./include -name "*.cpp" -o -name "*.hpp" -o -name "*.cc" -o -name "*.h" 2>/dev/null)
+        if [ -z "$SOURCES" ]; then
+          echo "No source files found"
+          exit 0
+        fi
+        
+        # Create a default .clang-tidy file
+        cat > .clang-tidy << EOF
+        ---
+        Checks: 'clang-diagnostic-*,clang-analyzer-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type'
+        WarningsAsErrors: ''
+        HeaderFilterRegex: '.*'
+        AnalyzeTemporaryDtors: false
+        FormatStyle: file
+        CheckOptions:
+          - key: readability-identifier-naming.ClassCase
+            value: CamelCase
+          - key: readability-identifier-naming.VariableCase
+            value: lower_case
+          - key: readability-identifier-naming.FunctionCase
+            value: lower_case
+          - key: readability-identifier-naming.MemberCase
+            value: lower_case
+          - key: readability-identifier-naming.ParameterCase
+            value: lower_case
+          - key: readability-identifier-naming.ConstantCase
+            value: UPPER_CASE
+        ...
+        EOF
+        
+        # Create a script to run clang-tidy
+        echo '#!/bin/bash
+        SOURCES="$@"
+        mkdir -p clang-tidy-results
+        WARNINGS=0
+        
+        for file in $SOURCES; do
+          echo "Analyzing $file"
+          clang-tidy -p=build $file > clang-tidy-results/$(basename $file).txt
+          if [ $? -ne 0 ]; then
+            WARNINGS=1
+          fi
+        done
+        
+        if [ $WARNINGS -ne 0 ]; then
+          echo "Warnings found. Check the artifacts for details."
+        else
+          echo "No warnings found."
+        fi' > run_clang_tidy.sh
+        chmod +x run_clang_tidy.sh
+        
+        # Use the script
+        ./run_clang_tidy.sh $SOURCES
+      continue-on-error: true
+    
+    - name: Upload clang-tidy results
+      uses: actions/upload-artifact@v4
+      with:
+        name: clang-tidy-results
+        path: clang-tidy-results
+        if-no-files-found: warn
+    
+    - name: Run lint script if available
+      run: |
+        if [ -f "./scripts/lint.sh" ]; then
+          chmod +x ./scripts/lint.sh
+          ./scripts/lint.sh
+        else
+          echo "No lint script found at ./scripts/lint.sh"
+        fi
+      continue-on-error: true
