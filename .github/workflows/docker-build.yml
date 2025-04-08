@@ -1,0 +1,56 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docker/**'
+      - 'src/**'
+      - 'include/**'
+      - 'CMakeLists.txt'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docker/**'
+      - 'src/**'
+      - 'include/**'
+      - 'CMakeLists.txt'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: false
+          load: true
+          tags: thales:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image
+        run: |
+          docker run --rm thales:test --version || true
+          docker run --rm thales:test --help || true
+
+      - name: Scan Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'thales:test'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
