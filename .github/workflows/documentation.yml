@@ -1,0 +1,119 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'include/**'
+      - '**/*.md'
+      - 'Doxyfile'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'include/**'
+      - '**/*.md'
+      - 'Doxyfile'
+  workflow_dispatch:
+
+jobs:
+  doxygen:
+    name: Generate Doxygen Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+      
+      - name: Create Doxyfile if not exists
+        run: |
+          if [ ! -f "Doxyfile" ]; then
+            echo "Creating default Doxyfile"
+            doxygen -g
+            # Configure Doxyfile
+            sed -i 's/PROJECT_NAME           = "My Project"/PROJECT_NAME           = "Thales"/g' Doxyfile
+            sed -i 's/PROJECT_BRIEF          =/PROJECT_BRIEF          = "A C++23 Algorithmic Trading Framework"/g' Doxyfile
+            sed -i 's/OUTPUT_DIRECTORY       =/OUTPUT_DIRECTORY       = docs\/doxygen/g' Doxyfile
+            sed -i 's/EXTRACT_ALL            = NO/EXTRACT_ALL            = YES/g' Doxyfile
+            sed -i 's/EXTRACT_PRIVATE        = NO/EXTRACT_PRIVATE        = YES/g' Doxyfile
+            sed -i 's/EXTRACT_STATIC         = NO/EXTRACT_STATIC         = YES/g' Doxyfile
+            sed -i 's/INPUT                  =/INPUT                  = include src/g' Doxyfile
+            sed -i 's/RECURSIVE              = NO/RECURSIVE              = YES/g' Doxyfile
+            sed -i 's/GENERATE_HTML          = YES/GENERATE_HTML          = YES/g' Doxyfile
+            sed -i 's/GENERATE_LATEX         = YES/GENERATE_LATEX         = NO/g' Doxyfile
+            sed -i 's/USE_MDFILE_AS_MAINPAGE =/USE_MDFILE_AS_MAINPAGE = README.md/g' Doxyfile
+            sed -i 's/HAVE_DOT               = NO/HAVE_DOT               = YES/g' Doxyfile
+            sed -i 's/UML_LOOK               = NO/UML_LOOK               = YES/g' Doxyfile
+            sed -i 's/CALL_GRAPH             = NO/CALL_GRAPH             = YES/g' Doxyfile
+            sed -i 's/CALLER_GRAPH           = NO/CALLER_GRAPH           = YES/g' Doxyfile
+          fi
+      
+      - name: Generate Doxygen documentation
+        run: doxygen Doxyfile
+      
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/doxygen/html
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Update documentation'
+      
+      - name: Upload documentation as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-documentation
+          path: docs/doxygen/html
+          if-no-files-found: warn
+
+  markdown:
+    name: Process Markdown Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install markdown-link-check
+        run: npm install -g markdown-link-check
+      
+      - name: Check links in markdown files
+        run: |
+          find . -name "*.md" -type f -exec markdown-link-check {} \;
+        continue-on-error: true
+      
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+      
+      - name: Lint markdown files
+        run: |
+          markdownlint "**/*.md" --ignore node_modules
+        continue-on-error: true
+      
+      - name: Generate markdown report
+        run: |
+          echo "# Markdown Documentation Report" > markdown-report.md
+          echo "" >> markdown-report.md
+          echo "## Files checked" >> markdown-report.md
+          echo "" >> markdown-report.md
+          find . -name "*.md" -type f | sort | awk '{print "- " $0}' >> markdown-report.md
+          echo "" >> markdown-report.md
+      
+      - name: Upload markdown report
+        uses: actions/upload-artifact@v4
+        with:
+          name: markdown-report
+          path: markdown-report.md
+          if-no-files-found: warn
