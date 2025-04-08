@@ -49,7 +49,7 @@ jobs:
         done
         
         if [ $FORMAT_DIFF -ne 0 ]; then
-          echo "Formatting issues found. Run ./scripts/format.sh to fix."
+          echo "Formatting issues found. Run ./scripts/quality/format.sh to fix."
           exit 1
         else
           echo "All files are properly formatted"
@@ -86,10 +86,10 @@ jobs:
     
     - name: Run format script if available
       run: |
-        if [ -f "./scripts/format.sh" ]; then
-          chmod +x ./scripts/format.sh
-          ./scripts/format.sh --check
+        if [ -f "./scripts/quality/format.sh" ]; then
+          chmod +x ./scripts/quality/format.sh
+          ./scripts/quality/format.sh --check
         else
-          echo "No format script found at ./scripts/format.sh"
+          echo "No format script found at ./scripts/quality/format.sh"
         fi
       continue-on-error: true

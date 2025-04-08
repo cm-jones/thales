@@ -37,9 +37,9 @@ jobs:
     - name: Run benchmarks
       run: |
         mkdir -p benchmark-results
-        if [ -f "./scripts/run_benchmarks.sh" ]; then
-          chmod +x ./scripts/run_benchmarks.sh
-          ./scripts/run_benchmarks.sh --output-dir=benchmark-results
+        if [ -f "./scripts/performance/run_benchmarks.sh" ]; then
+          chmod +x ./scripts/performance/run_benchmarks.sh
+          ./scripts/performance/run_benchmarks.sh --output-dir=benchmark-results
         else
           cd build
           if [ -d "./benchmarks" ]; then

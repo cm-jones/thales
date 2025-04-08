@@ -1,0 +1,114 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Run every Monday at 2:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    name: Check for Dependency Updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up CMake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+      
+      - name: Analyze CMake dependencies
+        run: |
+          mkdir -p dependency-report
+          
+          # Create report file
+          echo "# Dependency Update Report" > dependency-report/report.md
+          echo "" >> dependency-report/report.md
+          echo "## CMake Dependencies" >> dependency-report/report.md
+          echo "" >> dependency-report/report.md
+          
+          # Extract find_package calls from CMakeLists.txt files
+          echo "### Packages Used" >> dependency-report/report.md
+          echo "" >> dependency-report/report.md
+          echo "| Package | Version Required | Latest Version | Update Needed |" >> dependency-report/report.md
+          echo "|---------|------------------|----------------|---------------|" >> dependency-report/report.md
+          
+          # Process each CMakeLists.txt file
+          find . -name "CMakeLists.txt" -type f | while read -r cmake_file; do
+            grep -E "find_package\s*\(\s*[A-Za-z0-9_]+" "$cmake_file" | while read -r line; do
+              # Extract package name and version (basic extraction, might need refinement)
+              PKG_NAME=$(echo "$line" | sed -n 's/.*find_package\s*(\s*\([A-Za-z0-9_]\+\).*/\1/p')
+              VERSION_REQ=$(echo "$line" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+              
+              if [ -n "$PKG_NAME" ]; then
+                echo "| $PKG_NAME | ${VERSION_REQ:-Not specified} | (Check manually) | (Check manually) |" >> dependency-report/report.md
+              fi
+            done
+          done
+          
+          echo "" >> dependency-report/report.md
+          echo "## External Libraries" >> dependency-report/report.md
+          echo "" >> dependency-report/report.md
+          echo "The following external libraries should be checked for updates:" >> dependency-report/report.md
+          echo "" >> dependency-report/report.md
+          echo "- Boost" >> dependency-report/report.md
+          echo "- Any libraries in third_party/ directory" >> dependency-report/report.md
+          echo "" >> dependency-report/report.md
+          
+          cat dependency-report/report.md
+      
+      - name: Upload dependency report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-update-report
+          path: dependency-report
+          if-no-files-found: warn
+      
+      - name: Check for Dockerfiles
+        run: |
+          mkdir -p docker-update-report
+          
+          echo "# Docker Image Update Report" > docker-update-report/report.md
+          echo "" >> docker-update-report/report.md
+          echo "## Base Images Used" >> docker-update-report/report.md
+          echo "" >> docker-update-report/report.md
+          echo "| Dockerfile | Base Image | Base Tag | Latest Tag Available |" >> docker-update-report/report.md
+          echo "|------------|------------|----------|----------------------|" >> docker-update-report/report.md
+          
+          # Check all Dockerfiles in the repository
+          find . -name "Dockerfile*" -type f | while read -r dockerfile; do
+            BASE_IMG=$(grep -m 1 "^FROM" "$dockerfile" | awk '{print $2}')
+            if [ -n "$BASE_IMG" ]; then
+              # Split image and tag
+              IMG_NAME=$(echo "$BASE_IMG" | cut -d':' -f1)
+              IMG_TAG=$(echo "$BASE_IMG" | cut -d':' -f2)
+              if [ "$IMG_NAME" = "$BASE_IMG" ]; then
+                IMG_TAG="latest"
+              fi
+              
+              echo "| $dockerfile | $IMG_NAME | $IMG_TAG | (Check manually) |" >> docker-update-report/report.md
+            fi
+          done
+          
+          cat docker-update-report/report.md
+      
+      - name: Upload Docker update report
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-update-report
+          path: docker-update-report
+          if-no-files-found: warn
+      
+      - name: Create issue if manual update needed
+        if: github.event_name == 'schedule'
+        run: |
+          echo "To create an issue for dependency updates, uncomment and configure the gh CLI commands below"
+          
+          # This section can be uncommented and configured once GitHub CLI is set up
+          # gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+          # gh issue create \
+          #   --title "Monthly Dependency Update Check" \
+          #   --body "The monthly dependency update check has completed. Please review the attached reports and update dependencies as needed." \
+          #   --label "dependencies,maintenance"
+        continue-on-error: true

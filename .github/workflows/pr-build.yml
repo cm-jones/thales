@@ -1,0 +1,65 @@
+name: PR Quick Build
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  quick-build:
+    name: Quick Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libboost-all-dev
+      
+      - name: Configure
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF ..
+      
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config Debug -- -j$(nproc)
+          
+      - name: Verify executable
+        run: |
+          if [ -f "build/thales" ]; then
+            echo "✅ Build successful: Executable created"
+            ls -la build/thales
+          else
+            echo "❌ Build failed: No executable found"
+            ls -la build
+            exit 1
+          fi
+      
+      - name: Check compile time
+        run: |
+          echo "## Build Time Report" > build-time-report.md
+          echo "" >> build-time-report.md
+          echo "Build completed in ${{ steps.build.outputs.time }} seconds" >> build-time-report.md
+          echo "" >> build-time-report.md
+          
+          # Write PR comment with build time information
+          echo "🚀 PR Build completed successfully." > pr-comment.md
+          echo "" >> pr-comment.md
+          echo "The build took approximately $SECONDS seconds." >> pr-comment.md
+      
+      - name: Upload build report
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-time-report
+          path: build-time-report.md
+          if-no-files-found: warn

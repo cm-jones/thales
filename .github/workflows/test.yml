@@ -48,5 +48,5 @@ jobs:
       
     - name: Run test script
       run: |
-        chmod +x scripts/test.sh
-        ./scripts/test.sh
+        chmod +x scripts/test/test.sh
+        ./scripts/test/test.sh

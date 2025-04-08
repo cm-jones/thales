@@ -1,0 +1,254 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run every day at midnight UTC
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  comprehensive-build:
+    name: Comprehensive Nightly Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libboost-all-dev clang clang-tidy clang-format cppcheck lcov
+      
+      - name: Configure with various build options
+        run: |
+          # Create multiple build directories with different configurations
+          mkdir -p build-debug
+          cd build-debug
+          cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON ..
+          cd ..
+          
+          mkdir -p build-release
+          cd build-release
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON ..
+          cd ..
+          
+          mkdir -p build-coverage
+          cd build-coverage
+          cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON -DBUILD_TESTING=ON ..
+          cd ..
+      
+      - name: Build all configurations
+        run: |
+          echo "Building Debug configuration..."
+          cd build-debug
+          cmake --build . --config Debug
+          cd ..
+          
+          echo "Building Release configuration..."
+          cd build-release
+          cmake --build . --config Release
+          cd ..
+          
+          echo "Building with coverage..."
+          cd build-coverage
+          cmake --build . --config Debug
+          cd ..
+      
+      - name: Run tests in all configurations
+        run: |
+          echo "Running Debug tests..."
+          cd build-debug
+          ctest --output-on-failure -C Debug
+          cd ..
+          
+          echo "Running Release tests..."
+          cd build-release
+          ctest --output-on-failure -C Release
+          cd ..
+          
+          echo "Running tests with coverage..."
+          cd build-coverage
+          ctest --output-on-failure -C Debug
+          cd ..
+      
+      - name: Generate coverage report
+        run: |
+          cd build-coverage
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '/opt/*' '*/third_party/*' '*/tests/*' --output-file filtered_coverage.info
+          mkdir -p coverage_report
+          genhtml filtered_coverage.info --output-directory coverage_report
+      
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-coverage-report
+          path: build-coverage/coverage_report
+          if-no-files-found: warn
+      
+      - name: Run static analyzers
+        run: |
+          # Run cppcheck
+          echo "Running cppcheck..."
+          cppcheck --enable=all --std=c++20 --inconclusive --xml --xml-version=2 \
+            --suppress=missingIncludeSystem \
+            -I include src 2> cppcheck-report.xml
+          
+          # Run clang-tidy
+          echo "Running clang-tidy..."
+          mkdir -p clang-tidy-results
+          find src include -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | while read file; do
+            clang-tidy -p=build-debug $file > clang-tidy-results/$(basename $file).txt
+          done
+          
+          # Run include-what-you-use if available
+          if command -v iwyu_tool.py &> /dev/null; then
+            echo "Running include-what-you-use..."
+            iwyu_tool.py -p build-debug > iwyu-report.txt
+          fi
+      
+      - name: Upload static analysis results
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-static-analysis
+          path: |
+            cppcheck-report.xml
+            clang-tidy-results/
+            iwyu-report.txt
+          if-no-files-found: warn
+      
+      - name: Run benchmarks
+        run: |
+          # Run benchmarks if available
+          if [ -d "benchmarks" ]; then
+            echo "Running benchmarks..."
+            mkdir -p benchmark-results
+            cd build-release
+            
+            # Find and run all benchmarks
+            find . -type f -executable -name "benchmark_*" | while read bench; do
+              echo "Running $bench..."
+              $bench --benchmark_format=json --benchmark_out=../benchmark-results/$(basename $bench).json
+            done
+            
+            cd ..
+          else
+            echo "No benchmarks directory found, skipping benchmark run"
+          fi
+      
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-benchmark-results
+          path: benchmark-results
+          if-no-files-found: warn
+      
+      - name: Performance comparison
+        run: |
+          echo "# Nightly Performance Report" > performance-report.md
+          echo "" >> performance-report.md
+          echo "## Build Performance" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "| Configuration | Build Time (s) |" >> performance-report.md
+          echo "|---------------|---------------|" >> performance-report.md
+          echo "| Debug | $(cat build-debug/CMakeFiles/CMakeOutput.log | grep -oP 'Total build time: \K[0-9.]+' || echo 'N/A') |" >> performance-report.md
+          echo "| Release | $(cat build-release/CMakeFiles/CMakeOutput.log | grep -oP 'Total build time: \K[0-9.]+' || echo 'N/A') |" >> performance-report.md
+          echo "| Coverage | $(cat build-coverage/CMakeFiles/CMakeOutput.log | grep -oP 'Total build time: \K[0-9.]+' || echo 'N/A') |" >> performance-report.md
+          echo "" >> performance-report.md
+          
+          if [ -d "benchmark-results" ]; then
+            echo "## Benchmark Results" >> performance-report.md
+            echo "" >> performance-report.md
+            echo "See attached artifacts for detailed benchmark results." >> performance-report.md
+          fi
+          
+          cat performance-report.md
+      
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-performance-report
+          path: performance-report.md
+          if-no-files-found: warn
+      
+      - name: Check for memory leaks
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y valgrind
+          
+          echo "# Memory Analysis Report" > memory-report.md
+          echo "" >> memory-report.md
+          
+          cd build-debug
+          find . -type f -executable -name "test_*" | head -n 5 | while read test; do
+            echo "## Testing $(basename $test) for memory leaks" >> ../memory-report.md
+            echo "" >> ../memory-report.md
+            echo '```' >> ../memory-report.md
+            valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose $test 2>&1 | head -n 50 >> ../memory-report.md
+            echo '...' >> ../memory-report.md
+            echo '```' >> ../memory-report.md
+            echo "" >> ../memory-report.md
+          done
+          
+          cd ..
+          cat memory-report.md
+      
+      - name: Upload memory report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-memory-report
+          path: memory-report.md
+          if-no-files-found: warn
+      
+      - name: Create nightly summary
+        run: |
+          echo "# Nightly Build Summary" > nightly-summary.md
+          echo "" >> nightly-summary.md
+          echo "## Build Status" >> nightly-summary.md
+          echo "" >> nightly-summary.md
+          
+          # Check if all builds succeeded
+          BUILD_STATUS="✅ All configurations built successfully"
+          if [ ! -f "build-debug/thales" ] || [ ! -f "build-release/thales" ]; then
+            BUILD_STATUS="❌ Some builds failed"
+          fi
+          echo "$BUILD_STATUS" >> nightly-summary.md
+          echo "" >> nightly-summary.md
+          
+          # Add test summary
+          echo "## Test Status" >> nightly-summary.md
+          echo "" >> nightly-summary.md
+          DEBUG_TEST_RESULTS=$(cd build-debug && ctest --output-on-failure -C Debug -N | grep "Total Tests" || echo "N/A")
+          RELEASE_TEST_RESULTS=$(cd build-release && ctest --output-on-failure -C Release -N | grep "Total Tests" || echo "N/A")
+          echo "- Debug: $DEBUG_TEST_RESULTS" >> nightly-summary.md
+          echo "- Release: $RELEASE_TEST_RESULTS" >> nightly-summary.md
+          echo "" >> nightly-summary.md
+          
+          # Add coverage summary
+          if [ -f "build-coverage/filtered_coverage.info" ]; then
+            COVERAGE_PCT=$(lcov --summary build-coverage/filtered_coverage.info | grep "lines" | awk '{print $4}')
+            echo "## Code Coverage" >> nightly-summary.md
+            echo "" >> nightly-summary.md
+            echo "Current coverage: $COVERAGE_PCT" >> nightly-summary.md
+            echo "" >> nightly-summary.md
+          fi
+          
+          # Add links to all reports
+          echo "## Reports" >> nightly-summary.md
+          echo "" >> nightly-summary.md
+          echo "- [Coverage Report](../artifacts/nightly-coverage-report)" >> nightly-summary.md
+          echo "- [Static Analysis Results](../artifacts/nightly-static-analysis)" >> nightly-summary.md
+          echo "- [Benchmark Results](../artifacts/nightly-benchmark-results)" >> nightly-summary.md
+          echo "- [Performance Report](../artifacts/nightly-performance-report)" >> nightly-summary.md
+          echo "- [Memory Report](../artifacts/nightly-memory-report)" >> nightly-summary.md
+          echo "" >> nightly-summary.md
+          
+          cat nightly-summary.md
+      
+      - name: Upload nightly summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-build-summary
+          path: nightly-summary.md
+          if-no-files-found: warn

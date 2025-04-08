@@ -38,7 +38,7 @@ git clone https://github.com/cm-jones/thales.git
 cd thales
 
 # Install the Interactive Brokers C++ API
-./scripts/install_ibapi.sh
+./scripts/install/install_ibapi.sh
 
 # Create a build directory
 mkdir build && cd build
@@ -55,10 +55,10 @@ make
 
 ```bash
 # Run all tests
-./scripts/test.sh
+./scripts/test/test.sh
 
 # Run tests with coverage reporting
-./scripts/test_coverage.sh
+./scripts/test/test_coverage.sh
 ```
 
 The coverage report will be generated in `build/coverage_report/index.html`. Open this file in a browser to view the detailed coverage report.
@@ -71,7 +71,7 @@ git clone https://github.com/cm-jones/thales.git
 cd thales
 
 # Install the Interactive Brokers C++ API
-./scripts/install_ibapi.sh
+./scripts/install/install_ibapi.sh
 
 # Create a build directory
 mkdir build
@@ -225,7 +225,7 @@ Thales includes performance benchmarks for critical components using Google Benc
 
 ```bash
 # Run the benchmarks
-./scripts/run_benchmarks.sh
+./scripts/performance/run_benchmarks.sh
 ```
 
 This will build the benchmarks in Release mode and execute them, providing detailed performance metrics for various operations.
@@ -255,10 +255,10 @@ Thales can log trade executions to a PostgreSQL database for analysis and report
 1. Install PostgreSQL and libpqxx:
    ```bash
    # Install PostgreSQL
-   ./scripts/setup_postgres.sh
+   ./scripts/database/setup_postgres.sh
    
    # Install libpqxx
-   ./scripts/install_libpqxx.sh
+   ./scripts/install/install_libpqxx.sh
    ```
 
 2. Configure database logging in `config/config.json`:
@@ -301,7 +301,7 @@ This requires:
 
 If automatic creation fails, you can run the setup script manually:
 ```bash
-./scripts/setup_postgres.sh
+./scripts/database/setup_postgres.sh
 ```
 
 The database includes the following features:

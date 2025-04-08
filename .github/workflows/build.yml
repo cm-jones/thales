@@ -31,8 +31,8 @@ jobs:
     
     - name: Configure and build
       run: |
-        chmod +x scripts/build.sh
-        ./scripts/build.sh --type ${{ matrix.build_type }} --clean --test
+        chmod +x scripts/build/build.sh
+        ./scripts/build/build.sh --type ${{ matrix.build_type }} --clean --test
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4

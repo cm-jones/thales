@@ -138,10 +138,10 @@ jobs:
     
     - name: Run lint script if available
       run: |
-        if [ -f "./scripts/lint.sh" ]; then
-          chmod +x ./scripts/lint.sh
-          ./scripts/lint.sh
+        if [ -f "./scripts/quality/lint.sh" ]; then
+          chmod +x ./scripts/quality/lint.sh
+          ./scripts/quality/lint.sh
         else
-          echo "No lint script found at ./scripts/lint.sh"
+          echo "No lint script found at ./scripts/quality/lint.sh"
         fi
       continue-on-error: true

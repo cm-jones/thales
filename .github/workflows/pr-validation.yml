@@ -1,0 +1,196 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validation:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libboost-all-dev clang-format clang-tidy cppcheck
+      
+      - name: Validate PR title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "Validating PR title: $PR_TITLE"
+          
+          # Check title format (example: enforce a prefix like feat:, fix:, etc.)
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert):.+ ]]; then
+            echo "❌ PR title should start with one of: feat:, fix:, docs:, style:, refactor:, test:, chore:, perf:, ci:, build:, revert:"
+            echo "Example: 'feat: add new trading strategy'"
+            exit 1
+          else
+            echo "✅ PR title format is valid"
+          fi
+      
+      - name: Check changed files
+        id: changed-files
+        run: |
+          # Get list of changed files
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Check if any C++ files were changed
+          CPP_FILES=$(echo "$CHANGED_FILES" | grep -E '\.(cpp|hpp|h|cc)$' || true)
+          if [ -n "$CPP_FILES" ]; then
+            echo "cpp_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "cpp_changed=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check if any build files were changed
+          BUILD_FILES=$(echo "$CHANGED_FILES" | grep -E '(CMakeLists.txt|\.cmake|Makefile)' || true)
+          if [ -n "$BUILD_FILES" ]; then
+            echo "build_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "build_changed=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check if any docs were changed
+          DOC_FILES=$(echo "$CHANGED_FILES" | grep -E '(\.md|docs/|\.txt)' || true)
+          if [ -n "$DOC_FILES" ]; then
+            echo "docs_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "docs_changed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Code formatting check
+        if: steps.changed-files.outputs.cpp_changed == 'true'
+        run: |
+          # Create a script to check all changed C++ files
+          echo '#!/bin/bash
+          CPP_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\''\\.(cpp|hpp|h|cc)$'\'' || true)
+          if [ -z "$CPP_FILES" ]; then
+            echo "No C++ files to check"
+            exit 0
+          fi
+          
+          FORMAT_DIFF=0
+          for file in $CPP_FILES; do
+            if [ -f "$file" ]; then
+              clang-format --style=file "$file" | diff -u "$file" -
+              if [ $? -ne 0 ]; then
+                FORMAT_DIFF=1
+              fi
+            fi
+          done
+          
+          if [ $FORMAT_DIFF -ne 0 ]; then
+            echo "❌ Formatting issues found. Run ./scripts/quality/format.sh to fix."
+            exit 1
+          else
+            echo "✅ All files are properly formatted"
+          fi' > check_format.sh
+          chmod +x check_format.sh
+          ./check_format.sh
+      
+      - name: Check commits
+        run: |
+          # Get list of commits in PR
+          COMMITS=$(git log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --pretty=format:"%h %s")
+          echo "Commits in PR:"
+          echo "$COMMITS"
+          
+          # Check if any commit has a poorly formatted message
+          BAD_COMMITS=0
+          while IFS= read -r commit; do
+            HASH=$(echo $commit | cut -d' ' -f1)
+            MSG=$(echo $commit | cut -d' ' -f2-)
+            
+            # Check commit message format (similar to PR title check)
+            if [[ ! "$MSG" =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert):.+ ]]; then
+              echo "❌ Commit $HASH has an invalid message format: '$MSG'"
+              BAD_COMMITS=1
+            fi
+          done <<< "$COMMITS"
+          
+          if [ $BAD_COMMITS -ne 0 ]; then
+            echo "Please ensure all commit messages follow the format: type: description"
+            echo "Example: 'feat: add new trading strategy'"
+            # We're just warning here, not failing the build
+            echo "::warning::Some commit messages don't follow the conventional commit format"
+          else
+            echo "✅ All commit messages follow the conventional format"
+          fi
+      
+      - name: PR size check
+        run: |
+          # Count number of changes in PR
+          ADDITIONS=$(git diff --numstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | awk '{sum += $1} END {print sum}')
+          DELETIONS=$(git diff --numstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | awk '{sum += $2} END {print sum}')
+          TOTAL=$((ADDITIONS + DELETIONS))
+          
+          echo "PR changes: +$ADDITIONS, -$DELETIONS, total: $TOTAL"
+          
+          if [ $TOTAL -gt 1000 ]; then
+            echo "::warning::This PR is quite large ($TOTAL lines). Consider breaking it into smaller PRs if possible."
+          fi
+          
+          # Generate a report on PR size
+          echo "# PR Size Analysis" > pr-size-report.md
+          echo "" >> pr-size-report.md
+          echo "| Metric | Count |" >> pr-size-report.md
+          echo "|--------|-------|" >> pr-size-report.md
+          echo "| Lines added | $ADDITIONS |" >> pr-size-report.md
+          echo "| Lines deleted | $DELETIONS |" >> pr-size-report.md
+          echo "| Total changes | $TOTAL |" >> pr-size-report.md
+          echo "" >> pr-size-report.md
+          
+          if [ $TOTAL -lt 100 ]; then
+            echo "✅ PR size is small and focused" >> pr-size-report.md
+          elif [ $TOTAL -lt 500 ]; then
+            echo "⚠️ PR size is moderate" >> pr-size-report.md
+          else
+            echo "⚠️ PR size is large. Consider breaking it into smaller PRs in the future." >> pr-size-report.md
+          fi
+      
+      - name: Upload PR analysis report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-validation-report
+          path: pr-size-report.md
+          if-no-files-found: warn
+      
+      - name: Suggest reviewers
+        run: |
+          # Create a list of potential reviewers based on files changed
+          echo "# Suggested Reviewers" > reviewers.md
+          echo "" >> reviewers.md
+          
+          # This is a simplified example - in real world, you would have logic to determine 
+          # the right reviewers based on file paths and expertise areas
+          if [ "${{ steps.changed-files.outputs.cpp_changed }}" == "true" ]; then
+            echo "## C++ Code Changes" >> reviewers.md
+            echo "Suggest code owners for review" >> reviewers.md
+          fi
+          
+          if [ "${{ steps.changed-files.outputs.build_changed }}" == "true" ]; then
+            echo "## Build System Changes" >> reviewers.md
+            echo "Suggest build system experts for review" >> reviewers.md
+          fi
+          
+          if [ "${{ steps.changed-files.outputs.docs_changed }}" == "true" ]; then
+            echo "## Documentation Changes" >> reviewers.md
+            echo "Suggest documentation maintainers for review" >> reviewers.md
+          fi
+          
+          cat reviewers.md
+      
+      - name: Upload reviewer suggestions
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewer-suggestions
+          path: reviewers.md
+          if-no-files-found: warn

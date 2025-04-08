@@ -48,8 +48,8 @@ To maintain code consistency, we use clang-format with the following settings:
 Please ensure that your code adheres to this style. You can format your code using clang-format before committing by running the following script:
 
 ```sh
-chmod +x /scripts/format.sh # If the script isn't already executable
-./scripts/format.sh
+chmod +x scripts/quality/format.sh # If the script isn't already executable
+./scripts/quality/format.sh
 ```
 
 Alternatively, you can set up your editor or IDE to format the code automatically on save. Refer to your editor or IDE documentation for instructions on how to integrate clang-format.

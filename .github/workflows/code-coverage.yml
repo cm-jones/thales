@@ -22,8 +22,8 @@ jobs:
     
     - name: Run coverage script
       run: |
-        chmod +x scripts/test_coverage.sh
-        ./scripts/test_coverage.sh
+        chmod +x scripts/test/test_coverage.sh
+        ./scripts/test/test_coverage.sh
     
     - name: Generate coverage report
       run: |

@@ -1,0 +1,84 @@
+name: CPPCheck
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install cppcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+    
+    - name: Run cppcheck
+      run: |
+        mkdir -p cppcheck-results
+        
+        # Run cppcheck with extended error reporting
+        cppcheck --enable=all --std=c++20 --inconclusive --xml --xml-version=2 \
+                 --suppress=missingIncludeSystem \
+                 -I include src 2> cppcheck-results/cppcheck-report.xml
+      continue-on-error: true
+    
+    - name: Generate HTML report
+      run: |
+        # Install cppcheck-htmlreport if not available
+        pip install pygments
+        
+        # Generate HTML report
+        cppcheck-htmlreport --file=cppcheck-results/cppcheck-report.xml \
+                           --report-dir=cppcheck-results/html \
+                           --source-dir=.
+    
+    - name: Generate text summary
+      run: |
+        echo "## CPPCheck Summary" > cppcheck-summary.md
+        echo "" >> cppcheck-summary.md
+        
+        ERROR_COUNT=$(grep -c "severity=\"error\"" cppcheck-results/cppcheck-report.xml || echo 0)
+        WARNING_COUNT=$(grep -c "severity=\"warning\"" cppcheck-results/cppcheck-report.xml || echo 0)
+        STYLE_COUNT=$(grep -c "severity=\"style\"" cppcheck-results/cppcheck-report.xml || echo 0)
+        PERFORMANCE_COUNT=$(grep -c "severity=\"performance\"" cppcheck-results/cppcheck-report.xml || echo 0)
+        PORTABILITY_COUNT=$(grep -c "severity=\"portability\"" cppcheck-results/cppcheck-report.xml || echo 0)
+        
+        echo "* Errors: $ERROR_COUNT" >> cppcheck-summary.md
+        echo "* Warnings: $WARNING_COUNT" >> cppcheck-summary.md
+        echo "* Style issues: $STYLE_COUNT" >> cppcheck-summary.md
+        echo "* Performance issues: $PERFORMANCE_COUNT" >> cppcheck-summary.md
+        echo "* Portability issues: $PORTABILITY_COUNT" >> cppcheck-summary.md
+        echo "" >> cppcheck-summary.md
+        echo "Check the cppcheck-results artifact for the detailed HTML report." >> cppcheck-summary.md
+        
+        cat cppcheck-summary.md
+    
+    - name: Upload cppcheck results
+      uses: actions/upload-artifact@v4
+      with:
+        name: cppcheck-results
+        path: cppcheck-results
+        if-no-files-found: warn
+    
+    - name: Upload summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: cppcheck-summary
+        path: cppcheck-summary.md
+        if-no-files-found: warn
+    
+    - name: Check for severe issues
+      run: |
+        ERROR_COUNT=$(grep -c "severity=\"error\"" cppcheck-results/cppcheck-report.xml || echo 0)
+        
+        if [ "$ERROR_COUNT" -gt 0 ]; then
+          echo "::warning::$ERROR_COUNT severe issues found by cppcheck"
+        else
+          echo "No severe issues found by cppcheck"
+        fi
