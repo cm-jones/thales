@@ -1,0 +1,105 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Mondays at midnight
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: Run Performance Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for comparing benchmarks
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libboost-all-dev gnuplot
+    
+    - name: Configure benchmark build
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON ..
+    
+    - name: Build benchmarks
+      run: |
+        cd build
+        cmake --build . --target benchmarks --config Release
+    
+    - name: Run benchmarks
+      run: |
+        mkdir -p benchmark-results
+        if [ -f "./scripts/run_benchmarks.sh" ]; then
+          chmod +x ./scripts/run_benchmarks.sh
+          ./scripts/run_benchmarks.sh --output-dir=benchmark-results
+        else
+          cd build
+          if [ -d "./benchmarks" ]; then
+            cd benchmarks
+            for bench in $(find . -type f -executable -name "benchmark_*"); do
+              echo "Running $bench..."
+              ./$bench --benchmark_format=json --benchmark_out=../../benchmark-results/$(basename $bench).json
+            done
+          else
+            echo "No benchmarks directory found. Trying to find benchmark executables..."
+            for bench in $(find . -type f -executable -name "benchmark_*"); do
+              echo "Running $bench..."
+              ./$bench --benchmark_format=json --benchmark_out=../benchmark-results/$(basename $bench).json
+            done
+          fi
+        fi
+    
+    - name: Generate benchmark reports
+      run: |
+        echo "Creating simple report from benchmark results"
+        cd benchmark-results
+        echo "# Benchmark Results" > benchmark-report.md
+        echo "" >> benchmark-report.md
+        echo "## Summary" >> benchmark-report.md
+        echo "" >> benchmark-report.md
+        
+        for file in *.json; do
+          if [ -f "$file" ]; then
+            BENCH_NAME=$(basename "$file" .json)
+            echo "Processing $BENCH_NAME..."
+            echo "### $BENCH_NAME" >> benchmark-report.md
+            echo "" >> benchmark-report.md
+            echo "See the JSON file in the artifacts for detailed results." >> benchmark-report.md
+            echo "" >> benchmark-report.md
+          fi
+        done
+        
+        cat benchmark-report.md
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: benchmark-results
+        if-no-files-found: warn
+    
+    - name: Compare with previous run
+      if: github.event_name == 'pull_request'
+      run: |
+        # Extract the base commit hash
+        BASE_HASH=$(git merge-base HEAD origin/main)
+        
+        echo "Comparing benchmark results with base commit $BASE_HASH"
+        
+        # Create simple comparison report
+        echo "# Benchmark Comparison" > benchmark-comparison.md
+        echo "" >> benchmark-comparison.md
+        echo "Comparing PR changes against base commit $BASE_HASH" >> benchmark-comparison.md
+        echo "" >> benchmark-comparison.md
+        echo "**Note:** For a complete benchmark comparison, store benchmark results in a persistent storage and implement a retrieval and comparison mechanism." >> benchmark-comparison.md
+        
+        cat benchmark-comparison.md
+      continue-on-error: true
