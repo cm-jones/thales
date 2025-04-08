@@ -1,0 +1,95 @@
+name: Clang Format
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+    
+    - name: Check for .clang-format file
+      id: check_clang_format
+      run: |
+        if [ -f ".clang-format" ]; then
+          echo "Found .clang-format file"
+          echo "has_clang_format=true" >> $GITHUB_OUTPUT
+        else
+          echo "No .clang-format file found, will use default style"
+          echo "has_clang_format=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Check formatting with custom style
+      if: steps.check_clang_format.outputs.has_clang_format == 'true'
+      run: |
+        # Create a script to check all C++ files
+        echo '#!/bin/bash
+        SOURCES=$(find ./src ./include ./tests -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.cc" 2>/dev/null)
+        if [ -z "$SOURCES" ]; then
+          echo "No source files found to format"
+          exit 0
+        fi
+        
+        FORMAT_DIFF=0
+        for file in $SOURCES; do
+          clang-format --style=file "$file" | diff -u "$file" -
+          if [ $? -ne 0 ]; then
+            FORMAT_DIFF=1
+          fi
+        done
+        
+        if [ $FORMAT_DIFF -ne 0 ]; then
+          echo "Formatting issues found. Run ./scripts/format.sh to fix."
+          exit 1
+        else
+          echo "All files are properly formatted"
+        fi' > check_format.sh
+        chmod +x check_format.sh
+        ./check_format.sh
+      continue-on-error: true
+    
+    - name: Check formatting with default style
+      if: steps.check_clang_format.outputs.has_clang_format == 'false'
+      run: |
+        # Use LLVM style as default
+        SOURCES=$(find ./src ./include ./tests -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.cc" 2>/dev/null)
+        if [ -z "$SOURCES" ]; then
+          echo "No source files found to format"
+          exit 0
+        fi
+        
+        FORMAT_DIFF=0
+        for file in $SOURCES; do
+          clang-format --style=llvm "$file" | diff -u "$file" -
+          if [ $? -ne 0 ]; then
+            FORMAT_DIFF=1
+          fi
+        done
+        
+        if [ $FORMAT_DIFF -ne 0 ]; then
+          echo "Formatting issues found. Consider adding a .clang-format file."
+          exit 1
+        else
+          echo "All files are properly formatted according to LLVM style"
+        fi
+      continue-on-error: true
+    
+    - name: Run format script if available
+      run: |
+        if [ -f "./scripts/format.sh" ]; then
+          chmod +x ./scripts/format.sh
+          ./scripts/format.sh --check
+        else
+          echo "No format script found at ./scripts/format.sh"
+        fi
+      continue-on-error: true
