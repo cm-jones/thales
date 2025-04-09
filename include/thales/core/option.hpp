@@ -7,10 +7,10 @@ namespace thales {
 namespace core {
 
 /**
- * @struct Contract
+ * @struct Option
  * @brief Represents an options contract
  */
-struct Contract {
+struct alignas(64) Option {
     /**
      * @enum Type
      * @brief Defines the type of the option: CALL or PUT.
@@ -18,7 +18,7 @@ struct Contract {
     enum struct Type : uint8_t {
         CALL,     // Call option
         PUT,      // Put option
-        UNKNOWN,  // Unknown type, used for initialization or error handling
+        UNKNOWN,  // Used for initialization or error handling
     };
 
     /**
@@ -26,7 +26,7 @@ struct Contract {
      * @brief Contains the Greeks of the option: delta, gamma, theta, vega,
      * rho.
      */
-    struct Greeks {
+    struct alignas(64) Greeks {
         double delta = 0.0;  // Delta of the option
         double gamma = 0.0;  // Gamma of the option
         double theta = 0.0;  // Theta of the option
@@ -36,17 +36,15 @@ struct Contract {
         Greeks() = default;
     };
 
-    Greeks greeks;  // Greeks of the option (varies, likely >32 bytes)
-    std::string
-        exchange;  // The exchange where the option is traded (24-32 bytes)
-    std::string expiry;  // Expiration date (24-32 bytes)
-    double strike;       // Strike price (for options) (8 bytes)
-    Type type;    // Type of the option (CALL or PUT) (1 byte)
-    utils::SymbolLookup::symbol_id_t
-        symbol_id;  // The ID of the symbol (2 bytes)
+    std::unique_ptr<Greeks> greeks;           // Greeks of the option
+    std::array<char, 8> exchange;                         // The exchange where the option is traded
+    std::array<char, 8> expiry;                           // Expiration date
+    double strike;                            // Strike price
+    utils::SymbolLookup::SymbolID symbol_id;  // The ID of the symbol
+    Type type;                                // CALL or PUT
 
     // Constructor
-    Contract(utils::SymbolLookup::symbol_id_t sym_id =
+    Option(utils::SymbolLookup::SymbolID sym_id =
                utils::SymbolLookup::INVALID_SYMBOL_ID,
            const std::string& exch = "", Type t = Type::UNKNOWN,
            const std::string& exp = "", double strk = 0.0)
