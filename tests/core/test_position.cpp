@@ -19,7 +19,7 @@ TEST_F(PositionTest, DefaultConstructor) {
     
     EXPECT_EQ(position.contract.symbol_id, SymbolLookup::INVALID_SYMBOL_ID);
     EXPECT_EQ(position.contract.exchange, "");
-    EXPECT_EQ(position.contract.type, Contract::Type::UNKNOWN);
+    EXPECT_EQ(position.contract.type, Option::Type::UNKNOWN);
     EXPECT_EQ(position.quantity, 0);
     EXPECT_EQ(position.average_price, 0.0);
     EXPECT_EQ(position.last_price, 0.0);
@@ -30,7 +30,7 @@ TEST_F(PositionTest, DefaultConstructor) {
 TEST_F(PositionTest, ParameterizedConstructor) {
     auto symbol_id = SymbolLookup::get_instance().get_id("AAPL");
     std::string exchange = "NASDAQ";
-    Contract::Type option_type = Contract::Type::CALL;
+    Option::Type option_type = Option::Type::CALL;
     int quantity = 100;
     double avg_price = 150.0;
     double curr_price = 155.0;
@@ -86,13 +86,13 @@ TEST_F(PositionTest, PositionWithDifferentOptionTypes) {
     std::string exchange = "NASDAQ";
     
     // Test with CALL option
-    Position call_position(symbol_id, exchange, Contract::Type::CALL, 100, 150.0, 160.0);
-    EXPECT_EQ(call_position.contract.type, Contract::Type::CALL);
+    Position call_position(symbol_id, exchange, Option::Type::CALL, 100, 150.0, 160.0);
+    EXPECT_EQ(call_position.contract.type, Option::Type::CALL);
     EXPECT_EQ(call_position.get_unrealized_pnl(), 1000.0);
     
     // Test with PUT option
-    Position put_position(symbol_id, exchange, Contract::Type::PUT, 100, 150.0, 140.0);
-    EXPECT_EQ(put_position.contract.type, Contract::Type::PUT);
+    Position put_position(symbol_id, exchange, Option::Type::PUT, 100, 150.0, 140.0);
+    EXPECT_EQ(put_position.contract.type, Option::Type::PUT);
     EXPECT_EQ(put_position.get_unrealized_pnl(), -1000.0);
 }
 
@@ -100,13 +100,13 @@ TEST_F(PositionTest, PositionWithDifferentQuantities) {
     auto symbol_id = SymbolLookup::get_instance().get_id("AAPL");
     
     // Long position
-    Position long_position(symbol_id, "NASDAQ", Contract::Type::CALL, 100, 150.0, 160.0);
+    Position long_position(symbol_id, "NASDAQ", Option::Type::CALL, 100, 150.0, 160.0);
     EXPECT_EQ(long_position.quantity, 100);
     EXPECT_EQ(long_position.get_value(), 16000.0);
     EXPECT_EQ(long_position.get_unrealized_pnl(), 1000.0);
     
     // Short position (negative quantity)
-    Position short_position(symbol_id, "NASDAQ", Contract::Type::CALL, -50, 150.0, 160.0);
+    Position short_position(symbol_id, "NASDAQ", Option::Type::CALL, -50, 150.0, 160.0);
     EXPECT_EQ(short_position.quantity, static_cast<uint16_t>(-50) & 0xFFFF); // Unsigned conversion
     EXPECT_EQ(short_position.get_value(), short_position.quantity * 160.0);
     EXPECT_EQ(short_position.get_unrealized_pnl(), short_position.quantity * (160.0 - 150.0));

@@ -6,6 +6,7 @@
 #include <thales/core/position.hpp>
 #include <thales/utils/config.hpp>
 #include <vector>
+#include <boost/container/static_vector.hpp>
 
 namespace thales {
 namespace core {
@@ -119,10 +120,10 @@ class Portfolio {
 
    private:
     // Positions and orders
-    std::vector<Position>
-        positions_;  // Map of positions (56-64 bytes)
-    std::vector<Order>
-        orders_;  // Map of orders (56-64 bytes)
+    alignas(64) boost::container::static_vector<Position, 256>
+        positions_;  // Vector of positions (56-64 bytes)
+    alignas(64) boost::container::static_vector<Order, 256>
+        orders_;  // Vector of orders
 
     // Configuration
     utils::Config config_;  // Configuration object (varies, likely >32 bytes)

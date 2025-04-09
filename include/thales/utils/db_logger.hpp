@@ -20,7 +20,7 @@ namespace utils {
  * with a queue to minimize impact on trading performance.
  */
 class DbLogger {
-   public:
+public:
     /**
      * @brief Get the singleton instance of the database logger
      * @return Reference to the database logger instance
@@ -100,12 +100,12 @@ class DbLogger {
      */
     size_t get_failed_count() const;
 
-   private:
+    // Destructor made public for unique_ptr
+    ~DbLogger();
+
+private:
     // Private constructor for singleton pattern
     DbLogger();
-
-    // Destructor
-    ~DbLogger();
 
     // Prevent copying and assignment
     DbLogger(const DbLogger&) = delete;
@@ -171,7 +171,7 @@ class DbLogger {
 
     // Queue for logs
     std::queue<TradeExecutionLog> log_queue_;
-    std::mutex queue_mutex_;
+    mutable std::mutex queue_mutex_;
     std::condition_variable queue_condition_;
 
     // Worker thread

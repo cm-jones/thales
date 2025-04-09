@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <thales/core/contract.hpp>
+#include <thales/core/option.hpp>
 
 namespace thales {
 namespace core {
@@ -10,8 +10,8 @@ namespace core {
  * @struct Position
  * @brief Represents a position in a financial instrument.
  */
-struct Position {
-    Contract contract;         // The instrument associated with the position (varies,
+struct alignas(64) Position {
+    Option option;         // The instrument associated with the position (varies,
                            // >64 bytes)
     double average_price;  // Average entry price (4 bytes)
     double last_price;     // Current market price (4 bytes)
@@ -20,10 +20,10 @@ struct Position {
     uint16_t quantity;      // Quantity held (2 bytes)
 
     // Constructor
-    Position(utils::SymbolLookup::symbol_id_t sym_id =
+    Position(utils::SymbolLookup::SymbolID id =
                  utils::SymbolLookup::INVALID_SYMBOL_ID,
              const std::string& exchange = "",
-             Contract::Type option_type = Contract::Type::UNKNOWN, int qty = 0,
+             Option::Type option_type = Option::Type::UNKNOWN, int qty = 0,
              double avg_price = 0.0, double curr_price = 0.0,
              double unrealized_pnl = 0.0, double realized_pnl = 0.0);
 

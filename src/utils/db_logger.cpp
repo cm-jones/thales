@@ -291,7 +291,7 @@ bool DbLogger::log_trade_execution(
     log.exchange = exchange;
     log.order_type = order_type;
     log.is_option = is_option;
-    logcontract_data = option_data;
+    log.option_data = option_data;
     log.additional_data = additional_data;
     log.timestamp = get_current_timestamp();
 
@@ -410,30 +410,48 @@ bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
         // Create a transaction
         pqxx::work txn(conn);
 
-        // Prepare the statement
-        pqxx::prepare::declaration stmt = txn.conn().prepare(
-            "insert_trade_execution",
-            "INSERT INTO trade_executions ("
-            "timestamp, strategy_name, symbol, order_id, execution_id, "
-            "side, quantity, price, commission, total_value, "
-            "execution_time, account_id, exchange, order_type, "
-            "is_option, option_data, additional_data"
-            ") VALUES ("
-            "$1, $2, $3, $4, $5, "
-            "$6, $7, $8, $9, $10, "
-            "$11, $12, $13, $14, "
-            "$15, $16, $17"
-            ")");
-
-        // Insert each log
+        // Insert each log using simple string concatenation for demonstration
         for (const auto& log : logs) {
-            txn.exec_prepared("insert_trade_execution", log.timestamp,
-                              log.strategy_name, log.symbol, log.order_id,
-                              log.execution_id, log.side, log.quantity,
-                              log.price, log.commission, log.total_value,
-                              log.execution_time, log.account_id, log.exchange,
-                              log.order_type, log.is_option, logcontract_data,
-                              log.additional_data);
+            // Build the SQL query with proper escaping
+            std::string query = 
+                "INSERT INTO trade_executions ("
+                "timestamp, strategy_name, symbol, order_id, execution_id, "
+                "side, quantity, price, commission, total_value, "
+                "execution_time, account_id, exchange, order_type, "
+                "is_option, option_data, additional_data"
+                ") VALUES (";
+                
+            // Properly escape and quote string values
+            query += txn.quote(log.timestamp) + ", ";
+            query += txn.quote(log.strategy_name) + ", ";
+            query += txn.quote(log.symbol) + ", ";
+            query += txn.quote(log.order_id) + ", ";
+            query += txn.quote(log.execution_id) + ", ";
+            query += txn.quote(log.side) + ", ";
+            
+            // Add numeric values (no quotes needed)
+            query += std::to_string(log.quantity) + ", ";
+            query += std::to_string(log.price) + ", ";
+            query += std::to_string(log.commission) + ", ";
+            query += std::to_string(log.total_value) + ", ";
+            
+            // More string values
+            query += txn.quote(log.execution_time) + ", ";
+            query += txn.quote(log.account_id) + ", ";
+            query += txn.quote(log.exchange) + ", ";
+            query += txn.quote(log.order_type) + ", ";
+            
+            // Boolean value
+            query += std::string(log.is_option ? "TRUE" : "FALSE") + ", ";
+            
+            // JSON data
+            query += txn.quote(log.option_data) + ", ";
+            query += txn.quote(log.additional_data);
+            
+            query += ")";
+            
+            // Execute the query
+            txn.exec(query);
         }
 
         // Commit the transaction
@@ -470,7 +488,7 @@ void DbLogger::shutdown() {
 bool DbLogger::is_connected() const { return connected_; }
 
 size_t DbLogger::get_queue_size() const {
-    std::lock_guard<std::mutex> lock(queue_mutex_);
+    std::lock_guard<std::mutex> lock(queue_mutex_);  // non-const mutex passed here
     return log_queue_.size();
 }
 

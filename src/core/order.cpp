@@ -4,7 +4,7 @@ namespace thales {
 namespace core {
 
 Order::Order(const std::string& id,
-             utils::SymbolLookup::symbol_id_t sym_id,
+             utils::SymbolLookup::SymbolID sym_id,
              Type t, Side s, double qty,
              double p, double stop_p, Status stat,
              double filled_qty, double avg_fill_price,

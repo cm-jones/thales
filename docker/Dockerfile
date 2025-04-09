@@ -1,4 +1,5 @@
-FROM ubuntu:22.04 as builder
+ARG UBUNTU_VERSION
+FROM ubuntu:${UBUNTU_VERSION} as builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -16,13 +17,13 @@ COPY . .
 # Configure with performance flags
 RUN mkdir -p build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_FLAGS="-O3 -march=native -ffast-math -flto" ..
+    -DCMAKE_CXX_FLAGS="-O3 -march=native -ffast-math -flto" ..
 
 # Compile with all cores
 RUN cd build && make -j$(nproc)
 
 # Create minimal runtime image
-FROM ubuntu:22.04
+FROM ubuntu:${UBUNTU_VERSION}
 
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y \

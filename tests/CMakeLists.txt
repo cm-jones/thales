@@ -54,8 +54,15 @@ set(TEST_SOURCES
 # Add test executable
 add_executable(thales_tests ${TEST_SOURCES})
 
-# Link against the library and GTest
-target_link_libraries(thales_tests PRIVATE thales_lib)
+# Link against the individual libraries and GTest
+target_link_libraries(thales_tests PRIVATE 
+    core 
+    data 
+    models 
+    strategies 
+    utils
+    twsapi
+)
 
 # Link against the appropriate GTest and GMock libraries
 if(GTEST_FOUND)

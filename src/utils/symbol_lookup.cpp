@@ -21,20 +21,20 @@ SymbolLookup::SymbolLookup(const std::vector<std::string>& symbols) {
     }
 }
 
-SymbolLookup::symbol_id_t SymbolLookup::add_symbol(const std::string& symbol) {
+SymbolLookup::SymbolID SymbolLookup::add_symbol(const std::string& symbol) {
     // If the symbol already exists, return its ID
     if (has_symbol(symbol)) {
         return symbol_to_id_[symbol];
     }
 
     // Assign a new ID to the symbol
-    symbol_id_t id = next_id_++;
+    SymbolID id = next_id_++;
     symbol_to_id_[symbol] = id;
     id_to_symbol_[id] = symbol;
     return id;
 }
 
-SymbolLookup::symbol_id_t SymbolLookup::get_id(
+SymbolLookup::SymbolID SymbolLookup::get_id(
     const std::string& symbol) const {
     auto it = symbol_to_id_.find(symbol);
 
@@ -45,7 +45,7 @@ SymbolLookup::symbol_id_t SymbolLookup::get_id(
     return INVALID_SYMBOL_ID;
 }
 
-std::string SymbolLookup::get_symbol(symbol_id_t id) const {
+std::string SymbolLookup::get_symbol(SymbolID id) const {
     auto it = id_to_symbol_.find(id);
 
     if (it != id_to_symbol_.end()) {
@@ -59,7 +59,7 @@ bool SymbolLookup::has_symbol(const std::string& symbol) const {
     return symbol_to_id_.find(symbol) != symbol_to_id_.end();
 }
 
-bool SymbolLookup::has_id(symbol_id_t id) const {
+bool SymbolLookup::has_id(SymbolID id) const {
     return id_to_symbol_.find(id) != id_to_symbol_.end();
 }
 

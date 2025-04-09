@@ -3,7 +3,6 @@ from setuptools.command.build_ext import build_ext
 import os
 import sys
 import subprocess
-import platform
 
 # Find pybind11 headers
 import pybind11
@@ -35,12 +34,13 @@ class CMakeBuild(build_ext):
             '-DTHALES_ROOT=' + THALES_ROOT
         ]
         
-        # Configure build type
+        # Configure build type for Linux only
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
         
         cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-        build_args += ['--', '-j2']
+        # Use more cores on Linux containers
+        build_args += ['--', '-j4']
         
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
@@ -68,7 +68,7 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: POSIX :: Linux",
     ],
     python_requires=">=3.8",
     install_requires=[

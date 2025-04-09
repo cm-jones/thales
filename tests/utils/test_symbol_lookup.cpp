@@ -36,7 +36,7 @@ TEST_F(SymbolLookupTest, Initialization) {
     
     // Check all IDs were assigned
     for (size_t i = 0; i < symbols.size(); ++i) {
-        SymbolLookup::symbol_id_t id = i + 1; // IDs start from 1
+        SymbolLookup::SymbolID id = i + 1; // IDs start from 1
         EXPECT_TRUE(lookup.has_id(id));
         EXPECT_FALSE(lookup.get_symbol(id).empty());
     }

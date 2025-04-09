@@ -3,9 +3,9 @@
 namespace thales {
 namespace core {
 
-Position::Position(utils::SymbolLookup::symbol_id_t sym_id,
+Position::Position(utils::SymbolLookup::SymbolID sym_id,
                    const std::string& exchange,
-                   Contract::Type option_type, int qty,
+                   Option::Type option_type, int qty,
                    double avg_price, double curr_price,
                    double unrealized_pnl, double realized_pnl)
     : contract(sym_id, exchange, option_type),

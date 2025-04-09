@@ -53,7 +53,7 @@ struct Order {
     double average_fill_price;  // Average fill price (8 bytes)
     uint16_t quantity;          // Quantity to trade (2 bytes)
     uint16_t filled_quantity;   // Quantity that has been filled (2 bytes)
-    utils::SymbolLookup::symbol_id_t
+    utils::SymbolLookup::SymbolID
         symbol_id;  // ID of the instrument symbol (2 bytes)
     Type type;      // Order type (1 byte)
     Side side;      // Buy or sell (1 byte)
@@ -61,7 +61,7 @@ struct Order {
 
     // Constructor
     Order(const std::string& id = "",
-          utils::SymbolLookup::symbol_id_t sym_id =
+          utils::SymbolLookup::SymbolID sym_id =
               utils::SymbolLookup::INVALID_SYMBOL_ID,
           Type t = Type::MARKET, Side s = Side::BUY, double qty = 0.0,
           double p = 0.0, double stop_p = 0.0, Status stat = Status::PENDING,

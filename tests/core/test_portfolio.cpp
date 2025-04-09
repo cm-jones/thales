@@ -45,7 +45,7 @@ TEST_F(PortfolioTest, AddPosition) {
     
     // Create a test position
     auto symbol_id = SymbolLookup::get_instance().get_id("AAPL");
-    Position position(symbol_id, "NASDAQ", Contract::Type::CALL, 100, 150.0, 160.0);
+    Position position(symbol_id, "NASDAQ", Option::Type::CALL, 100, 150.0, 160.0);
     
     // Add position to portfolio
     portfolio.add_position(position);
@@ -72,7 +72,7 @@ TEST_F(PortfolioTest, UpdatePosition) {
     
     // Create and add a test position
     auto symbol_id = SymbolLookup::get_instance().get_id("AAPL");
-    Position position(symbol_id, "NASDAQ", Contract::Type::CALL, 100, 150.0, 160.0);
+    Position position(symbol_id, "NASDAQ", Option::Type::CALL, 100, 150.0, 160.0);
     portfolio.add_position(position);
     
     // Update position with new price
@@ -178,9 +178,9 @@ TEST_F(PortfolioTest, MultiplePositionsAndOrders) {
     auto msft_id = SymbolLookup::get_instance().get_id("MSFT");
     auto goog_id = SymbolLookup::get_instance().get_id("GOOG");
     
-    Position aapl_position(aapl_id, "NASDAQ", Contract::Type::CALL, 100, 150.0, 160.0);
-    Position msft_position(msft_id, "NASDAQ", Contract::Type::PUT, 50, 250.0, 240.0);
-    Position goog_position(goog_id, "NASDAQ", Contract::Type::CALL, 25, 2000.0, 2100.0);
+    Position aapl_position(aapl_id, "NASDAQ", Option::Type::CALL, 100, 150.0, 160.0);
+    Position msft_position(msft_id, "NASDAQ", Option::Type::PUT, 50, 250.0, 240.0);
+    Position goog_position(goog_id, "NASDAQ", Option::Type::CALL, 25, 2000.0, 2100.0);
     
     portfolio.add_position(aapl_position);
     portfolio.add_position(msft_position);

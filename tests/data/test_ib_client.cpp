@@ -63,7 +63,7 @@ TEST(IBContractTest, CreateEquityContract) {
     auto symbol_id = SymbolLookup::get_instance().add_symbol("AAPL");
     
     // Create a contract
-    Contract contract(symbol_id, "NASDAQ", Contract::Type::UNKNOWN);
+    Option contract(symbol_id, "NASDAQ", Option::Type::UNKNOWN);
     
     // Create IB contract
     IBContract ib_contract;
@@ -83,7 +83,7 @@ TEST(IBContractTest, CreateOptionContract) {
     auto symbol_id = SymbolLookup::get_instance().add_symbol("AAPL");
     
     // Create a call option contract
-    Contract call_contract(symbol_id, "NASDAQ", Contract::Type::CALL, "20251219", 200.0);
+    Option call_contract(symbol_id, "NASDAQ", Option::Type::CALL, "20251219", 200.0);
     
     // Create IB contract
     IBContract call_ib_contract;
@@ -105,7 +105,7 @@ TEST(IBContractTest, CreateOptionContract) {
     EXPECT_EQ(call_ib_contract.strike, 200.0);
     
     // Create a put option contract
-    Contract put_contract(symbol_id, "NASDAQ", Contract::Type::PUT, "20251219", 200.0);
+    Option put_contract(symbol_id, "NASDAQ", Option::Type::PUT, "20251219", 200.0);
     
     // Create IB contract
     IBContract put_ib_contract;

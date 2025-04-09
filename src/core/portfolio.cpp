@@ -30,7 +30,7 @@ Position Portfolio::get_position(const std::string& symbol) const {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Convert symbol string to symbol_id using SymbolLookup
-    utils::SymbolLookup::symbol_id_t symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
+    utils::SymbolLookup::SymbolID symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
     
     // Find position by symbol_id
     for (const auto& position : positions_) {
@@ -106,7 +106,7 @@ void Portfolio::update_position(const std::string& symbol, double last_price) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Convert symbol string to symbol_id using SymbolLookup
-    utils::SymbolLookup::symbol_id_t symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
+    utils::SymbolLookup::SymbolID symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
     
     // Find position by symbol_id and update it
     for (auto& position : positions_) {
