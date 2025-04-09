@@ -8,7 +8,7 @@ on:
 jobs:
   comprehensive-build:
     name: Comprehensive Nightly Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -91,7 +91,7 @@ jobs:
         run: |
           # Run cppcheck
           echo "Running cppcheck..."
-          cppcheck --enable=all --std=c++20 --inconclusive --xml --xml-version=2 \
+          cppcheck --enable=all --std=c++23 --inconclusive --xml --xml-version=2 \
             --suppress=missingIncludeSystem \
             -I include src 2> cppcheck-report.xml
           

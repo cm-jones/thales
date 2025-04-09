@@ -10,7 +10,7 @@ on:
 jobs:
   check-licenses:
     name: Check License Compliance
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

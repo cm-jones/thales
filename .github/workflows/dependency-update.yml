@@ -8,7 +8,7 @@ on:
 jobs:
   check-updates:
     name: Check for Dependency Updates
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

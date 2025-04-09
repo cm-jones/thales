@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-${{ vars.UBUNTU_VERSION }}]
         compiler:
           - { 
               name: 'gcc',
@@ -47,7 +47,7 @@ jobs:
       
       # Setup compilers on each OS
       - name: Setup GCC (Ubuntu)
-        if: matrix.os == 'ubuntu-latest' && matrix.compiler.name == 'gcc'
+        if: matrix.os == 'ubuntu-${{ vars.UBUNTU_VERSION }}' && matrix.compiler.name == 'gcc'
         run: |
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.compiler.install_ubuntu }}
@@ -55,7 +55,7 @@ jobs:
           echo "CXX=g++-${{ matrix.compiler.version }}" >> $GITHUB_ENV
       
       - name: Setup Clang (Ubuntu)
-        if: matrix.os == 'ubuntu-latest' && matrix.compiler.name == 'clang'
+        if: matrix.os == 'ubuntu-${{ vars.UBUNTU_VERSION }}' && matrix.compiler.name == 'clang'
         run: |
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.compiler.install_ubuntu }}
@@ -82,7 +82,7 @@ jobs:
       
       # Install dependencies on each OS
       - name: Install dependencies (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-${{ vars.UBUNTU_VERSION }}'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake build-essential libboost-all-dev
@@ -206,7 +206,7 @@ jobs:
   build-summary:
     name: Cross-Platform Build Summary
     needs: build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     if: always()
     steps:
       - name: Download all platform reports

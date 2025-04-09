@@ -6,21 +6,27 @@ on:
     paths:
       - 'docs/**'
       - 'include/**'
+      - 'src/**'
       - '**/*.md'
       - 'Doxyfile'
+      - 'scripts/documentation/**'
+      - '.github/workflows/documentation.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'docs/**'
       - 'include/**'
+      - 'src/**'
       - '**/*.md'
       - 'Doxyfile'
-  workflow_dispatch:
+      - 'scripts/documentation/**'
+      - '.github/workflows/documentation.yml'
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   doxygen:
     name: Generate Doxygen Documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -51,6 +57,7 @@ jobs:
             sed -i 's/UML_LOOK               = NO/UML_LOOK               = YES/g' Doxyfile
             sed -i 's/CALL_GRAPH             = NO/CALL_GRAPH             = YES/g' Doxyfile
             sed -i 's/CALLER_GRAPH           = NO/CALLER_GRAPH           = YES/g' Doxyfile
+            sed -i 's/HTML_EXTRA_STYLESHEET  =/HTML_EXTRA_STYLESHEET  = docs\/extra\/custom.css/g' Doxyfile
           fi
       
       - name: Generate Doxygen documentation
@@ -62,6 +69,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/doxygen/html
+          destination_dir: .
+          cname: cm-jones.github.io/thales
           force_orphan: true
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
@@ -76,7 +85,7 @@ jobs:
 
   markdown:
     name: Process Markdown Documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

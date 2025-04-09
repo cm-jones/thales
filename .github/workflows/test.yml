@@ -12,14 +12,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-${{ vars.UBUNTU_VERSION }}]
         build_type: [Debug]
         
     steps:
     - uses: actions/checkout@v3
     
     - name: Install dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-${{ vars.UBUNTU_VERSION }}'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake libboost-all-dev googletest
