@@ -1,0 +1,85 @@
+name: Test Docker Image
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    # Only trigger when relevant files change
+    paths:
+      - 'docker/**'
+      - '.github/workflows/docker-test.yml'
+      - 'src/**'
+      - 'include/**'
+      - 'CMakeLists.txt'
+      - '.version'
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Extract Ubuntu version from .version file
+      - name: Extract Ubuntu version
+        id: ubuntu_version
+        run: |
+          UBUNTU_VERSION=$(grep "UBUNTU_VERSION" .version | cut -d= -f2)
+          echo "UBUNTU_VERSION=$UBUNTU_VERSION" >> $GITHUB_ENV
+
+      # Build but don't push the Docker image
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: false
+          load: true  # Load the image into Docker daemon
+          build-args: |
+            UBUNTU_VERSION=${{ env.UBUNTU_VERSION }}
+          tags: |
+            thales:test
+
+      # Run the test script against the built image
+      - name: Test Docker image
+        run: |
+          chmod +x scripts/docker/test_docker_image.sh
+          ./scripts/docker/test_docker_image.sh thales:test
+
+      # Check that the image starts correctly
+      - name: Test startup
+        run: |
+          echo "Setting up test environment..."
+          mkdir -p logs data config
+          
+          echo "Starting container..."
+          docker run --name thales-test -d \
+            -v $PWD/logs:/usr/local/thales/logs \
+            -v $PWD/data:/usr/local/thales/data \
+            -e DB_HOST=localhost \
+            -e DB_USER=thales \
+            -e DB_PASSWORD=thales \
+            -e DB_NAME=thales \
+            thales:test
+          
+          # Give it a moment to start
+          sleep 5
+          
+          # Check container is running
+          if docker ps | grep -q thales-test; then
+            echo "Container started successfully!"
+          else
+            echo "Container failed to start correctly."
+            docker logs thales-test
+            exit 1
+          fi
+          
+          # Clean up
+          docker stop thales-test
+          docker rm thales-test

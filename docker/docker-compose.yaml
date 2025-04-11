@@ -3,23 +3,32 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+      args:
+        - UBUNTU_VERSION=${UBUNTU_VERSION}
+    platform: linux/amd64
     image: thales:latest
     container_name: thales
     restart: unless-stopped
     volumes:
-      - ../logs:/app/logs
-      - ../data:/app/data
-      - ../config:/app/config
+      - ../logs:/usr/local/thales/logs
+      - ../data:/usr/local/thales/data
+    depends_on:
+      - postgres
     environment:
-      - HOST_IP=${HOST_IP}
+      - HOST_IP=${HOST_IP:-host.docker.internal}
       - IB_GATEWAY_PORT=4001
       - LOG_LEVEL=INFO
-    network_mode: "host"
-    command: "/entrypoint.sh"
+      - DB_HOST=postgres
+      - DB_USER=thales
+      - DB_PASSWORD=thales
+      - DB_NAME=thales
+    networks:
+      - thales-network
 
   # Add PostgreSQL for logging and data storage
   postgres:
     image: postgres:15
+    platform: linux/amd64
     container_name: thales-postgres
     restart: unless-stopped
     volumes:
@@ -30,7 +39,13 @@ services:
       - POSTGRES_DB=thales
     ports:
       - "5432:5432"
+    networks:
+      - thales-network
 
 volumes:
   thales-postgres-data:
     driver: local
+
+networks:
+  thales-network:
+    driver: bridge
