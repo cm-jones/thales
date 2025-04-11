@@ -1,12 +1,14 @@
 #!/bin/bash
-# Script to download and install Interactive Brokers C++ API
 
 set -e
+
+# Navigate to the project root directory
+cd "$(git rev-parse --show-toplevel)"
 
 # Create the third_party/ibapi directory
 mkdir -p third_party/ibapi
 
-# Set the IB API version - you can update this to the latest version
+# Set the IB API version
 IB_API_VERSION="1035.01"
 
 # Determine the OS type
@@ -30,11 +32,11 @@ unzip -q "${TMP_DIR}/ibapi.zip" -d "${TMP_DIR}"
 # The C++ API client files are in the IBJts/source/cppclient/client directory
 IB_SOURCE_DIR="${TMP_DIR}/IBJts/source/cppclient/client"
 
-echo "Copying C++ API files to third_party/ibapi..."
+echo "Copying C++ API files into third_party/ibapi..."
 cp -r "${IB_SOURCE_DIR}/"* "third_party/ibapi/"
 
 # Clean up temporary directory
 rm -rf "${TMP_DIR}"
 
-echo "IB API installed successfully in third_party/ibapi/"
-echo "Now you can build your project with IB API support"
+echo "IB API successfully installed in third_party/ibapi/"
+echo "Now you can build this project with IB API support"

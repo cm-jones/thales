@@ -27,8 +27,8 @@ WORKDIR /app
 # Copy source code
 COPY . .
 
-# Initialize any submodules in third_party
-RUN git submodule update --init --recursive
+# No git submodules found in project, skipping initialization
+# RUN git submodule update --init --recursive
 
 # Clean any existing build artifacts
 RUN rm -rf build CMakeCache.txt CMakeFiles

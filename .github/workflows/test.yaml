@@ -9,26 +9,18 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     strategy:
       matrix:
-        os: [ubuntu-${{ vars.UBUNTU_VERSION }}]
-        build_type: [Debug]
+        build_type: ["Debug"]
         
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-${{ vars.UBUNTU_VERSION }}'
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake libboost-all-dev googletest
-    
-    - name: Install dependencies (macOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew update
-        brew install cmake boost googletest
     
     - name: Configure
       run: |

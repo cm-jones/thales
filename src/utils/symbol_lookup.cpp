@@ -10,6 +10,7 @@ SymbolLookup& SymbolLookup::get_instance() {
 
 void SymbolLookup::initialize(const std::vector<std::string>& symbols) {
     SymbolLookup& instance = get_instance();
+
     for (const auto& symbol : symbols) {
         instance.add_symbol(symbol);
     }
@@ -31,6 +32,7 @@ SymbolLookup::SymbolID SymbolLookup::add_symbol(const std::string& symbol) {
     SymbolID id = next_id_++;
     symbol_to_id_[symbol] = id;
     id_to_symbol_[id] = symbol;
+
     return id;
 }
 

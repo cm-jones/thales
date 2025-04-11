@@ -1,13 +1,33 @@
 #pragma once
 
+#define CACHE_LINE_SIZE 64
+
 #include <mutex>
 #include <string>
-#include <thales/core/order.hpp>
-#include <thales/core/position.hpp>
-#include <thales/utils/config.hpp>
-#include <vector>
 #include <boost/container/static_vector.hpp>
-#include "thales/core/option.hpp"
+#include <cstdint>
+
+// Include local headers
+#include "option.hpp"
+#include "order.hpp"
+#include "position.hpp"
+#include <thales/utils/config.hpp>
+#include <thales/utils/symbol_lookup.hpp>
+
+// Forward declarations to address namespace issues
+namespace boost {
+namespace container {
+template <typename T, size_t N>
+class static_vector;
+}
+}
+
+namespace thales {
+namespace utils {
+class Config;
+class SymbolLookup;
+}
+}
 
 namespace thales {
 namespace core {
@@ -42,7 +62,7 @@ class alignas(CACHE_LINE_SIZE) Portfolio {
      * @brief Get all positions in the portfolio
      * @return A stable_vector of positions
      */
-    boost::container::static_vector<Positions, 256> get_positions() const;
+    boost::container::static_vector<Position, 256> get_positions() const;
 
     /**
      * @brief Get a specific position by symbol

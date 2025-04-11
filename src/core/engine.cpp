@@ -7,11 +7,6 @@
 #if defined(__linux__)
     #include <sched.h>
     #include <pthread.h>
-#elif defined(_WIN32) || defined(_WIN64)
-    #include <windows.h>
-#elif defined(__APPLE__) || defined(__MACH__)
-    #include <mach/thread_policy.h>
-    #include <mach/thread_act.h>
 #endif
 
 namespace thales {
@@ -103,13 +98,6 @@ void Engine::main_loop() {
     } else {
         logger.warning("Failed to set thread affinity on Windows: " + std::to_string(GetLastError()));
     }
-#elif defined(__APPLE__) || defined(__MACH__)
-    // macOS thread affinity is very limited
-    logger.info("Thread pinning not fully supported on macOS");
-    // macOS doesn't provide API for thread-to-core pinning in user space
-    // You could use thread_policy_set() but it's not reliable for strict pinning
-#else
-    logger.info("Thread pinning not implemented for this platform");
 #endif
 
     logger.info("Main loop started with interval: " + std::to_string(loop_interval_ms) + "ms");
