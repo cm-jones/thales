@@ -1,37 +1,19 @@
-# Find Google Benchmark
-find_package(benchmark QUIET)
-
-# Use FetchContent as a fallback if Google Benchmark is not found
-if(NOT benchmark_FOUND)
-    message(STATUS "System Google Benchmark not found, fetching from source")
-    include(FetchContent)
-    FetchContent_Declare(
-        googlebenchmark
-        GIT_REPOSITORY https://github.com/google/benchmark.git
-        GIT_TAG v1.8.3
-    )
-    # Disable benchmark tests
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googlebenchmark)
-endif()
+# Google Benchmark is included from third_party/benchmark
 
 # Define benchmark sources
 set(BENCHMARK_SOURCES
     benchmark_black_scholes_model.cpp
+    benchmark_black_scholes_model_vectorized.cpp
 )
 
 # Add benchmark executable
 add_executable(thales_benchmarks ${BENCHMARK_SOURCES})
 
 # Link against the library and Google Benchmark
-target_link_libraries(thales_benchmarks PRIVATE thales_lib)
+target_link_libraries(thales_benchmarks PRIVATE models core data strategies utils)
 
-# Link against the appropriate Google Benchmark libraries
-if(benchmark_FOUND)
-    target_link_libraries(thales_benchmarks PRIVATE benchmark::benchmark)
-else()
-    target_link_libraries(thales_benchmarks PRIVATE benchmark)
-endif()
+# Link against the Google Benchmark library
+target_link_libraries(thales_benchmarks PRIVATE benchmark)
 
 # Add pthread if needed (usually required on Unix-like systems)
 find_package(Threads REQUIRED)

@@ -1,0 +1,21 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Boost 1.74 REQUIRED COMPONENTS container)
+find_dependency(yaml-cpp 0.7.0 REQUIRED)
+
+# libpqxx
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBPQXX REQUIRED libpqxx)
+
+# Import the targets
+include("${CMAKE_CURRENT_LIST_DIR}/thales-targets.cmake")
+
+# Set the include directories
+set_and_check(thales_INCLUDE_DIRS "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set_and_check(thales_LIB_DIRS "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
+
+# Define the main target variables
+set(thales_LIBRARIES thales::core thales::data thales::models thales::strategies thales::utils)
+
+check_required_components(thales)

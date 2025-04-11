@@ -1,7 +1,12 @@
 #pragma once
 
 #include <string>
+#include <array>
+#include <memory>
+#include <algorithm>
 #include <thales/utils/symbol_lookup.hpp>
+
+#define CACHE_LINE_SIZE 64
 
 namespace thales {
 namespace core {
@@ -10,7 +15,7 @@ namespace core {
  * @struct Option
  * @brief Represents an options contract
  */
-struct alignas(64) Option {
+struct alignas(CACHE_LINE_SIZE) Option {
     /**
      * @enum Type
      * @brief Defines the type of the option: CALL or PUT.
@@ -26,7 +31,7 @@ struct alignas(64) Option {
      * @brief Contains the Greeks of the option: delta, gamma, theta, vega,
      * rho.
      */
-    struct alignas(64) Greeks {
+    struct alignas(CACHE_LINE_SIZE) Greeks {
         double delta = 0.0;  // Delta of the option
         double gamma = 0.0;  // Gamma of the option
         double theta = 0.0;  // Theta of the option
@@ -37,8 +42,8 @@ struct alignas(64) Option {
     };
 
     std::unique_ptr<Greeks> greeks;           // Greeks of the option
-    std::array<char, 8> exchange;                         // The exchange where the option is traded
-    std::array<char, 8> expiry;                           // Expiration date
+    std::array<char, 8> exchange;             // The exchange where the option is traded
+    std::array<char, 8> expiry;               // Expiration date
     double strike;                            // Strike price
     utils::SymbolLookup::SymbolID symbol_id;  // The ID of the symbol
     Type type;                                // CALL or PUT
@@ -48,11 +53,25 @@ struct alignas(64) Option {
                utils::SymbolLookup::INVALID_SYMBOL_ID,
            const std::string& exch = "", Type t = Type::UNKNOWN,
            const std::string& exp = "", double strk = 0.0)
-        : exchange(exch),
-          expiry(exp),
-          strike(strk),
+        : strike(strk),
           type(t),
-          symbol_id(sym_id) {}
+          symbol_id(sym_id) {
+        // Safely copy exchange string
+        std::fill(exchange.begin(), exchange.end(), '\0');
+        if (!exch.empty()) {
+            std::copy_n(exch.begin(), 
+                       std::min(exch.size(), exchange.size() - 1), 
+                       exchange.begin());
+        }
+        
+        // Safely copy expiry string
+        std::fill(expiry.begin(), expiry.end(), '\0');
+        if (!exp.empty()) {
+            std::copy_n(exp.begin(), 
+                       std::min(exp.size(), expiry.size() - 1), 
+                       expiry.begin());
+        }
+    }
 };
 
 }  // namespace core

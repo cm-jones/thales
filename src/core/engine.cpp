@@ -144,7 +144,7 @@ void Engine::execute_orders() {
     logger.debug("Executing orders...");
 
     // Get open orders
-    std::vector<Order> open_orders = portfolio_->get_open_orders();
+    boost::container::static_vector<Order, 256> open_orders = portfolio_->get_open_orders();
 
     if (open_orders.empty()) {
         logger.debug("No orders to execute");
@@ -158,8 +158,9 @@ void Engine::execute_orders() {
         // In real implementation, this would check for fill status, etc.
         std::string symbol = utils::SymbolLookup::get_instance().get_symbol(order.symbol_id);
         logger.info(
-            "Processing order: " + order.order_id + ", " + symbol +
-            ", " + order.side_to_string() + ", " + order.type_to_string());
+            "Processing order: " + symbol +
+            ", " + order.side_to_string() + ", " + order.type_to_string() + 
+            (order.type != Order::Type::MARKET ? ", Price: " + std::to_string(order.price.limit) : ""));
     }
 }
 
@@ -176,7 +177,7 @@ void Engine::update_portfolio() {
 
     // Update each position with latest market data
     for (const auto& position : positions) {
-        std::string symbol = symbol_lookup.get_symbol(position.contract.symbol_id);
+        std::string symbol = symbol_lookup.get_symbol(position.option.symbol_id);
         auto market_data =
             data_manager_->get_latest_market_data(symbol);
         portfolio_->update_position(symbol, market_data.price);

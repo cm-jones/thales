@@ -26,14 +26,24 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
+# Check if git is installed
+if ! command -v git &> /dev/null; then
+    echo -e "${RED}Error: Git is not installed${NC}"
+    exit 1
+fi
+
+# Find the repository root directory using git
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+DOCKER_DIR="${REPO_ROOT}/docker"
+
 # Check for .env file
-if [ ! -f "$(dirname "$0")/.env" ]; then
-    echo -e "${RED}Error: .env file not found in docker directory${NC}"
+if [ ! -f "$DOCKER_DIR/.env" ]; then
+    echo -e "${RED}Error: .env file not found at $DOCKER_DIR/.env${NC}"
     exit 1
 fi
 
 # Source the .env file to get environment variables
-source "$(dirname "$0")/.env"
+source "$DOCKER_DIR/.env"
 
 # Verify required environment variables
 if [ -z "$HOST_IP" ]; then
@@ -41,8 +51,18 @@ if [ -z "$HOST_IP" ]; then
     exit 1
 fi
 
-if [ -z "$IB_PORT" ]; then
-    echo -e "${RED}Error: IB_PORT not set in .env file${NC}"
+if [ -z "$IB_GATEWAY_PORT" ]; then
+    echo -e "${RED}Error: IB_GATEWAY_PORT not set in .env file${NC}"
+    exit 1
+fi
+
+if [ -z "$DB_HOST" ]; then
+    echo -e "${RED}Error: DB_HOST not set in .env file${NC}"
+    exit 1
+fi
+
+if [ -z "$DB_USER" ]; then
+    echo -e "${RED}Error: DB_USER not set in .env file${NC}"
     exit 1
 fi
 
@@ -51,20 +71,33 @@ if [ -z "$DB_PASSWORD" ]; then
     exit 1
 fi
 
+if [ -z "$DB_NAME" ]; then
+    echo -e "${RED}Error: DB_NAME not set in .env file${NC}"
+    exit 1
+fi
+
 # Create required directories if they don't exist
-mkdir -p ../logs
-mkdir -p ../data
-mkdir -p ../config
+mkdir -p "${REPO_ROOT}/logs"
+mkdir -p "${REPO_ROOT}/data"
+mkdir -p "${REPO_ROOT}/config"
+
+# Update Ubuntu version from .version file
+echo "Updating Ubuntu version from .version file..."
+"${REPO_ROOT}/scripts/docker/update_ubuntu_version.sh"
 
 # Build and start the containers
 echo "Building and starting Docker containers..."
-cd "$(dirname "$0")"
+cd "${DOCKER_DIR}"
 
-# Pull latest PostgreSQL image
-docker-compose pull postgres
+# Pull latest PostgreSQL image (without credential helpers)
+echo "Pulling latest PostgreSQL image..."
+DOCKER_CONFIG=/tmp docker-compose pull postgres || {
+  echo -e "${RED}Warning: Could not pull latest postgres image. Will use cached version if available.${NC}"
+  # Continue anyway, as we might have the image cached locally
+}
 
-# Build and start services
-if docker-compose up -d --build; then
+# Build and start services with temporary Docker config to bypass credential helpers
+if DOCKER_CONFIG=/tmp docker-compose up -d --build; then
     echo -e "${GREEN}Thales trading bot started successfully!${NC}"
     echo -e "${GREEN}PostgreSQL is running on port 5432${NC}"
     echo "Use 'docker-compose logs -f' to view logs"

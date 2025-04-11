@@ -7,6 +7,7 @@
 #include <thales/utils/config.hpp>
 #include <vector>
 #include <boost/container/static_vector.hpp>
+#include "thales/core/option.hpp"
 
 namespace thales {
 namespace core {
@@ -18,7 +19,7 @@ namespace core {
  * This class is responsible for tracking positions, orders, and
  * calculating portfolio metrics such as value, profit/loss, etc.
  */
-class Portfolio {
+class alignas(CACHE_LINE_SIZE) Portfolio {
    public:
     /**
      * @brief Constructor
@@ -41,7 +42,7 @@ class Portfolio {
      * @brief Get all positions in the portfolio
      * @return A stable_vector of positions
      */
-    std::vector<Position> get_positions() const;
+    boost::container::static_vector<Positions, 256> get_positions() const;
 
     /**
      * @brief Get a specific position by symbol
@@ -54,14 +55,14 @@ class Portfolio {
      * @brief Get all open orders
      * @return A stable_vector of open orders
      */
-    std::vector<Order> get_open_orders() const;
+    boost::container::static_vector<Order, 256> get_open_orders() const;
 
     /**
      * @brief Get all orders for a specific symbol
      * @param symbol The symbol to look up
      * @return A stable_vector of orders for the symbol
      */
-    std::vector<Order> get_orders(const std::string& symbol) const;
+    boost::container::static_vector<Order, 256> get_orders(const std::string& symbol) const;
 
     /**
      * @brief Get the total portfolio value
@@ -120,9 +121,9 @@ class Portfolio {
 
    private:
     // Positions and orders
-    alignas(64) boost::container::static_vector<Position, 256>
-        positions_;  // Vector of positions (56-64 bytes)
-    alignas(64) boost::container::static_vector<Order, 256>
+    alignas(CACHE_LINE_SIZE) boost::container::static_vector<Position, 256>
+        positions_;  // Vector of positions
+    alignas(CACHE_LINE_SIZE) boost::container::static_vector<Order, 256>
         orders_;  // Vector of orders
 
     // Configuration

@@ -8,26 +8,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Find required packages
 find_package(PkgConfig REQUIRED)
+find_package(Boost 1.74 REQUIRED COMPONENTS container)
+find_package(yaml-cpp 0.7.0 REQUIRED)
 pkg_check_modules(LIBPQXX REQUIRED libpqxx)
-
-# Find Protocol Buffers (optional)
-find_package(Protobuf QUIET)
-if(Protobuf_FOUND)
-  include_directories(${Protobuf_INCLUDE_DIRS})
-  add_definitions(-DHAS_PROTOBUF)
-else()
-  message(STATUS "Protocol Buffers not found - some features may be disabled")
-  # Add define to disable protobuf features in IBAPI
-  add_definitions(-DIBAPI_NO_PROTOBUF)
-endif()
 
 # Include directories
 include_directories(include)
 include_directories(third_party)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})  # To find proto/*.pb.h
 
 # Add subdirectories
 add_subdirectory(third_party/ibapi)
+add_subdirectory(third_party/benchmark)
 
 # Define source files
 file(GLOB_RECURSE CORE_SOURCES "src/core/*.cpp")
@@ -39,11 +30,11 @@ file(GLOB_RECURSE UTILS_SOURCES "src/utils/*.cpp")
 # Define utility library
 add_library(utils STATIC ${UTILS_SOURCES})
 target_include_directories(utils PUBLIC ${LIBPQXX_INCLUDE_DIRS})
-target_link_libraries(utils PUBLIC ${LIBPQXX_LIBRARIES})
+target_link_libraries(utils PUBLIC ${LIBPQXX_LIBRARIES} yaml-cpp::yaml-cpp)
 
 # Define core library
 add_library(core STATIC ${CORE_SOURCES})
-target_link_libraries(core PUBLIC utils)
+target_link_libraries(core PUBLIC utils Boost::container)
 
 # Define data library
 add_library(data STATIC ${DATA_SOURCES})
@@ -70,3 +61,55 @@ target_link_libraries(thales
 
 # Add tests
 add_subdirectory(tests)
+
+# Add benchmarks
+add_subdirectory(benchmarks)
+
+# Install targets
+include(GNUInstallDirs)
+
+# Install headers
+install(DIRECTORY include/thales
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+
+# Install libraries
+install(TARGETS core data models strategies utils
+        EXPORT thales-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Install executable
+install(TARGETS thales
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Install config files
+install(FILES config/config.yaml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/thales/config)
+
+# Export targets
+install(EXPORT thales-targets
+        FILE thales-targets.cmake
+        NAMESPACE thales::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/thales)
+
+# Create and install config-file package
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config/thales-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/thales-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/thales
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR CMAKE_INSTALL_LIBDIR
+)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/thales-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/thales-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/thales-config-version.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/thales
+)

@@ -1,0 +1,64 @@
+engine:
+  loopIntervalMs: 1000
+  maxThreads: 4
+
+risk:
+  maxPositionSize: 100000.0
+  maxDrawdown: 0.05
+  maxLeverage: 2.0
+  maxRiskPerTrade: 0.01
+  maxDailyLoss: 0.02
+
+data:
+  ibHost: "127.0.0.1"
+  ibPort: 7496
+  ibClientId: 1
+  ibAccount: "DU12345"
+  symbols:
+    - "SPY"
+    - "QQQ"
+    - "AAPL"
+    - "MSFT"
+    - "AMZN"
+    - "GOOGL"
+    - "FB"
+    - "TSLA"
+  barSizes:
+    - "1 min"
+    - "5 mins"
+    - "1 hour"
+    - "1 day"
+  historyDays: 30
+
+strategies:
+  enabled:
+    - "BlackScholesArbitrage"
+  BlackScholesArbitrage:
+    minPriceDiscrepancy: 0.05
+    minVolatility: 0.15
+    maxVolatility: 0.50
+    minDaysToExpiration: 7
+    maxDaysToExpiration: 45
+
+logging:
+  logToFile: true
+  logFilePath: "logs/thales.log"
+  consoleLogLevel: "INFO"
+  fileLogLevel: "DEBUG"
+  database:
+    enabled: true
+    host: "localhost"
+    port: 5432
+    name: "thales"
+    user: "thales_user"
+    password: "your_secure_password"
+    max_queue_size: 10000
+    batch_size: 100
+
+backtesting:
+  enabled: false
+  startDate: "2023-01-01"
+  endDate: "2023-12-31"
+  initialCapital: 1000000.0
+  commission: 0.005
+  slippage: 0.001

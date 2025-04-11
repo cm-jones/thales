@@ -2,15 +2,55 @@
 
 #include <string>
 #include <thales/utils/symbol_lookup.hpp>
+#include "thales/core/option.hpp"
 
 namespace thales {
 namespace core {
 
 /**
+ * @struct Price
+ * @brief Represents price information for an order to avoid parameter confusion.
+ */
+struct alignas(CACHE_LINE_SIZE) Price {
+    double limit;            // Limit price for the order
+    double stop;             // Stop price for stop/stop-limit orders
+    double average_fill;     // Average fill price for executed orders
+    
+    // Default constructor
+    Price() : limit(0.0), stop(0.0), average_fill(0.0) {}
+    
+    // Parameter struct for Price constructor to avoid parameter confusion
+    struct PriceParams {
+        double limit_price = 0.0;
+        double stop_price = 0.0;
+        double avg_fill_price = 0.0;
+    };
+    
+    // Constructor with named parameter struct
+    explicit Price(const PriceParams& params)
+        : limit(params.limit_price), stop(params.stop_price), average_fill(params.avg_fill_price) {}
+        
+    // Factory methods to create Price objects with specific configurations
+    static Price market_price() { return Price(); }
+    
+    static Price limit_price(double limit_value) {
+        PriceParams params;
+        params.limit_price = limit_value;
+        return Price(params);
+    }
+    
+    static Price stop_price(double stop_value) {
+        PriceParams params;
+        params.stop_price = stop_value;
+        return Price(params);
+    }
+};
+
+/**
  * @struct Order
  * @brief Represents an order to buy or sell a financial instrument.
  */
-struct Order {
+struct alignas(CACHE_LINE_SIZE) Order {
     /**
      * @enum Type
      * @brief Defines the type of the order: MARKET, LIMIT, STOP, or
@@ -45,28 +85,32 @@ struct Order {
         REJECTED,
     };
 
-    std::string order_id;  // Unique order ID (24-32 bytes)
-    std::string
-        timestamp;      // Timestamp when the order was created (24-32 bytes)
-    double price;       // Limit price (if applicable) (8 bytes)
-    double stop_price;  // Stop price (if applicable) (8 bytes)
-    double average_fill_price;  // Average fill price (8 bytes)
-    uint16_t quantity;          // Quantity to trade (2 bytes)
-    uint16_t filled_quantity;   // Quantity that has been filled (2 bytes)
+    std::string timestamp;      // When the order was created
+    Price price;                // Price information for the order
+    uint32_t order_id;          // Unique order ID
+    uint16_t quantity;          // Quantity to trade
+    uint16_t filled_quantity;   // Quantity that has been filled
     utils::SymbolLookup::SymbolID
-        symbol_id;  // ID of the instrument symbol (2 bytes)
-    Type type;      // Order type (1 byte)
-    Side side;      // Buy or sell (1 byte)
-    Status status;  // Order status (1 byte)
+        symbol_id;              // ID of the instrument symbol
+    Type type;                  // Order type
+    Side side;                  // BUY or SELL
+    Status status;              // Order status
 
-    // Constructor
-    Order(const std::string& id = "",
-          utils::SymbolLookup::SymbolID sym_id =
-              utils::SymbolLookup::INVALID_SYMBOL_ID,
-          Type t = Type::MARKET, Side s = Side::BUY, double qty = 0.0,
-          double p = 0.0, double stop_p = 0.0, Status stat = Status::PENDING,
-          double filled_qty = 0.0, double avg_fill_price = 0.0,
-          const std::string& ts = "");
+        // Parameter struct for Order constructor to avoid parameter confusion
+    struct OrderParams {
+        uint32_t order_id = 0;
+        utils::SymbolLookup::SymbolID symbol_id = utils::SymbolLookup::INVALID_SYMBOL_ID;
+        Type type = Type::MARKET;
+        Side side = Side::BUY;
+        double quantity = 0.0;
+        Price price = Price();
+        Status status = Status::PENDING;
+        double filled_quantity = 0.0;
+        std::string timestamp = "";
+    };
+    
+    // Constructor using the parameter struct
+    explicit Order(const OrderParams& params);
 
     // Calculate the remaining quantity to be filled
     double get_remaining_quantity() const;
