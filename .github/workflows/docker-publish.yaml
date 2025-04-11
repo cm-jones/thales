@@ -6,7 +6,7 @@ on:
     # Only trigger when Dockerfile or docker-compose changes
     paths:
       - 'docker/**'
-      - '.github/workflows/docker-publish.yml'
+      - '.github/workflows/docker-publish.yaml'
       - 'src/**'
       - 'include/**'
       - 'CMakeLists.txt'
