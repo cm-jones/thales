@@ -11,11 +11,8 @@
 #include <vector>
 
 int main(int argc, char** argv) {
-    long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-    std::cout << "Number of available cores: " << num_cores << "\n";
-
-    // Load configuration
-    std::string config_path = "config/config.json";
+    // Default config
+    std::string config_path = "config/config.yaml";
     
     // Parse command line arguments for --config flag
     for (int i = 1; i < argc; ++i) {
@@ -29,6 +26,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Create config object
     thales::utils::Config config;
     if (!config.load_from_file(config_path)) {
         std::cerr << "Failed to load configuration from: " << config_path << "\n";
@@ -106,10 +104,8 @@ int main(int argc, char** argv) {
             std::to_string(market_data.price));
     }
 
-    // Instantiate trading engine
+    // Initialize trading engine
     thales::core::Engine engine(config);
-
-    // Start the engine
     if (!engine.initialize()) {
         logger.error("Failed to initialize trading engine");
         return EXIT_FAILURE;
@@ -120,7 +116,9 @@ int main(int argc, char** argv) {
     // Run the engine
     engine.run();
 
+    // If we reach here, the engine has finished running
     ib_client.disconnect();
+
     logger.info("Disconnected from Interactive Brokers");
 
     return EXIT_SUCCESS;

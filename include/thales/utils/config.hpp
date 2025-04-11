@@ -4,6 +4,11 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
+#include <algorithm>
+
+namespace YAML {
+    class Node;
+}
 
 namespace thales {
 namespace utils {
@@ -111,6 +116,10 @@ class Config {
     void set_value(const std::string& key, const ConfigValue& value);
 
    private:
+    // Helper to write YAML values with proper formatting
+    void writeYamlValue(std::ofstream& file, const std::string& key, 
+                       const ConfigValue& value, int indent) const;
+    
     std::unordered_map<std::string, ConfigValue> data_;
 };
 

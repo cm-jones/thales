@@ -1,10 +1,8 @@
 # Build directories
-build/
-build_asan/
-cmake-build-*/
-out/
-bin/
-lib/
+/build/
+/cmake-build-*/
+/out/
+/bin/
 
 # IDE files
 .idea/

@@ -1,6 +1,5 @@
 # Define ARG before FROM (proper syntax)
 ARG UBUNTU_VERSION=22.04
-# Specify platform
 FROM --platform=linux/amd64 ubuntu:${UBUNTU_VERSION} AS builder
 
 # Install build dependencies
@@ -19,45 +18,47 @@ RUN pip3 install conan==1.59.0 && \
     conan profile update settings.compiler.libcxx=libstdc++11 default
 
 # Copy source code
-WORKDIR /build
+WORKDIR /app
 COPY . .
+
+# Create .dockerignore file to exclude build artifacts
+RUN echo "build/" > .dockerignore && \
+    echo "CMakeFiles/" >> .dockerignore && \
+    echo "CMakeCache.txt" >> .dockerignore
 
 # Initialize any submodules in third_party
 RUN git submodule update --init --recursive
 
-# Ensure no CMake cache issues by cleaning up any potential cache files
-RUN find . -name "CMakeCache.txt" -delete && \
-    find . -name "CMakeFiles" -type d -exec rm -rf {} +
+# Add a script to inspect what's in the third_party directory
+RUN echo "Contents of the third_party directory:" && \
+    ls -la third_party || echo "No third_party directory found"
 
-# Set environment variables for optimization
-ENV CXXFLAGS="-O3 -march=native -ffast-math -flto"
-ENV CFLAGS="-O3 -march=native -ffast-math -flto"
-
-# Debug: show what's in the directory
-RUN ls -la
-
-# Step by step Conan build with verbose output
+# Build using Conan with verbose and more debugging output
 RUN mkdir -p build && cd build && \
-    echo "Running conan install..." && \
+    echo "Installing dependencies with Conan..." && \
     conan install .. --build=missing -v && \
-    echo "Running conan build..." && \
-    conan build .. -v
+    echo "Running CMake configure..." && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON && \
+    echo "Running CMake build..." && \
+    cmake --build . --verbose -- -j$(nproc) || { \
+        echo "ERROR: Build failed, showing CMake logs:" && \
+        cat CMakeFiles/CMakeError.log || echo "No CMakeError.log found" && \
+        cat CMakeFiles/CMakeOutput.log || echo "No CMakeOutput.log found" && \
+        exit 1; \
+    }
 
 # Create minimal runtime image
 FROM --platform=linux/amd64 ubuntu:${UBUNTU_VERSION}
 
-# Install runtime dependencies (minimal set needed to run the application)
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
-    libboost-system1.74.0 \
-    libboost-filesystem1.74.0 \
-    libboost-thread1.74.0 \
     libboost-container1.74.0 \
     libpq5 \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled application and configs
-COPY --from=builder /build/build/bin/thales /usr/local/bin/
+COPY --from=builder /app/build/bin/thales /usr/local/bin/
 COPY config /etc/thales/config/
 
 # Create necessary directories

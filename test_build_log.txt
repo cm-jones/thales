@@ -1,0 +1,50 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.test
+#1 transferring dockerfile: 1.03kB done
+#1 WARN: FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 4)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 268B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM docker.io/library/ubuntu:22.04@sha256:d80997daaa3811b175119350d84305e1ec9129e1799bba0bd1e3120da3ff52c3
+#4 resolve docker.io/library/ubuntu:22.04@sha256:d80997daaa3811b175119350d84305e1ec9129e1799bba0bd1e3120da3ff52c3 done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 130.87kB 0.1s done
+#5 DONE 0.1s
+
+#6 [2/7] RUN apt-get update && apt-get install -y     build-essential     cmake     libboost-all-dev     libpq-dev     git     pkg-config     libyaml-cpp-dev     libpqxx-dev     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/7] WORKDIR /build
+#7 CACHED
+
+#8 [4/7] COPY . .
+#8 DONE 0.2s
+
+#9 [5/7] RUN git submodule update --init --recursive
+#9 0.354 fatal: not a git repository (or any of the parent directories): .git
+#9 ERROR: process "/bin/sh -c git submodule update --init --recursive" did not complete successfully: exit code: 128
+------
+ > [5/7] RUN git submodule update --init --recursive:
+0.354 fatal: not a git repository (or any of the parent directories): .git
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 4)
+Dockerfile.test:23
+--------------------
+  21 |     
+  22 |     # Initialize any submodules in third_party
+  23 | >>> RUN git submodule update --init --recursive
+  24 |     
+  25 |     # Ensure no CMake cache issues by cleaning up any potential cache files
+--------------------
+ERROR: failed to solve: process "/bin/sh -c git submodule update --init --recursive" did not complete successfully: exit code: 128

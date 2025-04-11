@@ -1,0 +1,34 @@
+# Define ARG before FROM (proper syntax)
+ARG UBUNTU_VERSION=22.04
+# Specify platform
+FROM --platform=linux/amd64 ubuntu:${UBUNTU_VERSION}
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    libboost-all-dev \
+    libpq-dev \
+    git \
+    pkg-config \
+    libyaml-cpp-dev \
+    libpqxx-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy source code
+WORKDIR /build
+COPY . .
+
+# Initialize any submodules in third_party
+RUN git submodule update --init --recursive
+
+# Ensure no CMake cache issues by cleaning up any potential cache files
+RUN find . -name "CMakeCache.txt" -delete && \
+    find . -name "CMakeFiles" -type d -exec rm -rf {} +
+
+# Configure with verbose output
+RUN rm -rf build && mkdir -p build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release /build --log-level=VERBOSE
+
+# Only try the cmake configure step, don't build
+CMD ["echo", "CMake configuration completed successfully"]

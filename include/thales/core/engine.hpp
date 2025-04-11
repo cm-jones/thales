@@ -2,7 +2,6 @@
 
 #include <atomic>
 #include <memory>
-#include <string>
 #include <thales/core/portfolio.hpp>
 #include <thales/data/data_manager.hpp>
 #include <thales/strategies/strategy_registry.hpp>

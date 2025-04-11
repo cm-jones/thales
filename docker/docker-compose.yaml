@@ -2,7 +2,7 @@ services:
   thales:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.final
       args:
         - UBUNTU_VERSION=${UBUNTU_VERSION}
     platform: linux/amd64
