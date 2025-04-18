@@ -1,0 +1,18 @@
+{
+    "name": "Thales Development",
+    "dockerFile": "../docker/Dockerfile",
+    "context": "..",
+    "remoteUser": "root",
+    
+    // Add your source code
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "workspaceFolder": "/workspace",
+    
+    // Forward ports from container to host
+    "forwardPorts": [8080],
+    
+    // Set environment variables
+    "remoteEnv": {
+      "ENVIRONMENT": "development"
+    }
+}
