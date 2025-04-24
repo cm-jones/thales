@@ -28,10 +28,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 900M
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 450M
     healthcheck:
       test: ["CMD", "pg_isready", "-h", "postgres", "-U", "thales"]
@@ -57,10 +57,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 450M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 225M
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U thales"]
@@ -75,10 +75,10 @@ services:
       - ./prometheus:/etc/prometheus
       - prometheus-data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
     ports:
       - "9090:9090"
     networks:
@@ -86,10 +86,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 450M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 225M
 
   grafana:
@@ -99,7 +99,7 @@ services:
       - grafana-data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin  # Change this in production
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Change this in production
       - GF_USERS_ALLOW_SIGN_UP=false
     ports:
       - "3000:3000"
@@ -108,29 +108,29 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 450M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 225M
 
   node-exporter:
     image: prom/node-exporter
     container_name: thales-node-exporter
     command:
-      - '--path.rootfs=/host'
+      - "--path.rootfs=/host"
     network_mode: host
     pid: host
     restart: unless-stopped
     volumes:
-      - '/:/host:ro,rslave'
+      - "/:/host:ro,rslave"
     deploy:
       resources:
         limits:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 100M
         reservations:
-          cpus: '0.05'
+          cpus: "0.05"
           memory: 50M
 
   postgres-exporter:
@@ -145,10 +145,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 100M
         reservations:
-          cpus: '0.05'
+          cpus: "0.05"
           memory: 50M
     depends_on:
       - postgres

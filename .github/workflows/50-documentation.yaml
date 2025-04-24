@@ -10,7 +10,7 @@ on:
       - "**/*.md"
       - "Doxyfile"
       - "scripts/documentation/**"
-      - ".github/workflows/documentation.yml"
+      - ".github/workflows/documentation.yaml"
   pull_request:
     branches: main
     paths:
@@ -20,7 +20,7 @@ on:
       - "**/*.md"
       - "Doxyfile"
       - "scripts/documentation/**"
-      - ".github/workflows/documentation.yml"
+      - ".github/workflows/documentation.yaml"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
