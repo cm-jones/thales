@@ -2,26 +2,26 @@ name: Documentation
 
 on:
   push:
-    branches: [ main ]
+    branches: main
     paths:
-      - 'docs/**'
-      - 'include/**'
-      - 'src/**'
-      - '**/*.md'
-      - 'Doxyfile'
-      - 'scripts/documentation/**'
-      - '.github/workflows/documentation.yml'
+      - "docs/**"
+      - "include/**"
+      - "src/**"
+      - "**/*.md"
+      - "Doxyfile"
+      - "scripts/documentation/**"
+      - ".github/workflows/documentation.yml"
   pull_request:
-    branches: [ main ]
+    branches: main
     paths:
-      - 'docs/**'
-      - 'include/**'
-      - 'src/**'
-      - '**/*.md'
-      - 'Doxyfile'
-      - 'scripts/documentation/**'
-      - '.github/workflows/documentation.yml'
-  workflow_dispatch:  # Allow manual triggering
+      - "docs/**"
+      - "include/**"
+      - "src/**"
+      - "**/*.md"
+      - "Doxyfile"
+      - "scripts/documentation/**"
+      - ".github/workflows/documentation.yml"
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   doxygen:
@@ -30,12 +30,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       - name: Install Doxygen
         run: |
-          sudo apt-get update
-          sudo apt-get install -y doxygen graphviz
-      
+          sudo apt update
+          sudo apt install -y doxygen graphviz
+
       - name: Create Doxyfile if not exists
         run: |
           if [ ! -f "Doxyfile" ]; then
@@ -59,10 +59,10 @@ jobs:
             sed -i 's/CALLER_GRAPH           = NO/CALLER_GRAPH           = YES/g' Doxyfile
             sed -i 's/HTML_EXTRA_STYLESHEET  =/HTML_EXTRA_STYLESHEET  = docs\/extra\/custom.css/g' Doxyfile
           fi
-      
+
       - name: Generate Doxygen documentation
         run: doxygen Doxyfile
-      
+
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
@@ -72,10 +72,10 @@ jobs:
           destination_dir: .
           cname: cm-jones.github.io/thales
           force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Update documentation'
-      
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "Update documentation"
+
       - name: Upload documentation as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -89,28 +89,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       - name: Install markdown-link-check
         run: npm install -g markdown-link-check
-      
+
       - name: Check links in markdown files
         run: |
           find . -name "*.md" -type f -exec markdown-link-check {} \;
         continue-on-error: true
-      
+
       - name: Install markdownlint
         run: npm install -g markdownlint-cli
-      
+
       - name: Lint markdown files
         run: |
           markdownlint "**/*.md" --ignore node_modules
         continue-on-error: true
-      
+
       - name: Generate markdown report
         run: |
           echo "# Markdown Documentation Report" > markdown-report.md
@@ -119,7 +119,7 @@ jobs:
           echo "" >> markdown-report.md
           find . -name "*.md" -type f | sort | awk '{print "- " $0}' >> markdown-report.md
           echo "" >> markdown-report.md
-      
+
       - name: Upload markdown report
         uses: actions/upload-artifact@v4
         with:

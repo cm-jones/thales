@@ -2,11 +2,11 @@ name: Cross-Platform Build
 
 on:
   push:
-    branches: [ main ]
+    branches: main
   pull_request:
-    branches: [ main ]
+    branches: main
   schedule:
-    - cron: '0 2 * * 5'  # Run every Friday at 2:00 UTC
+    - cron: "0 2 * * 5" # Run every Friday at 2:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -18,71 +18,68 @@ jobs:
       matrix:
         os: ["ubuntu-${{ vars.UBUNTU_VERSION }}"]
         compiler:
-          - { 
-              name: 'gcc',
-              cc: 'gcc',
-              cxx: 'g++',
-              version: '12',
-              install_macos: 'gcc@12',
-              install_ubuntu: 'g++-12'
+          - {
+              name: "gcc",
+              cc: "gcc",
+              cxx: "g++",
+              version: "12",
+              install_macos: "gcc@12",
+              install_ubuntu: "g++-12",
             }
           - {
-              name: 'clang',
-              cc: 'clang',
-              cxx: 'clang++',
-              version: '15',
-              install_macos: 'llvm@15',
-              install_ubuntu: 'clang-15 libc++-15-dev libc++abi-15-dev'
+              name: "clang",
+              cc: "clang",
+              cxx: "clang++",
+              version: "15",
+              install_macos: "llvm@15",
+              install_ubuntu: "clang-15 libc++-15-dev libc++abi-15-dev",
             }
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       # Setup compilers
       - name: Setup GCC
         if: matrix.compiler.name == 'gcc'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ${{ matrix.compiler.install_ubuntu }}
+          sudo apt update
+          sudo apt install -y ${{ matrix.compiler.install_ubuntu }}
           echo "CC=gcc-${{ matrix.compiler.version }}" >> $GITHUB_ENV
           echo "CXX=g++-${{ matrix.compiler.version }}" >> $GITHUB_ENV
-      
+
       - name: Setup Clang
         if: matrix.compiler.name == 'clang'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ${{ matrix.compiler.install_ubuntu }}
+          sudo apt update
+          sudo apt install -y ${{ matrix.compiler.install_ubuntu }}
           echo "CC=clang-${{ matrix.compiler.version }}" >> $GITHUB_ENV
           echo "CXX=clang++-${{ matrix.compiler.version }}" >> $GITHUB_ENV
-      
-      
+
       # Install dependencies
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libboost-all-dev
-      
-      
+          sudo apt update
+          sudo apt install -y cmake build-essential libboost-all-dev
+
       # Configure and build
       - name: Configure CMake
         run: |
           mkdir -p build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
-      
-      
+
       - name: Build
         run: |
           cd build
           cmake --build . --config Release
-      
+
       - name: Run tests
         run: |
           cd build
           ctest -C Release --output-on-failure
         continue-on-error: true
-      
+
       # Create compiler-specific report
       - name: Generate compiler report
         run: |
@@ -92,17 +89,17 @@ jobs:
           echo "" >> platform-report.md
           echo "- OS: ubuntu-${{ vars.UBUNTU_VERSION }}" >> platform-report.md
           echo "- Compiler: ${{ matrix.compiler.name }} ${{ matrix.compiler.version }}" >> platform-report.md
-          
+
           echo "- CC: $CC" >> platform-report.md
           echo "- CXX: $CXX" >> platform-report.md
           $CC --version >> compiler-version.txt
           echo '```' >> platform-report.md
           cat compiler-version.txt >> platform-report.md
           echo '```' >> platform-report.md
-          
+
           echo "" >> platform-report.md
           echo "## Build Status" >> platform-report.md
-          
+
           if [ -d "build" ]; then
             echo "- Build directory exists and was created successfully." >> platform-report.md
             
@@ -114,17 +111,17 @@ jobs:
           else
             echo "- Build directory does not exist." >> platform-report.md
           fi
-          
+
           cat platform-report.md
         shell: bash
-      
+
       - name: Upload platform report
         uses: actions/upload-artifact@v4
         with:
           name: platform-report-ubuntu-${{ vars.UBUNTU_VERSION }}-${{ matrix.compiler.name }}
           path: platform-report.md
           if-no-files-found: warn
-      
+
       # Upload build artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -143,14 +140,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: reports
-      
+
       - name: Generate summary report
         run: |
           echo "# Cross-Platform Build Summary" > summary-report.md
           echo "" >> summary-report.md
           echo "| Platform | Compiler | Status |" >> summary-report.md
           echo "|----------|----------|--------|" >> summary-report.md
-          
+
           for report_dir in reports/platform-report-*; do
             if [ -d "$report_dir" ]; then
               platform_compiler=$(basename "$report_dir" | sed 's/platform-report-//g')
@@ -164,12 +161,12 @@ jobs:
               fi
             fi
           done
-          
+
           echo "" >> summary-report.md
           echo "See individual platform reports for details." >> summary-report.md
-          
+
           cat summary-report.md
-      
+
       - name: Upload summary report
         uses: actions/upload-artifact@v4
         with:

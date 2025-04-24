@@ -2,11 +2,11 @@ name: Dependency Check
 
 on:
   push:
-    branches: [ main ]
+    branches: main
   pull_request:
-    branches: [ main ]
+    branches: main
   schedule:
-    - cron: '0 3 * * 0'  # Run every Sunday at 3:00 UTC
+    - cron: "0 3 * * 0" # Run every Sunday at 3:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -16,40 +16,40 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       - name: Set up JDK for OWASP Dependency Check
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
-      
+          distribution: "temurin"
+          java-version: "17"
+
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'thales'
-          path: '.'
-          format: 'HTML'
-          out: 'reports'
+          project: "thales"
+          path: "."
+          format: "HTML"
+          out: "reports"
           args: >
             --enableExperimental
             --scan .
             --suppression .github/owasp-suppressions.xml
         continue-on-error: true
-      
+
       - name: Upload dependency check report
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
           path: reports
           if-no-files-found: warn
-      
+
       - name: Check for CMake dependencies
         run: |
           echo "## CMake Dependencies Report" > cmake-deps-report.md
           echo "" >> cmake-deps-report.md
           echo "### External dependencies found in CMakeLists.txt:" >> cmake-deps-report.md
           echo "" >> cmake-deps-report.md
-          
+
           # Find all find_package, include, and external project declarations
           grep -r --include="CMakeLists.txt" "find_package" . | sort | uniq >> cmake-deps-report.md
           echo "" >> cmake-deps-report.md
@@ -58,26 +58,26 @@ jobs:
           grep -r --include="CMakeLists.txt" "FetchContent" . | sort | uniq >> cmake-deps-report.md
           echo "" >> cmake-deps-report.md
           grep -r --include="CMakeLists.txt" "ExternalProject" . | sort | uniq >> cmake-deps-report.md
-          
+
           cat cmake-deps-report.md
-      
+
       - name: Upload CMake dependencies report
         uses: actions/upload-artifact@v4
         with:
           name: cmake-dependencies-report
           path: cmake-deps-report.md
           if-no-files-found: warn
-      
+
       - name: Check for license compliance
         run: |
           mkdir -p license-check
-          
+
           # Create a licenses report
           echo "## License Scan Results" > license-check/licenses-report.md
           echo "" >> license-check/licenses-report.md
           echo "### Project Dependencies" >> license-check/licenses-report.md
           echo "" >> license-check/licenses-report.md
-          
+
           # Look for license files and add to report
           find . -type f -name "LICENSE*" -o -name "COPYING*" | while read license_file; do
             echo "Found license: $license_file" >> license-check/licenses-report.md
@@ -87,9 +87,9 @@ jobs:
             echo "\`\`\`" >> license-check/licenses-report.md
             echo "" >> license-check/licenses-report.md
           done
-          
+
           cat license-check/licenses-report.md
-      
+
       - name: Upload license report
         uses: actions/upload-artifact@v4
         with:

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include <thales/strategies/black_scholes_arbitrage.hpp>
 #include <thales/strategies/strategy_registry.hpp>
 #include <thales/utils/logger.hpp>
@@ -5,13 +7,15 @@
 namespace thales {
 namespace strategies {
 
-StrategyRegistry::StrategyRegistry(const utils::Config& config)
-    : config_(config) {}
-
-StrategyRegistry::~StrategyRegistry() {}
+StrategyRegistry::StrategyRegistry(
+    const utils::Config &config,
+    std::shared_ptr<data::DataManager> &&data_manager,
+    core::Portfolio *portfolio)
+    : config_(config), data_manager_(std::move(data_manager)),
+      portfolio_(portfolio) {}
 
 bool StrategyRegistry::initialize() {
-    auto& logger = utils::Logger::get_instance();
+    auto &logger = utils::Logger::get_instance();
     logger.info("Initializing strategy registry");
 
     try {
@@ -21,7 +25,7 @@ bool StrategyRegistry::initialize() {
         logger.info("Strategy registry initialized successfully with " +
                     std::to_string(strategies_.size()) + " strategies");
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         logger.error("Exception during strategy registry initialization: " +
                      std::string(e.what()));
         return false;
@@ -34,7 +38,7 @@ bool StrategyRegistry::initialize() {
 
 bool StrategyRegistry::register_strategy(
     std::unique_ptr<StrategyBase> strategy) {
-    auto& logger = utils::Logger::get_instance();
+    auto &logger = utils::Logger::get_instance();
 
     if (!strategy) {
         logger.error("Cannot register null strategy");
@@ -66,7 +70,7 @@ bool StrategyRegistry::register_strategy(
     return true;
 }
 
-StrategyBase* StrategyRegistry::get_strategy(const std::string& name) const {
+StrategyBase *StrategyRegistry::get_strategy(const std::string &name) const {
     auto it = strategies_.find(name);
     if (it == strategies_.end()) {
         return nullptr;
@@ -75,11 +79,11 @@ StrategyBase* StrategyRegistry::get_strategy(const std::string& name) const {
     return it->second.get();
 }
 
-std::vector<StrategyBase*> StrategyRegistry::get_all_strategies() const {
-    std::vector<StrategyBase*> result;
+std::vector<StrategyBase *> StrategyRegistry::get_all_strategies() const {
+    std::vector<StrategyBase *> result;
     result.reserve(strategies_.size());
 
-    for (const auto& pair : strategies_) {
+    for (const auto &pair : strategies_) {
         result.push_back(pair.second.get());
     }
 
@@ -87,22 +91,61 @@ std::vector<StrategyBase*> StrategyRegistry::get_all_strategies() const {
 }
 
 bool StrategyRegistry::execute_strategies() {
-    auto& logger = utils::Logger::get_instance();
+    auto &logger = utils::Logger::get_instance();
     logger.debug("Executing strategies");
 
-    // This is a placeholder for the actual implementation
-    // In a real implementation, you would:
-    // 1. Get the latest market data
-    // 2. Get the current portfolio
-    // 3. Execute each enabled strategy
-    // 4. Collect and process the signals
+    if (!data_manager_ || !portfolio_) {
+        logger.error("Cannot execute strategies: missing components");
+        return false;
+    }
 
-    logger.debug("Strategies executed successfully");
-    return true;
+    try {
+        // Get the latest market data for all symbols we're interested in
+        std::vector<std::string> symbols;
+        for (const auto &pair : strategies_) {
+            auto strategy_symbols = pair.second->get_symbols();
+            symbols.insert(symbols.end(), strategy_symbols.begin(),
+                           strategy_symbols.end());
+        }
+
+        // Get latest market data for all symbols
+        std::vector<data::MarketData> market_data;
+        for (const auto &symbol : symbols) {
+            auto data = data_manager_->get_latest_market_data(symbol);
+            market_data.push_back(std::move(data));
+        }
+
+        // Execute each enabled strategy
+        for (const auto &pair : strategies_) {
+            if (!enabled_strategies_[pair.first]) {
+                continue;
+            }
+
+            auto &strategy = pair.second;
+            logger.debug("Executing strategy: " + strategy->get_name());
+
+            // Execute strategy with latest data
+            auto signals = strategy->execute(market_data, *portfolio_);
+
+            // Process signals (to be implemented)
+            for (const auto &signal : signals) {
+                logger.info("Signal generated: " + signal.symbol + " " +
+                            (signal.type == Signal::Type::BUY    ? "BUY"
+                             : signal.type == Signal::Type::SELL ? "SELL"
+                                                                 : "HOLD"));
+            }
+        }
+
+        logger.debug("Strategies executed successfully");
+        return true;
+    } catch (const std::exception &e) {
+        logger.error("Error executing strategies: " + std::string(e.what()));
+        return false;
+    }
 }
 
-bool StrategyRegistry::enable_strategy(const std::string& name) {
-    auto& logger = utils::Logger::get_instance();
+bool StrategyRegistry::enable_strategy(const std::string &name) {
+    auto &logger = utils::Logger::get_instance();
 
     auto it = strategies_.find(name);
     if (it == strategies_.end()) {
@@ -115,8 +158,8 @@ bool StrategyRegistry::enable_strategy(const std::string& name) {
     return true;
 }
 
-bool StrategyRegistry::disable_strategy(const std::string& name) {
-    auto& logger = utils::Logger::get_instance();
+bool StrategyRegistry::disable_strategy(const std::string &name) {
+    auto &logger = utils::Logger::get_instance();
 
     auto it = strategies_.find(name);
     if (it == strategies_.end()) {
@@ -129,7 +172,7 @@ bool StrategyRegistry::disable_strategy(const std::string& name) {
     return true;
 }
 
-bool StrategyRegistry::is_strategy_enabled(const std::string& name) const {
+bool StrategyRegistry::is_strategy_enabled(const std::string &name) const {
     auto it = enabled_strategies_.find(name);
     if (it == enabled_strategies_.end()) {
         return false;
@@ -139,7 +182,7 @@ bool StrategyRegistry::is_strategy_enabled(const std::string& name) const {
 }
 
 void StrategyRegistry::load_strategies_from_config() {
-    auto& logger = utils::Logger::get_instance();
+    auto &logger = utils::Logger::get_instance();
 
     // Check if there are enabled strategies in the configuration
     if (!config_.has_key("strategies.enabled")) {
@@ -158,7 +201,7 @@ void StrategyRegistry::load_strategies_from_config() {
                 " strategies from configuration");
 
     // Register each enabled strategy
-    for (const auto& strategy_name : enabled_strategies) {
+    for (const auto &strategy_name : enabled_strategies) {
         if (strategy_name == "BlackScholes") {
             auto strategy = std::make_unique<BlackScholesArbitrage>(config_);
             register_strategy(std::move(strategy));
@@ -167,5 +210,5 @@ void StrategyRegistry::load_strategies_from_config() {
     }
 }
 
-}  // namespace strategies
-}  // namespace thales
+} // namespace strategies
+} // namespace thales

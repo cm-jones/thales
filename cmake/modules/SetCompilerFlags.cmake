@@ -20,6 +20,8 @@ function(set_compiler_flags)
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(COMPILER_MSVC TRUE)
   endif()
+
+  set(DCMAKE_CXX_INCLUDE_WHAT_YOU_USE include-what-you-use)
   
   # Set flags based on compiler and build type
   set(CXX_FLAGS_COMMON "")

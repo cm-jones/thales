@@ -3,8 +3,8 @@
 
 # Project details
 PROJECT_NAME           = "Thales"
-PROJECT_BRIEF          = "A C++23 Algorithmic Trading Framework"
-PROJECT_NUMBER         = "1.0"
+PROJECT_BRIEF          = "Ultra low-latency, multi-threaded, highly configurable, and extensible algorithmic trading bot designed for trading options contracts with built-in risk management"
+PROJECT_NUMBER         = "0.1.0"
 PROJECT_LOGO           = 
 OUTPUT_DIRECTORY       = docs/doxygen
 

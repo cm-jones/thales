@@ -7,7 +7,7 @@
 #  IBAPI_LIBRARIES    - Libraries to link against IBAPI
 #  IBAPI_VERSION      - Version of IBAPI if available
 
-# Look for the headers in various common locations
+# Look for the headers and protobuf files in various common locations
 find_path(IBAPI_INCLUDE_DIR
   NAMES 
     EClient.h
@@ -18,12 +18,25 @@ find_path(IBAPI_INCLUDE_DIR
     ${CMAKE_SOURCE_DIR}/third_party/ibapi
     /usr/include/ibapi
     /usr/local/include/ibapi
-  PATH_SUFFIXES 
+  PATH_SUFFIXES
     include
     client
     IBJts/source/cppclient/client
     tws-api/IBJts/source/cppclient/client
     tws-api/source/cppclient/client
+    protobufUnix
+)
+
+# Also find protobuf headers directory
+find_path(IBAPI_PROTOBUF_INCLUDE_DIR
+  NAMES
+    ExecutionFilter.pb.h
+  PATHS
+    ${IBAPI_ROOT_DIR}
+    $ENV{IBAPI_ROOT_DIR}
+    ${CMAKE_SOURCE_DIR}/third_party/ibapi
+  PATH_SUFFIXES
+    protobufUnix
 )
 
 # Look for the library
@@ -70,7 +83,7 @@ if(IBAPI_FOUND)
     # Handle the case where IBAPI is header-only or source-only
     set(IBAPI_LIBRARIES "")
   endif()
-  set(IBAPI_INCLUDE_DIRS ${IBAPI_INCLUDE_DIR})
+  set(IBAPI_INCLUDE_DIRS ${IBAPI_INCLUDE_DIR} ${IBAPI_PROTOBUF_INCLUDE_DIR})
 endif()
 
 # Set IBAPI_ROOT_DIR for future use

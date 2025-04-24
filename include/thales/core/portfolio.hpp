@@ -1,160 +1,121 @@
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #define CACHE_LINE_SIZE 64
 
+// Standard library includes
 #include <mutex>
 #include <string>
-#include <boost/container/static_vector.hpp>
-#include <cstdint>
 
-// Include local headers
+// Third-party includes
+#include <boost/container/static_vector.hpp>
+
+// Project includes
 #include "option.hpp"
 #include "order.hpp"
 #include "position.hpp"
 #include <thales/utils/config.hpp>
 #include <thales/utils/symbol_lookup.hpp>
 
-// Forward declarations to address namespace issues
-namespace boost {
-namespace container {
-template <typename T, size_t N>
-class static_vector;
-}
-}
-
-namespace thales {
-namespace utils {
-class Config;
-class SymbolLookup;
-}
-}
-
 namespace thales {
 namespace core {
 
-/**
- * @class Portfolio
- * @brief Manages the portfolio of positions and orders.
- *
- * This class is responsible for tracking positions, orders, and
- * calculating portfolio metrics such as value, profit/loss, etc.
- */
+/// Portfolio management system responsible for tracking positions and orders.
+///
+/// Provides thread-safe management of:
+/// - Active positions and their current market values
+/// - Open and historical orders
+/// - Portfolio metrics (value, P&L)
+/// - Position updates from market data and fills
+///
+/// Uses static vectors with pre-allocated capacity for performance.
 class alignas(CACHE_LINE_SIZE) Portfolio {
-   public:
-    /**
-     * @brief Constructor
-     * @param config The configuration for the portfolio
-     */
-    explicit Portfolio(const utils::Config& config);
+  public:
+    /// Construct a new Portfolio instance
+    /// @param config Portfolio configuration parameters
+    explicit Portfolio(const utils::Config &config);
 
-    /**
-     * @brief Destructor
-     */
+    /// @brief Destructor
     ~Portfolio();
 
-    /**
-     * @brief Initialize the portfolio
-     * @return true if initialization was successful, false otherwise
-     */
+    /// Initialize the portfolio state
+    /// @return true if initialization succeeds, false otherwise
     bool initialize();
 
-    /**
-     * @brief Get all positions in the portfolio
-     * @return A stable_vector of positions
-     */
+    /// Retrieve all current positions
+    /// @return Vector of active positions (thread-safe copy)
     boost::container::static_vector<Position, 256> get_positions() const;
 
-    /**
-     * @brief Get a specific position by symbol
-     * @param symbol The symbol to look up
-     * @return The position, or an empty position if not found
-     */
-    Position get_position(const std::string& symbol) const;
+    /// Lookup a specific position by symbol
+    /// @param symbol Trading symbol to search for
+    /// @return Position for the symbol, or empty position if not found
+    Position get_position(const std::string &symbol) const;
 
-    /**
-     * @brief Get all open orders
-     * @return A stable_vector of open orders
-     */
+    /// Retrieve all open orders
+    /// @return Vector of currently open orders (thread-safe copy)
     boost::container::static_vector<Order, 256> get_open_orders() const;
 
-    /**
-     * @brief Get all orders for a specific symbol
-     * @param symbol The symbol to look up
-     * @return A stable_vector of orders for the symbol
-     */
-    boost::container::static_vector<Order, 256> get_orders(const std::string& symbol) const;
+    /// Lookup all orders for a specific symbol
+    /// @param symbol Trading symbol to search for
+    /// @return Vector of all orders for the symbol (thread-safe copy)
+    boost::container::static_vector<Order, 256>
+    get_orders(const std::string &symbol) const;
 
-    /**
-     * @brief Get the total portfolio value
-     * @return The total value of all positions
-     */
+    /// Calculate total portfolio market value
+    /// @return Sum of all position values in portfolio
     double get_total_value() const;
 
-    /**
-     * @brief Get the total unrealized profit/loss
-     * @return The total unrealized profit/loss
-     */
+    /// Calculate total unrealized profit/loss
+    /// @return Sum of unrealized P&L across all positions
     double get_total_unrealized_pnl() const;
 
-    /**
-     * @brief Get the total realized profit/loss
-     * @return The total realized profit/loss
-     */
+    /// Calculate total realized profit/loss
+    /// @return Sum of realized P&L from closed positions
     double get_total_realized_pnl() const;
 
-    /**
-     * @brief Update a position with new market data
-     * @param symbol The symbol to update
-     * @param last_price The current market price
-     */
-    void update_position(const std::string& symbol, double last_price);
+    /// Update position with new market data
+    /// @param symbol Symbol of position to update
+    /// @param last_price Current market price
+    void update_position(const std::string &symbol, double last_price);
 
-    /**
-     * @brief Add a new position to the portfolio
-     * @param position The position to add
-     */
-    void add_position(const Position& position);
+    /// Add new position to portfolio
+    /// @param position Position to add
+    void add_position(const Position &position);
 
-    /**
-     * @brief Update an order status
-     * @param order_id The order ID to update
-     * @param status The new status
-     * @param filled_quantity The filled quantity
-     * @param average_fill_price The average fill price
-     */
-    void update_order(const std::string& order_id, Order::Status status,
+    /// Update order execution status
+    /// @param order_id ID of order to update
+    /// @param status New order status
+    /// @param filled_quantity Quantity filled in this update
+    /// @param average_fill_price Average price of fills
+    void update_order(const std::string &order_id, Order::Status status,
                       double filled_quantity = 0.0,
                       double average_fill_price = 0.0);
 
-    /**
-     * @brief Add a new order to the portfolio
-     * @param order The order to add
-     */
-    void add_order(const Order& order);
+    /// Submit new order to portfolio
+    /// @param order Order to add
+    void add_order(const Order &order);
 
-    /**
-     * @brief Cancel an order
-     * @param order_id The order ID to cancel
-     * @return true if the order was canceled, false otherwise
-     */
-    bool cancel_order(const std::string& order_id);
+    /// Cancel existing order
+    /// @param order_id ID of order to cancel
+    /// @return true if order was found and canceled, false otherwise
+    bool cancel_order(const std::string &order_id);
 
-   private:
-    // Positions and orders
-    alignas(CACHE_LINE_SIZE) boost::container::static_vector<Position, 256>
-        positions_;  // Vector of positions
-    alignas(CACHE_LINE_SIZE) boost::container::static_vector<Order, 256>
-        orders_;  // Vector of orders
+  private:
+    // Core data structures
+    alignas(CACHE_LINE_SIZE) boost::container::static_vector<
+        Position, 256> positions_; ///< Active positions
 
-    // Configuration
-    utils::Config config_;  // Configuration object (varies, likely >32 bytes)
+    alignas(CACHE_LINE_SIZE)
+        boost::container::static_vector<Order, 256> orders_; ///< Order history
 
-    // Mutex for thread safety
-    mutable std::mutex mutex_;  // Mutex for thread safety (40-48 bytes)
+    utils::Config config_;     ///< Portfolio configuration
+    mutable std::mutex mutex_; ///< Synchronization guard
 
-    // Private methods
-    void update_position_from_order(const Order& order);
+    /// Update position based on order execution
+    /// @param order Order that was executed
+    void update_position_from_order(const Order &order);
 };
 
-}  // namespace core
-}  // namespace thales
+} // namespace core
+} // namespace thales

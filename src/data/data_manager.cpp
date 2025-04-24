@@ -1,20 +1,46 @@
+// SPDX-License-Identifier: MIT
+
+// Standard library includes
+#include <algorithm>
+#include <mutex>
+
+// Project includes
 #include <thales/data/data_manager.hpp>
 #include <thales/utils/logger.hpp>
 
 namespace thales {
 namespace data {
 
-DataManager::DataManager(const utils::Config& config) : config_(config) {}
+namespace {
+// Thread-safe access to shared data
+std::mutex g_market_data_mutex;
+} // namespace
+
+DataManager::DataManager(const utils::Config &config)
+    : config_(config), ib_client_(nullptr) {}
 
 DataManager::~DataManager() {
-    // Clean up resources
-    for (const auto& symbol : subscribed_symbols_) {
-        unsubscribe_market_data(symbol);
+    try {
+        // Clean up market data subscriptions
+        for (const auto &symbol : subscribed_symbols_) {
+            unsubscribe_market_data(symbol);
+        }
+
+        // Clear caches
+        {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            latest_market_data_.clear();
+            subscribed_symbols_.clear();
+        }
+    } catch (const std::exception &e) {
+        auto &logger = utils::Logger::get_instance();
+        logger.error("Error during DataManager cleanup: " +
+                     std::string(e.what()));
     }
 }
 
 bool DataManager::initialize() {
-    auto& logger = utils::Logger::get_instance();
+    auto &logger = utils::Logger::get_instance();
     logger.info("Initializing data manager...");
 
     try {
@@ -35,7 +61,7 @@ bool DataManager::initialize() {
 
         logger.info("Data manager initialized successfully");
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         logger.error("Exception during data manager initialization: " +
                      std::string(e.what()));
         return false;
@@ -45,109 +71,186 @@ bool DataManager::initialize() {
     }
 }
 
-bool DataManager::subscribe_market_data(const std::string& symbol) {
-    auto& logger = utils::Logger::get_instance();
+bool DataManager::subscribe_market_data(const std::string &symbol) {
+    auto &logger = utils::Logger::get_instance();
     logger.info("Subscribing to market data for " + symbol);
 
-    // Check if already subscribed
-    if (std::find(subscribed_symbols_.begin(), subscribed_symbols_.end(),
-                  symbol) != subscribed_symbols_.end()) {
-        logger.info("Already subscribed to " + symbol);
-        return true;
-    }
+    try {
+        // Thread-safe check for existing subscription
+        {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            if (std::find(subscribed_symbols_.begin(),
+                          subscribed_symbols_.end(),
+                          symbol) != subscribed_symbols_.end()) {
+                logger.info("Already subscribed to " + symbol);
+                return true;
+            }
+        }
 
 #ifdef ENABLE_IB_CLIENT
-    // Subscribe through IB client
-    if (ib_client_ && ib_client_->subscribe_market_data(symbol)) {
-        subscribed_symbols_.push_back(symbol);
-        logger.info("Successfully subscribed to " + symbol);
-        return true;
-    } else {
+        if (!ib_client_) {
+            logger.error("IB client not initialized");
+            return false;
+        }
+
+        if (ib_client_->subscribe_market_data(symbol)) {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            subscribed_symbols_.push_back(symbol);
+            logger.info("Successfully subscribed to " + symbol);
+            return true;
+        }
+
         logger.error("Failed to subscribe to " + symbol);
         return false;
-    }
 #else
-    // Create a dummy market data entry for testing
-    MarketData dummyData;
-    dummyData.symbol = symbol;
-    dummyData.price = 100.0;  // Default dummy price
-    dummyData.volume = 1000;
-    dummyData.timestamp = "2023-04-01T12:00:00Z";
-    latestMarketData_[symbol] = dummyData;
+        // Create dummy market data for testing
+        MarketData dummy_data;
+        dummy_data.symbol = symbol;
+        dummy_data.price = 100.0;
+        dummy_data.volume = 1000;
+        dummy_data.timestamp = "2023-04-01T12:00:00Z";
 
-    subscribedSymbols_.push_back(symbol);
-    logger.info("Created dummy market data for " + symbol);
-    return true;
+        {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            latest_market_data_[symbol] = dummy_data;
+            subscribed_symbols_.push_back(symbol);
+        }
+
+        logger.info("Created dummy market data for " + symbol);
+        return true;
 #endif
-}
-
-bool DataManager::unsubscribe_market_data(const std::string& symbol) {
-    auto& logger = utils::Logger::get_instance();
-    logger.info("Unsubscribing from market data for " + symbol);
-
-    auto it = std::find(subscribed_symbols_.begin(), subscribed_symbols_.end(),
-                        symbol);
-    if (it == subscribed_symbols_.end()) {
-        logger.info("Not subscribed to " + symbol);
-        return true;
-    }
-
-#ifdef ENABLE_IB_CLIENT
-    // Unsubscribe through IB client
-    if (ib_client_ && ib_client_->unsubscribe_market_data(symbol)) {
-        subscribed_symbols_.erase(it);
-        logger.info("Successfully unsubscribed from " + symbol);
-        return true;
-    } else {
-        logger.error("Failed to unsubscribe from " + symbol);
+    } catch (const std::exception &e) {
+        logger.error("Error subscribing to market data: " +
+                     std::string(e.what()));
         return false;
     }
+}
+
+bool DataManager::unsubscribe_market_data(const std::string &symbol) {
+    auto &logger = utils::Logger::get_instance();
+    logger.info("Unsubscribing from market data for " + symbol);
+
+    try {
+        std::vector<std::string>::iterator it;
+        {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            it = std::find(subscribed_symbols_.begin(),
+                           subscribed_symbols_.end(), symbol);
+            if (it == subscribed_symbols_.end()) {
+                logger.info("Not subscribed to " + symbol);
+                return true;
+            }
+        }
+
+#ifdef ENABLE_IB_CLIENT
+        if (!ib_client_) {
+            logger.error("IB client not initialized");
+            return false;
+        }
+
+        if (ib_client_->unsubscribe_market_data(symbol)) {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            subscribed_symbols_.erase(it);
+            latest_market_data_.erase(symbol);
+            logger.info("Successfully unsubscribed from " + symbol);
+            return true;
+        }
+
+        logger.error("Failed to unsubscribe from " + symbol);
+        return false;
 #else
-    // Remove from subscribed symbols
-    subscribedSymbols_.erase(it);
-    logger.info("Removed dummy subscription for " + symbol);
-    return true;
+        {
+            std::lock_guard<std::mutex> lock(g_market_data_mutex);
+            subscribed_symbols_.erase(it);
+            latest_market_data_.erase(symbol);
+        }
+        logger.info("Removed dummy subscription for " + symbol);
+        return true;
 #endif
-}
-
-MarketData DataManager::get_latest_market_data(
-    const std::string& symbol) const {
-    auto it = latest_market_data_.find(symbol);
-    if (it != latest_market_data_.end()) {
-        return it->second;
+    } catch (const std::exception &e) {
+        logger.error("Error unsubscribing from market data: " +
+                     std::string(e.what()));
+        return false;
     }
-
-    // Return empty market data if not found
-    MarketData emptyData;
-    emptyData.symbol = symbol;
-    emptyData.price = 0.0;
-    emptyData.volume = 0;
-    emptyData.timestamp = "";
-
-    return emptyData;
 }
+
+MarketData
+DataManager::get_latest_market_data(const std::string &symbol) const {
+    try {
+        std::lock_guard<std::mutex> lock(g_market_data_mutex);
+        auto it = latest_market_data_.find(symbol);
+        if (it != latest_market_data_.end()) {
+            return it->second;
+        }
+
+        // Return empty market data if not found
+        MarketData empty_data;
+        empty_data.symbol = symbol;
+        empty_data.price = 0.0;
+        empty_data.volume = 0;
+        empty_data.timestamp = "";
+        return empty_data;
+    } catch (const std::exception &e) {
+        auto &logger = utils::Logger::get_instance();
+        logger.error("Error retrieving market data: " + std::string(e.what()));
+        MarketData error_data;
+        error_data.symbol = symbol;
+        return error_data;
+    }
+}
+
+struct HistoricalDataRequest {
+    std::string symbol;
+    std::string start_time;
+    std::string end_time;
+    std::string interval;
+};
 
 std::vector<MarketData> DataManager::get_historical_market_data(
-    [[maybe_unused]] const std::string& symbol, 
-    [[maybe_unused]] const std::string& startTime,
-    [[maybe_unused]] const std::string& endTime, 
-    [[maybe_unused]] const std::string& interval) const {
-    // For the stub implementation, return an empty vector
+    const std::string &symbol, const std::string &start_time,
+    const std::string &end_time, const std::string &interval) const {
+
+    const HistoricalDataRequest request{.symbol = symbol,
+                                        .start_time = start_time,
+                                        .end_time = end_time,
+                                        .interval = interval};
+
+    // TODO: Implement historical data retrieval
+    // For now, return empty vector
     return {};
 }
 
-std::unordered_map<std::string, OptionData> DataManager::get_option_chain(
-    [[maybe_unused]] const std::string& symbol, 
-    [[maybe_unused]] const std::string& expirationDate) const {
-    // For the stub implementation, return an empty map
+struct OptionChainRequest {
+    std::string symbol;
+    std::string expiration_date;
+};
+
+std::unordered_map<std::string, OptionData>
+DataManager::get_option_chain(const std::string &symbol,
+                              const std::string &expiration_date) const {
+
+    const OptionChainRequest request{.symbol = symbol,
+                                     .expiration_date = expiration_date};
+
+    // TODO: Implement option chain retrieval
+    // For now, return empty map
     return {};
 }
 
-void DataManager::process_market_data(const MarketData& data) {
-    cache_market_data(data);
+void DataManager::process_market_data(const MarketData &data) {
+    try {
+        // Cache the new data
+        cache_market_data(data);
 
-    // In a real implementation, this would notify subscribers, update
-    // analytics, etc.
+        // TODO: In a real implementation:
+        // - Notify data subscribers
+        // - Update analytics
+        // - Log significant price moves
+        // - Check for alerts/triggers
+    } catch (const std::exception &e) {
+        auto &logger = utils::Logger::get_instance();
+        logger.error("Error processing market data: " + std::string(e.what()));
+    }
 }
 
 bool DataManager::connect_to_data_sources() {
@@ -162,9 +265,10 @@ bool DataManager::connect_to_data_sources() {
     return true;
 }
 
-void DataManager::cache_market_data(const MarketData& data) {
+void DataManager::cache_market_data(const MarketData &data) {
+    std::lock_guard<std::mutex> lock(g_market_data_mutex);
     latest_market_data_[data.symbol] = data;
 }
 
-}  // namespace data
-}  // namespace thales
+} // namespace data
+} // namespace thales

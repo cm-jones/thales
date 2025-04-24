@@ -2,7 +2,7 @@ name: Docker Build and Publish
 
 on:
   push:
-    branches: ["main"]
+    branches: main
     # Only trigger when Dockerfile or docker-compose changes
     paths:
       - "docker/**"
@@ -22,7 +22,7 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     permissions:
       contents: read
       packages: write

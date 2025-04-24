@@ -29,6 +29,7 @@ set(TEST_SOURCES
     # Models tests
     models/test_black_scholes_model.cpp
     models/test_black_scholes_model_greeks.cpp
+    models/test_monte_carlo_model.cpp
     # models/test_implied_volatility.cpp
 
     # Strategies tests

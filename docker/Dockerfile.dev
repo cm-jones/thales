@@ -1,0 +1,105 @@
+ARG UBUNTU_VERSION=22.04
+FROM ubuntu:${UBUNTU_VERSION}
+
+# Install system essentials
+RUN apt update && apt install -y \
+    curl \
+    git \
+    wget \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install build tools
+RUN apt update && apt install -y \
+    build-essential \
+    cmake \
+    ninja-build \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install development and debugging tools
+RUN apt update && apt install -y \
+    clang \
+    clang-format \
+    clang-tidy \
+    cppcheck \
+    gdb \
+    lldb \
+    valgrind \
+    heaptrack \
+    linux-tools-generic \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python tools
+RUN apt update && apt install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install database development packages
+RUN apt update && apt install -y \
+    postgresql-client \
+    postgresql-server-dev-all \
+    libpq-dev \
+    libpqxx-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install library dependencies
+RUN apt update && apt install -y \
+    libboost-all-dev \
+    libyaml-cpp-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    unzip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install IB API
+RUN mkdir -p /app/third_party/ibapi
+WORKDIR /app
+COPY scripts/depends/install_ibapi.sh /app/
+RUN IB_API_VERSION="1035.01" && \
+    DOWNLOAD_URL="https://interactivebrokers.github.io/downloads/twsapi_macunix.${IB_API_VERSION}.zip" && \
+    TMP_DIR=$(mktemp -d) && \
+    echo "Downloading IB API version ${IB_API_VERSION}..." && \
+    curl -L -o "${TMP_DIR}/ibapi.zip" "${DOWNLOAD_URL}" && \
+    echo "Extracting files..." && \
+    unzip -q "${TMP_DIR}/ibapi.zip" -d "${TMP_DIR}" && \
+    echo "Copying C++ API files into third_party/ibapi..." && \
+    cp -r "${TMP_DIR}/IBJts/source/cppclient/client/"* "/app/third_party/ibapi/" && \
+    rm -rf "${TMP_DIR}"
+
+# Install development tools
+RUN apt update && apt install -y \
+    vim \
+    tree \
+    htop \
+    strace \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy source code into container
+COPY . .
+WORKDIR /app
+
+# Create build directory
+RUN mkdir -p build
+
+# Set environment variables
+ENV CC=clang
+ENV CXX=clang++
+ENV PATH="/app/build:${PATH}"
+ENV ASAN_OPTIONS=halt_on_error=0:detect_stack_use_after_return=1:check_initialization_order=1
+
+# Configure CMake with development settings
+RUN cd build && cmake .. \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DENABLE_ASAN=ON \
+    -DBUILD_TESTING=ON \
+    -DBUILD_EXAMPLES=ON
+
+# Build the project
+RUN cd build && ninja
+
+# Default command (interactive shell)
+CMD ["/bin/bash"]

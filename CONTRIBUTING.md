@@ -41,7 +41,7 @@ git push origin descriptive-branch-name
 
 To maintain code consistency, we use clang-format with the following settings:
 
-- BasedOnStyle: Google
+- BasedOnStyle: LLVM
 - IndentWidth: 4
 - ColumnLimit: 80
 

@@ -1,33 +1,36 @@
-#include <thales/data/ib_contract.hpp>
+// SPDX-License-Identifier: MIT
+
 #include <sstream>
+#include <thales/data/ib_contract.hpp>
 
 namespace thales {
 namespace data {
 
-IBContract::IBContract(const std::string& symbol, const std::string& sec_type,
-                     const std::string& exchange, const std::string& currency)
-    : symbol(symbol), sec_type(sec_type), exchange(exchange), currency(currency) {}
+IBContract::IBContract(const std::string &symbol, const std::string &sec_type,
+                       const std::string &exchange, const std::string &currency)
+    : symbol(symbol), sec_type(sec_type), exchange(exchange),
+      currency(currency) {}
 
 std::string IBContract::to_string() const {
     std::stringstream ss;
     ss << "Contract: " << symbol;
-    
+
     if (!sec_type.empty()) {
         ss << " (" << sec_type << ")";
     }
-    
+
     if (!exchange.empty()) {
         ss << " @ " << exchange;
     }
-    
+
     if (!currency.empty()) {
         ss << " in " << currency;
     }
-    
+
     if (contract_id > 0) {
         ss << " [ID: " << contract_id << "]";
     }
-    
+
     if (sec_type == "OPT" || sec_type == "FOP") {
         ss << " " << strike;
         if (!right.empty()) {
@@ -37,63 +40,63 @@ std::string IBContract::to_string() const {
             ss << " " << last_trade_date;
         }
     }
-    
+
     return ss.str();
 }
 
-IBContractDetails::IBContractDetails(const IBContract& contract)
+IBContractDetails::IBContractDetails(const IBContract &contract)
     : contract(contract) {}
 
 std::string IBContractDetails::to_string() const {
     std::stringstream ss;
     ss << contract.to_string() << "\n";
-    
+
     if (!market_name.empty()) {
         ss << "Market: " << market_name << "\n";
     }
-    
+
     if (!long_name.empty()) {
         ss << "Name: " << long_name << "\n";
     }
-    
+
     if (!industry.empty()) {
         ss << "Industry: " << industry << "\n";
     }
-    
+
     if (!category.empty()) {
         ss << "Category: " << category << "\n";
     }
-    
+
     if (!subcategory.empty()) {
         ss << "Subcategory: " << subcategory << "\n";
     }
-    
+
     if (min_tick > 0.0) {
         ss << "Min Tick: " << min_tick << "\n";
     }
-    
+
     if (!trading_hours.empty()) {
         ss << "Trading Hours: " << trading_hours << "\n";
     }
-    
+
     if (!liquid_hours.empty()) {
         ss << "Liquid Hours: " << liquid_hours << "\n";
     }
-    
+
     if (!time_zone_id.empty()) {
         ss << "Time Zone: " << time_zone_id << "\n";
     }
-    
+
     return ss.str();
 }
 
-IBContractDescription::IBContractDescription(const IBContract& contract)
+IBContractDescription::IBContractDescription(const IBContract &contract)
     : contract(contract) {}
 
 std::string IBContractDescription::to_string() const {
     std::stringstream ss;
     ss << contract.to_string() << "\n";
-    
+
     if (!derivative_sec_types.empty()) {
         ss << "Derivative Types: ";
         for (size_t i = 0; i < derivative_sec_types.size(); ++i) {
@@ -104,7 +107,7 @@ std::string IBContractDescription::to_string() const {
         }
         ss << "\n";
     }
-    
+
     return ss.str();
 }
 

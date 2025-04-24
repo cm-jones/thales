@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 project(thales VERSION 0.1.0 LANGUAGES CXX)
 
 # Add cmake modules directory to module path
@@ -11,8 +12,6 @@ set_compiler_flags()
 # Find required packages
 find_package(PkgConfig REQUIRED)
 find_package(Boost 1.74 REQUIRED COMPONENTS container)
-# yaml-cpp is provided by Conan
-# find_package(yaml-cpp 0.7.0 REQUIRED)
 find_package(LibPQXX REQUIRED)
 
 # Optional: Find IBAPI (if available)
@@ -28,7 +27,7 @@ include_directories(include)
 include_directories(third_party)
 
 # Add subdirectories (commented out as third_party dependencies are missing)
-# add_subdirectory(third_party/ibapi)
+add_subdirectory(third_party/ibapi)
 # add_subdirectory(third_party/benchmark)
 
 # Check for Google Benchmark

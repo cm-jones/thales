@@ -13,8 +13,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Check if PostgreSQL is installed
     if ! command -v psql &> /dev/null; then
         echo "PostgreSQL not found. Installing..."
-        sudo apt-get update
-        sudo apt-get install -y postgresql postgresql-contrib
+        sudo apt update
+        sudo apt install -y postgresql postgresql-contrib
     else
         echo "PostgreSQL is already installed"
     fi

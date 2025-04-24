@@ -2,7 +2,7 @@ name: Test Docker Image
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: main
     # Only trigger when relevant files change
     paths:
       - 'docker/**'

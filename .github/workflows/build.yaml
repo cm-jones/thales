@@ -2,37 +2,37 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
+    branches: main
   pull_request:
-    branches: [ main ]
+    branches: main
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: 
+        os:
           - ubuntu-${{ vars.UBUNTU_VERSION }}
         build_type: [Debug, Release]
-        
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake libboost-all-dev
-    
-    - name: Configure and build
-      run: |
-        chmod +x scripts/build/build.sh
-        ./scripts/build/build.sh --type ${{ matrix.build_type }} --clean --test
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: thales-${{ matrix.os }}-${{ matrix.build_type }}
-        path: |
-          build/thales
-          build/thales.exe
-        if-no-files-found: ignore
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake libboost-all-dev
+
+      - name: Configure and build
+        run: |
+          chmod +x scripts/build/build.sh
+          ./scripts/build/build.sh --type ${{ matrix.build_type }} --clean --test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: thales-${{ matrix.os }}-${{ matrix.build_type }}
+          path: |
+            build/thales
+            build/thales.exe
+          if-no-files-found: ignore

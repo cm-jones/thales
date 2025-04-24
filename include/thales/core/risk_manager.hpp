@@ -1,86 +1,87 @@
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
+// Standard library includes
 #include <string>
+
+// Project includes
 #include <thales/core/portfolio.hpp>
 #include <thales/utils/config.hpp>
 
 namespace thales {
 namespace core {
 
-/**
- * @class RiskManager
- * @brief Manages risk for the trading bot.
- *
- * This class is responsible for enforcing risk limits and constraints
- * on trading activities, such as maximum position sizes, maximum
- * drawdown, and other risk metrics.
- */
+/// Risk management system for enforcing trading constraints
+///
+/// Provides real-time risk monitoring and control:
+/// - Position size limits
+/// - Maximum drawdown tracking
+/// - Leverage restrictions
+/// - Per-trade risk limits
+/// - Daily loss limits
+///
+/// All risk parameters are configurable and can be updated dynamically
+/// based on market conditions and portfolio performance.
 class RiskManager {
-   public:
-    /**
-     * @brief Constructor
-     * @param config The configuration for the risk manager
-     */
-    explicit RiskManager(const utils::Config& config);
+  public:
+    /// Construct a new RiskManager with configuration
+    /// @param config Risk management parameters
+    explicit RiskManager(const utils::Config &config);
 
-    /**
-     * @brief Destructor
-     */
+    /// @brief Destructor
     ~RiskManager();
 
-    /**
-     * @brief Initialize the risk manager
-     * @return true if initialization was successful, false otherwise
-     */
+    /// Initialize risk management system
+    /// @return true if initialization succeeds, false otherwise
     bool initialize();
 
-    /**
-     * @brief Check if an order is allowed based on risk constraints
-     * @param order The order to check
-     * @param portfolio The current portfolio
-     * @return true if the order is allowed, false otherwise
-     */
-    bool is_order_allowed(const Order& order, const Portfolio& portfolio) const;
+    /// Validate order against risk constraints
+    /// @param order Order to validate
+    /// @param portfolio Current portfolio state
+    /// @return true if order complies with risk limits
+    bool is_order_allowed(const Order &order, const Portfolio &portfolio) const;
 
-    /**
-     * @brief Get the maximum allowed position size for a symbol
-     * @param symbol The symbol to check
-     * @param portfolio The current portfolio
-     * @return The maximum allowed position size
-     */
-    double get_max_position_size(const std::string& symbol,
-                                 const Portfolio& portfolio) const;
+    /// Calculate maximum allowed position size
+    /// @param symbol Trading symbol to check
+    /// @param portfolio Current portfolio state
+    /// @return Maximum allowed position size in base units
+    double get_max_position_size(const std::string &symbol,
+                                 const Portfolio &portfolio) const;
 
-    /**
-     * @brief Get the current risk level
-     * @param portfolio The current portfolio
-     * @return The current risk level (0.0 to 1.0, where 1.0 is maximum
-     * risk)
-     */
-    double get_current_risk_level(const Portfolio& portfolio) const;
+    /// Calculate current portfolio risk level
+    /// @param portfolio Current portfolio state
+    /// @return Risk level from 0.0 (lowest) to 1.0 (highest)
+    double get_current_risk_level(const Portfolio &portfolio) const;
 
-    /**
-     * @brief Update risk parameters based on market conditions
-     * @param portfolio The current portfolio
-     */
-    void update_risk_params(const Portfolio& portfolio);
+    /// Update risk parameters dynamically
+    /// @param portfolio Current portfolio state to analyze
+    void update_risk_params(const Portfolio &portfolio);
 
-   private:
-    // Configuration
-    utils::Config config_;  // Configuration object (varies, likely >32 bytes)
+  private:
+    // Core configuration
+    utils::Config config_; ///< Risk management settings
 
-    // Risk parameters
-    double max_position_size_;   // Maximum position size (8 bytes)
-    double max_drawdown_;        // Maximum drawdown (8 bytes)
-    double max_leverage_;        // Maximum leverage (8 bytes)
-    double max_risk_per_trade_;  // Maximum risk per trade (8 bytes)
-    double max_daily_loss_;      // Maximum daily loss (8 bytes)
+    // Risk limits
+    double max_position_size_;  ///< Maximum position size per instrument
+    double max_drawdown_;       ///< Maximum allowed drawdown percentage
+    double max_leverage_;       ///< Maximum portfolio leverage ratio
+    double max_risk_per_trade_; ///< Maximum risk per single trade
+    double max_daily_loss_;     ///< Maximum allowed daily loss
 
-    // Private methods
-    double calculate_position_risk(const std::string& symbol, double quantity,
-                                   const Portfolio& portfolio) const;
-    double calculate_portfolio_risk(const Portfolio& portfolio) const;
+    /// Calculate risk for a specific position
+    /// @param symbol Trading symbol
+    /// @param quantity Position size
+    /// @param portfolio Current portfolio state
+    /// @return Risk measure for the position
+    double calculate_position_risk(const std::string &symbol, double quantity,
+                                   const Portfolio &portfolio) const;
+
+    /// Calculate aggregate portfolio risk
+    /// @param portfolio Current portfolio state
+    /// @return Total portfolio risk measure
+    double calculate_portfolio_risk(const Portfolio &portfolio) const;
 };
 
-}  // namespace core
-}  // namespace thales
+} // namespace core
+} // namespace thales
