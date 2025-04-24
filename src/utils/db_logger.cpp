@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include <chrono>
 #include <iomanip>
 #include <sstream>
@@ -15,35 +17,28 @@ namespace utils {
 std::unique_ptr<DbLogger> DbLogger::instance_ = nullptr;
 
 DbLogger::DbLogger()
-    : db_host_("localhost"),
-      db_port_(5432),
-      db_name_("thales"),
-      db_user_("thales_user"),
-      db_password_(""),
-      max_queue_size_(10000),
-      batch_size_(100),
-      connected_(false),
-      running_(false),
-      failed_count_(0) {}
+    : db_host_("localhost"), db_port_(5432), db_name_("thales"),
+      db_user_("thales_user"), db_password_(""), max_queue_size_(10000),
+      batch_size_(100), connected_(false), running_(false), failed_count_(0) {}
 
 DbLogger::~DbLogger() { shutdown(); }
 
-DbLogger& DbLogger::get_instance() {
+DbLogger &DbLogger::get_instance() {
     if (!instance_) {
         initialize();
     }
     return *instance_;
 }
 
-bool DbLogger::initialize(const std::string& dbHost, int dbPort,
-                          const std::string& dbName, const std::string& dbUser,
-                          const std::string& dbPassword, size_t maxQueueSize,
+bool DbLogger::initialize(const std::string &dbHost, int dbPort,
+                          const std::string &dbName, const std::string &dbUser,
+                          const std::string &dbPassword, size_t maxQueueSize,
                           size_t batchSize) {
     if (!instance_) {
         instance_ = std::unique_ptr<DbLogger>(new DbLogger());
     }
 
-    auto& logger = Logger::get_instance();
+    auto &logger = Logger::get_instance();
     logger.info("Initializing database logger");
 
     instance_->db_host_ = dbHost;
@@ -79,7 +74,7 @@ bool DbLogger::initialize(const std::string& dbHost, int dbPort,
 bool DbLogger::connect() {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto& logger = thales::utils::Logger::get_instance();
+    auto &logger = thales::utils::Logger::get_instance();
 
     try {
         // Create a connection string
@@ -102,7 +97,7 @@ bool DbLogger::connect() {
 
                 return true;
             }
-        } catch (const pqxx::broken_connection& e) {
+        } catch (const pqxx::broken_connection &e) {
             // Database might not exist, try to create it
             logger.warning("Could not connect to database: " +
                            std::string(e.what()));
@@ -165,7 +160,7 @@ bool DbLogger::connect() {
                         "Database '" + db_name_ +
                         "' exists but connection failed. Check permissions.");
                 }
-            } catch (const std::exception& e) {
+            } catch (const std::exception &e) {
                 logger.error("Failed to create database: " +
                              std::string(e.what()));
                 logger.info(
@@ -178,7 +173,7 @@ bool DbLogger::connect() {
         logger.error("Failed to connect to PostgreSQL database: " + db_name_);
         connected_ = false;
         return false;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         logger.error("Exception while connecting to database: " +
                      std::string(e.what()));
         connected_ = false;
@@ -209,7 +204,7 @@ std::string DbLogger::get_connection_string() const {
 bool DbLogger::create_tables_if_not_exist() {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    auto& logger = Logger::get_instance();
+    auto &logger = Logger::get_instance();
 
     try {
         // Create a connection
@@ -243,22 +238,19 @@ bool DbLogger::create_tables_if_not_exist() {
         )");
 
         // Create indexes for faster queries
-        txn.exec(
-            "CREATE INDEX IF NOT EXISTS idx_trade_executions_timestamp ON "
-            "trade_executions(timestamp)");
-        txn.exec(
-            "CREATE INDEX IF NOT EXISTS idx_trade_executions_symbol ON "
-            "trade_executions(symbol)");
-        txn.exec(
-            "CREATE INDEX IF NOT EXISTS idx_trade_executions_strategy ON "
-            "trade_executions(strategy_name)");
+        txn.exec("CREATE INDEX IF NOT EXISTS idx_trade_executions_timestamp ON "
+                 "trade_executions(timestamp)");
+        txn.exec("CREATE INDEX IF NOT EXISTS idx_trade_executions_symbol ON "
+                 "trade_executions(symbol)");
+        txn.exec("CREATE INDEX IF NOT EXISTS idx_trade_executions_strategy ON "
+                 "trade_executions(strategy_name)");
 
         // Commit the transaction
         txn.commit();
 
         logger.info("Database tables created successfully");
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         logger.error("Exception while creating database tables: " +
                      std::string(e.what()));
         return false;
@@ -266,14 +258,14 @@ bool DbLogger::create_tables_if_not_exist() {
 }
 
 bool DbLogger::log_trade_execution(
-    const std::string& strategy_name, const std::string& symbol,
-    const std::string& order_id, const std::string& execution_id,
-    const std::string& side, double quantity, double price, double commission,
-    double total_value, const std::string& execution_time,
-    const std::string& account_id, const std::string& exchange,
-    const std::string& order_type, bool is_option,
-    const std::string& option_data, const std::string& additional_data) {
-    auto& logger = Logger::get_instance();
+    const std::string &strategy_name, const std::string &symbol,
+    const std::string &order_id, const std::string &execution_id,
+    const std::string &side, double quantity, double price, double commission,
+    double total_value, const std::string &execution_time,
+    const std::string &account_id, const std::string &exchange,
+    const std::string &order_type, bool is_option,
+    const std::string &option_data, const std::string &additional_data) {
+    auto &logger = Logger::get_instance();
 
     // Create a log entry
     TradeExecutionLog log;
@@ -315,7 +307,7 @@ bool DbLogger::log_trade_execution(
 }
 
 void DbLogger::worker_thread() {
-    auto& logger = Logger::get_instance();
+    auto &logger = Logger::get_instance();
     logger.info("Database logger worker thread started");
 
     while (running_) {
@@ -325,7 +317,7 @@ void DbLogger::worker_thread() {
 
             // Sleep for a short time
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             logger.error("Exception in database logger worker thread: " +
                          std::string(e.what()));
         }
@@ -334,7 +326,7 @@ void DbLogger::worker_thread() {
     // Process any remaining logs
     try {
         process_logs();
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         logger.error("Exception while processing remaining logs: " +
                      std::string(e.what()));
     }
@@ -343,7 +335,7 @@ void DbLogger::worker_thread() {
 }
 
 void DbLogger::process_logs() {
-    auto& logger = Logger::get_instance();
+    auto &logger = Logger::get_instance();
 
     // Check if there are logs to process
     std::vector<TradeExecutionLog> logs;
@@ -389,12 +381,12 @@ void DbLogger::process_logs() {
     }
 }
 
-bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
+bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog> &logs) {
     if (logs.empty()) {
         return true;
     }
 
-    auto& logger = Logger::get_instance();
+    auto &logger = Logger::get_instance();
 
     try {
         // Check if we're connected
@@ -411,16 +403,16 @@ bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
         pqxx::work txn(conn);
 
         // Insert each log using simple string concatenation for demonstration
-        for (const auto& log : logs) {
+        for (const auto &log : logs) {
             // Build the SQL query with proper escaping
-            std::string query = 
+            std::string query =
                 "INSERT INTO trade_executions ("
                 "timestamp, strategy_name, symbol, order_id, execution_id, "
                 "side, quantity, price, commission, total_value, "
                 "execution_time, account_id, exchange, order_type, "
                 "is_option, option_data, additional_data"
                 ") VALUES (";
-                
+
             // Properly escape and quote string values
             query += txn.quote(log.timestamp) + ", ";
             query += txn.quote(log.strategy_name) + ", ";
@@ -428,28 +420,28 @@ bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
             query += txn.quote(log.order_id) + ", ";
             query += txn.quote(log.execution_id) + ", ";
             query += txn.quote(log.side) + ", ";
-            
+
             // Add numeric values (no quotes needed)
             query += std::to_string(log.quantity) + ", ";
             query += std::to_string(log.price) + ", ";
             query += std::to_string(log.commission) + ", ";
             query += std::to_string(log.total_value) + ", ";
-            
+
             // More string values
             query += txn.quote(log.execution_time) + ", ";
             query += txn.quote(log.account_id) + ", ";
             query += txn.quote(log.exchange) + ", ";
             query += txn.quote(log.order_type) + ", ";
-            
+
             // Boolean value
             query += std::string(log.is_option ? "TRUE" : "FALSE") + ", ";
-            
+
             // JSON data
             query += txn.quote(log.option_data) + ", ";
             query += txn.quote(log.additional_data);
-            
+
             query += ")";
-            
+
             // Execute the query
             txn.exec(query);
         }
@@ -458,7 +450,7 @@ bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
         txn.commit();
 
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         logger.error("Exception while inserting log batch: " +
                      std::string(e.what()));
         connected_ = false;
@@ -467,7 +459,7 @@ bool DbLogger::insert_log_batch(const std::vector<TradeExecutionLog>& logs) {
 }
 
 void DbLogger::shutdown() {
-    auto& logger = Logger::get_instance();
+    auto &logger = Logger::get_instance();
     logger.info("Shutting down database logger");
 
     // Stop the worker thread
@@ -488,7 +480,8 @@ void DbLogger::shutdown() {
 bool DbLogger::is_connected() const { return connected_; }
 
 size_t DbLogger::get_queue_size() const {
-    std::lock_guard<std::mutex> lock(queue_mutex_);  // non-const mutex passed here
+    std::lock_guard<std::mutex> lock(
+        queue_mutex_); // non-const mutex passed here
     return log_queue_.size();
 }
 
@@ -504,5 +497,5 @@ std::string DbLogger::get_current_timestamp() {
     return ss.str();
 }
 
-}  // namespace utils
-}  // namespace thales
+} // namespace utils
+} // namespace thales

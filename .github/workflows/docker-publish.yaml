@@ -2,15 +2,15 @@ name: Docker Build and Publish
 
 on:
   push:
-    branches: [ "main" ]
+    branches: main
     # Only trigger when Dockerfile or docker-compose changes
     paths:
-      - 'docker/**'
-      - '.github/workflows/docker-publish.yaml'
-      - 'src/**'
-      - 'include/**'
-      - 'CMakeLists.txt'
-      - '.version'
+      - "docker/**"
+      - ".github/workflows/docker-publish.yaml"
+      - "src/**"
+      - "include/**"
+      - "CMakeLists.txt"
+      - ".version"
   # Allow manual triggering
   workflow_dispatch:
 
@@ -22,7 +22,7 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     permissions:
       contents: read
       packages: write
@@ -48,7 +48,7 @@ jobs:
         run: |
           UBUNTU_VERSION=$(grep "UBUNTU_VERSION" .version | cut -d= -f2)
           echo "UBUNTU_VERSION=$UBUNTU_VERSION" >> $GITHUB_ENV
-          
+
       # Extract version for tagging
       - name: Extract version
         id: version

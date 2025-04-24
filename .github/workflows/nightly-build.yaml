@@ -17,8 +17,8 @@ jobs:
       
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake libboost-all-dev clang clang-tidy clang-format cppcheck lcov
+          sudo apt update
+          sudo apt install -y build-essential cmake libboost-all-dev clang clang-tidy clang-format cppcheck lcov
       
       - name: Configure with various build options
         run: |
@@ -175,7 +175,7 @@ jobs:
       - name: Check for memory leaks
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get install -y valgrind
+          sudo apt install -y valgrind
           
           echo "# Memory Analysis Report" > memory-report.md
           echo "" >> memory-report.md

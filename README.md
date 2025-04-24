@@ -58,7 +58,7 @@ make
 ./scripts/test/test.sh
 
 # Run tests with coverage reporting
-./scripts/test/test_coverage.sh
+./scripts/test/coverage.sh
 ```
 
 The coverage report will be generated in `build/coverage_report/index.html`. Open this file in a browser to view the detailed coverage report.

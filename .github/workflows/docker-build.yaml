@@ -2,19 +2,19 @@ name: Docker Build
 
 on:
   push:
-    branches: [ main ]
+    branches: main
     paths:
-      - 'docker/**'
-      - 'src/**'
-      - 'include/**'
-      - 'CMakeLists.txt'
+      - "docker/**"
+      - "src/**"
+      - "include/**"
+      - "CMakeLists.txt"
   pull_request:
-    branches: [ main ]
+    branches: main
     paths:
-      - 'docker/**'
-      - 'src/**'
-      - 'include/**'
-      - 'CMakeLists.txt'
+      - "docker/**"
+      - "src/**"
+      - "include/**"
+      - "CMakeLists.txt"
   workflow_dispatch:
 
 jobs:
@@ -47,10 +47,10 @@ jobs:
       - name: Scan Docker image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'thales:test'
-          format: 'table'
-          exit-code: '1'
+          image-ref: "thales:test"
+          format: "table"
+          exit-code: "1"
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
         continue-on-error: true

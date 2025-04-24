@@ -2,7 +2,7 @@ services:
   thales:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.final
+      dockerfile: docker/Dockerfile.prod
       args:
         - UBUNTU_VERSION=${UBUNTU_VERSION}
     platform: linux/amd64
@@ -10,10 +10,11 @@ services:
     container_name: thales
     restart: unless-stopped
     volumes:
-      - ../logs:/usr/local/thales/logs
-      - ../data:/usr/local/thales/data
+      - ../logs:/usr/local/thales/logs:rw
+      - ../data:/usr/local/thales/data:rw
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - HOST_IP=${HOST_IP:-host.docker.internal}
       - IB_GATEWAY_PORT=4001
@@ -24,15 +25,27 @@ services:
       - DB_NAME=thales
     networks:
       - thales-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 900M
+        reservations:
+          cpus: '0.5'
+          memory: 450M
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "postgres", "-U", "thales"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Add PostgreSQL for logging and data storage
   postgres:
     image: postgres:15
     platform: linux/amd64
     container_name: thales-postgres
     restart: unless-stopped
     volumes:
-      - thales-postgres-data:/var/lib/postgresql/data
+      - thales-postgres-data:/var/lib/postgresql/data:rw
     environment:
       - POSTGRES_PASSWORD=thales
       - POSTGRES_USER=thales
@@ -41,11 +54,114 @@ services:
       - "5432:5432"
     networks:
       - thales-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 450M
+        reservations:
+          cpus: '0.25'
+          memory: 225M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U thales"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus
+    container_name: thales-prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - thales-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 450M
+        reservations:
+          cpus: '0.25'
+          memory: 225M
+
+  grafana:
+    image: grafana/grafana
+    container_name: thales-grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Change this in production
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    networks:
+      - thales-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 450M
+        reservations:
+          cpus: '0.25'
+          memory: 225M
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: thales-node-exporter
+    command:
+      - '--path.rootfs=/host'
+    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.05'
+          memory: 50M
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: thales-postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=postgresql://thales:thales@postgres:5432/thales?sslmode=disable
+    ports:
+      - "9187:9187"
+    networks:
+      - thales-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.05'
+          memory: 50M
+    depends_on:
+      - postgres
 
 volumes:
   thales-postgres-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
     driver: local
 
 networks:
   thales-network:
     driver: bridge
+    name: thales-network

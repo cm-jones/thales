@@ -1,0 +1,86 @@
+ARG UBUNTU_VERSION=22.04
+
+# Build stage
+FROM ubuntu:${UBUNTU_VERSION} AS builder
+
+# Install minimal build dependencies
+RUN apt update && apt install -y \
+    build-essential \
+    cmake \
+    ninja-build \
+    pkg-config \
+    curl \
+    unzip \
+    libboost-container-dev \
+    libboost-system-dev \
+    libpq-dev \
+    libpqxx-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install IB API in builder stage
+COPY scripts/depends/install_ibapi.sh /tmp/
+RUN chmod +x /tmp/install_ibapi.sh && \
+    cd /tmp && \
+    ./install_ibapi.sh && \
+    rm -rf /tmp/install_ibapi.sh
+
+# Set up working directory
+WORKDIR /app
+
+# Copy only files needed for build first to improve cache utilization
+COPY CMakeLists.txt .
+COPY cmake ./cmake
+COPY include ./include
+COPY src ./src
+COPY third_party ./third_party
+
+# Create build directory and build
+RUN mkdir -p build && \
+    cd build && \
+    cmake .. \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_TESTING=OFF \
+        -DBUILD_DOCS=OFF \
+        -DBUILD_EXAMPLES=OFF \
+        -DCMAKE_CXX_FLAGS="-O3 -march=native -DNDEBUG" && \
+    ninja
+
+# Runtime stage
+FROM ubuntu:${UBUNTU_VERSION} AS runtime
+
+# Install minimal runtime dependencies
+RUN apt update && apt install -y \
+    libboost-container1.74.0 \
+    libboost-system1.74.0 \
+    libpq5 \
+    libpqxx-6.4 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create necessary directories
+RUN mkdir -p /usr/local/thales/logs /usr/local/thales/data
+
+# Copy binary and config
+COPY --from=builder /app/build/thales /usr/local/bin/
+COPY config /etc/thales/config/
+
+# Copy and set up entrypoint
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set runtime user for security
+RUN groupadd -r thales && \
+    useradd -r -g thales -s /bin/false thales && \
+    chown -R thales:thales /usr/local/thales && \
+    chown thales:thales /usr/local/bin/thales
+
+USER thales
+
+# Set default environment variables
+ENV DB_HOST=postgres \
+    DB_NAME=thales \
+    DB_USER=thales \
+    IB_GATEWAY_PORT=4001 \
+    LOG_LEVEL=INFO
+
+ENTRYPOINT ["/entrypoint.sh"]

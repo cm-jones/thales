@@ -5,13 +5,13 @@
 using namespace thales::models;
 
 // Benchmark for call_price function
-static void BM_BlackScholesCallPrice(benchmark::State& state) {
+static void BM_BlackScholesCallPrice(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -21,13 +21,13 @@ static void BM_BlackScholesCallPrice(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCallPrice);
 
 // Benchmark for put_price function
-static void BM_BlackScholesPutPrice(benchmark::State& state) {
+static void BM_BlackScholesPutPrice(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -37,13 +37,13 @@ static void BM_BlackScholesPutPrice(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesPutPrice);
 
 // Benchmark for call_delta function
-static void BM_BlackScholesCallDelta(benchmark::State& state) {
+static void BM_BlackScholesCallDelta(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -53,13 +53,13 @@ static void BM_BlackScholesCallDelta(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCallDelta);
 
 // Benchmark for put_delta function
-static void BM_BlackScholesPutDelta(benchmark::State& state) {
+static void BM_BlackScholesPutDelta(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -69,13 +69,13 @@ static void BM_BlackScholesPutDelta(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesPutDelta);
 
 // Benchmark for gamma function
-static void BM_BlackScholesGamma(benchmark::State& state) {
+static void BM_BlackScholesGamma(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(BlackScholesModel::gamma(S, K, r, sigma, T));
@@ -84,13 +84,13 @@ static void BM_BlackScholesGamma(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesGamma);
 
 // Benchmark for vega function
-static void BM_BlackScholesVega(benchmark::State& state) {
+static void BM_BlackScholesVega(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(BlackScholesModel::vega(S, K, r, sigma, T));
@@ -99,13 +99,13 @@ static void BM_BlackScholesVega(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesVega);
 
 // Benchmark for call_theta function
-static void BM_BlackScholesCallTheta(benchmark::State& state) {
+static void BM_BlackScholesCallTheta(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -115,13 +115,13 @@ static void BM_BlackScholesCallTheta(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCallTheta);
 
 // Benchmark for put_theta function
-static void BM_BlackScholesPutTheta(benchmark::State& state) {
+static void BM_BlackScholesPutTheta(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -131,13 +131,13 @@ static void BM_BlackScholesPutTheta(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesPutTheta);
 
 // Benchmark for call_rho function
-static void BM_BlackScholesCallRho(benchmark::State& state) {
+static void BM_BlackScholesCallRho(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -147,13 +147,13 @@ static void BM_BlackScholesCallRho(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCallRho);
 
 // Benchmark for put_rho function
-static void BM_BlackScholesPutRho(benchmark::State& state) {
+static void BM_BlackScholesPutRho(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(BlackScholesModel::put_rho(S, K, r, sigma, T));
@@ -162,13 +162,13 @@ static void BM_BlackScholesPutRho(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesPutRho);
 
 // Benchmark for call_implied_volatility function
-static void BM_BlackScholesCallImpliedVolatility(benchmark::State& state) {
+static void BM_BlackScholesCallImpliedVolatility(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     // Calculate option price for the given volatility
     double price = BlackScholesModel::call_price(S, K, r, sigma, T);
@@ -181,13 +181,13 @@ static void BM_BlackScholesCallImpliedVolatility(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCallImpliedVolatility);
 
 // Benchmark for put_implied_volatility function
-static void BM_BlackScholesPutImpliedVolatility(benchmark::State& state) {
+static void BM_BlackScholesPutImpliedVolatility(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     // Calculate option price for the given volatility
     double price = BlackScholesModel::put_price(S, K, r, sigma, T);
@@ -200,9 +200,9 @@ static void BM_BlackScholesPutImpliedVolatility(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesPutImpliedVolatility);
 
 // Benchmark for normal_cdf function
-static void BM_BlackScholesNormalCDF(benchmark::State& state) {
+static void BM_BlackScholesNormalCDF(benchmark::State &state) {
     // Setup parameters
-    double x = 0.5;  // A typical value for d1 or d2
+    double x = 0.5; // A typical value for d1 or d2
 
     for (auto _ : state) {
         // We need to access the private method using a workaround
@@ -214,9 +214,9 @@ static void BM_BlackScholesNormalCDF(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesNormalCDF);
 
 // Benchmark for normal_pdf function
-static void BM_BlackScholesNormalPDF(benchmark::State& state) {
+static void BM_BlackScholesNormalPDF(benchmark::State &state) {
     // Setup parameters
-    double x = 0.5;  // A typical value for d1 or d2
+    double x = 0.5; // A typical value for d1 or d2
 
     for (auto _ : state) {
         // We need to access the private method using a workaround
@@ -228,13 +228,13 @@ static void BM_BlackScholesNormalPDF(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesNormalPDF);
 
 // Benchmark for a complete option pricing scenario
-static void BM_BlackScholesCompleteOptionPricing(benchmark::State& state) {
+static void BM_BlackScholesCompleteOptionPricing(benchmark::State &state) {
     // Setup parameters
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
-    double T = 1.0;      // Time to expiration (1 year)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
+    double T = 1.0;     // Time to expiration (1 year)
 
     for (auto _ : state) {
         // Calculate call and put prices
@@ -266,15 +266,15 @@ static void BM_BlackScholesCompleteOptionPricing(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCompleteOptionPricing);
 
 // Parameterized benchmark for call_price with different moneyness levels
-static void BM_BlackScholesCallPrice_Moneyness(benchmark::State& state) {
+static void BM_BlackScholesCallPrice_Moneyness(benchmark::State &state) {
     // Get the moneyness parameter (S/K ratio)
-    double moneyness = state.range(0) / 100.0;  // Convert from int to ratio
+    double moneyness = state.range(0) / 100.0; // Convert from int to ratio
 
-    double K = 100.0;          // Strike price
-    double S = K * moneyness;  // Current stock price based on moneyness
-    double r = 0.05;           // Risk-free rate (5%)
-    double sigma = 0.2;        // Volatility (20%)
-    double T = 1.0;            // Time to expiration (1 year)
+    double K = 100.0;         // Strike price
+    double S = K * moneyness; // Current stock price based on moneyness
+    double r = 0.05;          // Risk-free rate (5%)
+    double sigma = 0.2;       // Volatility (20%)
+    double T = 1.0;           // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -285,14 +285,14 @@ static void BM_BlackScholesCallPrice_Moneyness(benchmark::State& state) {
 BENCHMARK(BM_BlackScholesCallPrice_Moneyness)->Arg(80)->Arg(100)->Arg(120);
 
 // Parameterized benchmark for call_price with different volatility levels
-static void BM_BlackScholesCallPrice_Volatility(benchmark::State& state) {
+static void BM_BlackScholesCallPrice_Volatility(benchmark::State &state) {
     // Get the volatility parameter
-    double sigma = state.range(0) / 100.0;  // Convert from int to decimal
+    double sigma = state.range(0) / 100.0; // Convert from int to decimal
 
-    double S = 100.0;  // Current stock price
-    double K = 100.0;  // Strike price
-    double r = 0.05;   // Risk-free rate (5%)
-    double T = 1.0;    // Time to expiration (1 year)
+    double S = 100.0; // Current stock price
+    double K = 100.0; // Strike price
+    double r = 0.05;  // Risk-free rate (5%)
+    double T = 1.0;   // Time to expiration (1 year)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
@@ -307,20 +307,21 @@ BENCHMARK(BM_BlackScholesCallPrice_Volatility)
     ->Arg(50);
 
 // Parameterized benchmark for call_price with different time to expiration
-static void BM_BlackScholesCallPrice_TimeToExpiration(benchmark::State& state) {
+static void BM_BlackScholesCallPrice_TimeToExpiration(benchmark::State &state) {
     // Get the time to expiration parameter in days
-    double T = state.range(0) / 365.0;  // Convert from days to years
+    double T = state.range(0) / 365.0; // Convert from days to years
 
-    double S = 100.0;    // Current stock price
-    double K = 100.0;    // Strike price
-    double r = 0.05;     // Risk-free rate (5%)
-    double sigma = 0.2;  // Volatility (20%)
+    double S = 100.0;   // Current stock price
+    double K = 100.0;   // Strike price
+    double r = 0.05;    // Risk-free rate (5%)
+    double sigma = 0.2; // Volatility (20%)
 
     for (auto _ : state) {
         benchmark::DoNotOptimize(
             BlackScholesModel::call_price(S, K, r, sigma, T));
     }
 }
+
 // Test with different expiration times: 7 days, 30 days, 90 days, 180 days, 365
 // days
 BENCHMARK(BM_BlackScholesCallPrice_TimeToExpiration)

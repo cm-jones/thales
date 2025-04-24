@@ -12,7 +12,7 @@
 set -e
 
 function print_help() {
-    echo "Usage: ./scripts/documentation/generate_docs.sh [options]"
+    echo "Usage: ./scripts/docs/generate_docs.sh [options]"
     echo ""
     echo "Options:"
     echo "  --no-browser    Generate documentation without opening browser"

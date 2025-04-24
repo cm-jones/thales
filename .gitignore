@@ -1,5 +1,5 @@
 # Build directories
-/build/
+/build
 /cmake-build-*/
 /out/
 /bin/
@@ -97,4 +97,3 @@ tmp/
 third_party/
 
 .cache/
-docs/

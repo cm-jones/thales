@@ -1,17 +1,17 @@
-name: Performance Benchmarks
+name: Benchmarks
 
 on:
   push:
-    branches: [ main ]
+    branches: main
   pull_request:
-    branches: [ main ]
+    branches: main
   schedule:
     - cron: '0 0 * * 1'  # Weekly on Mondays at midnight
   workflow_dispatch:
 
 jobs:
   benchmark:
-    name: Run Performance Benchmarks
+    name: Run benchmarks
     runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     steps:
     - uses: actions/checkout@v3
@@ -20,8 +20,8 @@ jobs:
     
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake libboost-all-dev gnuplot
+        sudo apt update
+        sudo apt install -y build-essential cmake libboost-all-dev gnuplot
     
     - name: Configure benchmark build
       run: |

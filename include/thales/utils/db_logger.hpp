@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <atomic>
@@ -20,12 +22,12 @@ namespace utils {
  * with a queue to minimize impact on trading performance.
  */
 class DbLogger {
-public:
+  public:
     /**
      * @brief Get the singleton instance of the database logger
      * @return Reference to the database logger instance
      */
-    static DbLogger& get_instance();
+    static DbLogger &get_instance();
 
     /**
      * @brief Initialize the database logger
@@ -38,11 +40,11 @@ public:
      * @param batchSize Number of logs to insert in a batch
      * @return true if initialization was successful, false otherwise
      */
-    static bool initialize(const std::string& dbHost = "localhost",
+    static bool initialize(const std::string &dbHost = "localhost",
                            int dbPort = 5432,
-                           const std::string& dbName = "thales",
-                           const std::string& dbUser = "thales_user",
-                           const std::string& dbPassword = "",
+                           const std::string &dbName = "thales",
+                           const std::string &dbUser = "thales_user",
+                           const std::string &dbPassword = "",
                            size_t maxQueueSize = 10000, size_t batchSize = 100);
 
     /**
@@ -66,14 +68,14 @@ public:
      * @return true if the log was queued successfully, false otherwise
      */
     bool log_trade_execution(
-        const std::string& strategy_name, const std::string& symbol,
-        const std::string& order_id, const std::string& execution_id,
-        const std::string& side, double quantity, double price,
+        const std::string &strategy_name, const std::string &symbol,
+        const std::string &order_id, const std::string &execution_id,
+        const std::string &side, double quantity, double price,
         double commission, double total_value,
-        const std::string& execution_time, const std::string& account_id,
-        const std::string& exchange, const std::string& order_type,
-        bool is_option = false, const std::string& option_data = "{}",
-        const std::string& additional_data = "{}");
+        const std::string &execution_time, const std::string &account_id,
+        const std::string &exchange, const std::string &order_type,
+        bool is_option = false, const std::string &option_data = "{}",
+        const std::string &additional_data = "{}");
 
     /**
      * @brief Shutdown the database logger
@@ -103,13 +105,13 @@ public:
     // Destructor made public for unique_ptr
     ~DbLogger();
 
-private:
+  private:
     // Private constructor for singleton pattern
     DbLogger();
 
     // Prevent copying and assignment
-    DbLogger(const DbLogger&) = delete;
-    DbLogger& operator=(const DbLogger&) = delete;
+    DbLogger(const DbLogger &) = delete;
+    DbLogger &operator=(const DbLogger &) = delete;
 
     // Structure to hold a trade execution log
     struct TradeExecutionLog {
@@ -151,7 +153,7 @@ private:
     void process_logs();
 
     // Insert a batch of logs
-    bool insert_log_batch(const std::vector<TradeExecutionLog>& logs);
+    bool insert_log_batch(const std::vector<TradeExecutionLog> &logs);
 
     // Get the current timestamp
     static std::string get_current_timestamp();
@@ -185,5 +187,5 @@ private:
     static std::unique_ptr<DbLogger> instance_;
 };
 
-}  // namespace utils
-}  // namespace thales
+} // namespace utils
+} // namespace thales

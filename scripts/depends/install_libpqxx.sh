@@ -1,6 +1,4 @@
 #!/bin/bash
-# libpqxx installation script for Thales trading bot
-# This script installs the libpqxx library, which is required for PostgreSQL connectivity in C++
 
 # Exit on error
 set -e
@@ -14,10 +12,10 @@ command_exists() {
 install_libpqxx() {
     echo "Installing libpqxx..."
     
-    if command_exists apt-get; then
+    if command_exists apt; then
         # Debian/Ubuntu
-        sudo apt-get update
-        sudo apt-get install -y libpqxx-dev
+        sudo apt update
+        sudo apt install -y libpqxx-dev
     elif command_exists yum; then
         # RHEL/CentOS/Fedora
         sudo yum install -y libpqxx-devel

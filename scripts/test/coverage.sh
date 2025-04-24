@@ -7,7 +7,7 @@ cd "$(git rev-parse --show-toplevel)"
 # Check if lcov is installed
 if ! command -v lcov > /dev/null; then
   echo "Error: lcov is not installed. Please install it first."
-  echo "  Ubuntu: sudo apt-get install lcov"
+  echo "  Ubuntu: sudo apt install lcov"
   echo "  macOS: brew install lcov"
   exit 1
 fi

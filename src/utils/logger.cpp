@@ -1,16 +1,18 @@
+// SPDX-License-Identifier: MIT
+
+#include "thales/utils/logger.hpp"
 #include <chrono>
 #include <ctime>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
-#include <thales/utils/logger.hpp>
 
 // Forward declaration for DbLogger
 namespace thales {
 namespace utils {
 class DbLogger;
 }
-}  // namespace thales
+} // namespace thales
 
 // Include DbLogger header if enabled
 #if ENABLE_DB_LOGGER
@@ -24,12 +26,10 @@ namespace utils {
 std::unique_ptr<Logger> Logger::instance_ = nullptr;
 
 Logger::Logger()
-    : logToFile_(false),
-      log_file_path_("logs/thales.log"),
-      console_level_(LogLevel::INFO),
-      file_level_(LogLevel::TRACE) {}
+    : logToFile_(false), log_file_path_("logs/thales.log"),
+      console_level_(LogLevel::INFO), file_level_(LogLevel::TRACE) {}
 
-Logger& Logger::get_instance() {
+Logger &Logger::get_instance() {
     if (!instance_) {
         initialize();
     }
@@ -37,7 +37,7 @@ Logger& Logger::get_instance() {
     return *instance_;
 }
 
-bool Logger::initialize(bool log_to_file, const std::string& log_file_path,
+bool Logger::initialize(bool log_to_file, const std::string &log_file_path,
                         LogLevel console_level, LogLevel file_level) {
     if (!instance_) {
         instance_ = std::unique_ptr<Logger>(new Logger());
@@ -49,36 +49,36 @@ bool Logger::initialize(bool log_to_file, const std::string& log_file_path,
     return instance_->set_file_logging(log_to_file, log_file_path);
 }
 
-void Logger::trace(const std::string& message) {
+void Logger::trace(const std::string &message) {
     log(LogLevel::TRACE, message);
 }
 
-void Logger::debug(const std::string& message) {
+void Logger::debug(const std::string &message) {
     log(LogLevel::DEBUG, message);
 }
 
-void Logger::info(const std::string& message) { log(LogLevel::INFO, message); }
+void Logger::info(const std::string &message) { log(LogLevel::INFO, message); }
 
-void Logger::warning(const std::string& message) {
+void Logger::warning(const std::string &message) {
     log(LogLevel::WARNING, message);
 }
 
-void Logger::error(const std::string& message) {
+void Logger::error(const std::string &message) {
     log(LogLevel::ERROR, message);
 }
 
-void Logger::fatal(const std::string& message) {
+void Logger::fatal(const std::string &message) {
     log(LogLevel::FATAL, message);
 }
 
 void Logger::log_trade_execution(
-    const std::string& strategy_name, const std::string& symbol,
-    const std::string& order_id, const std::string& execution_id,
-    const std::string& side, double quantity, double price, double commission,
-    double total_value, const std::string& execution_time,
-    const std::string& account_id, const std::string& exchange,
-    const std::string& order_type, bool is_option,
-    const std::string& option_data, const std::string& additional_data) {
+    const std::string &strategy_name, const std::string &symbol,
+    const std::string &order_id, const std::string &execution_id,
+    const std::string &side, double quantity, double price, double commission,
+    double total_value, const std::string &execution_time,
+    const std::string &account_id, const std::string &exchange,
+    const std::string &order_type, bool is_option,
+    const std::string &option_data, const std::string &additional_data) {
     // Log to console and file
     std::stringstream ss;
     ss << "Trade execution: " << strategy_name << ", " << symbol << ", " << side
@@ -87,12 +87,12 @@ void Logger::log_trade_execution(
 
     // Log to database if enabled
 #if ENABLE_DB_LOGGER
-    auto& dbLogger = DbLogger::get_instance();
+    auto &dbLogger = DbLogger::get_instance();
     bool success = dbLogger.log_trade_execution(
-        strategy_name, symbol, order_id, execution_id, side, quantity,
-        price, commission, total_value, execution_time, account_id,
-        exchange, order_type, is_option, option_data, additional_data);
-    
+        strategy_name, symbol, order_id, execution_id, side, quantity, price,
+        commission, total_value, execution_time, account_id, exchange,
+        order_type, is_option, option_data, additional_data);
+
     if (!success) {
         error("Failed to log trade execution to database");
     }
@@ -109,7 +109,7 @@ void Logger::set_file_level(LogLevel level) {
     file_level_ = level;
 }
 
-bool Logger::set_file_logging(bool enable, const std::string& log_file_path) {
+bool Logger::set_file_logging(bool enable, const std::string &log_file_path) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Close the current log file if it's open
@@ -145,7 +145,7 @@ bool Logger::set_file_logging(bool enable, const std::string& log_file_path) {
     return true;
 }
 
-void Logger::log(LogLevel level, const std::string& message) {
+void Logger::log(LogLevel level, const std::string &message) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     std::string timestamp = get_current_timestamp();
@@ -153,34 +153,32 @@ void Logger::log(LogLevel level, const std::string& message) {
 
     // Log to console if the level is high enough
     if (level >= console_level_) {
-        std::cout << timestamp << " [" << levelStr << "] " << message
-                  << '\n';
+        std::cout << timestamp << " [" << levelStr << "] " << message << '\n';
     }
 
     // Log to file if enabled and the level is high enough
     if (logToFile_ && log_file_ && level >= file_level_) {
-        *log_file_ << timestamp << " [" << levelStr << "] " << message
-                  << '\n';
+        *log_file_ << timestamp << " [" << levelStr << "] " << message << '\n';
         log_file_->flush();
     }
 }
 
 std::string Logger::levelToString(LogLevel level) {
     switch (level) {
-        case LogLevel::TRACE:
-            return "TRACE";
-        case LogLevel::DEBUG:
-            return "DEBUG";
-        case LogLevel::INFO:
-            return "INFO";
-        case LogLevel::WARNING:
-            return "WARNING";
-        case LogLevel::ERROR:
-            return "ERROR";
-        case LogLevel::FATAL:
-            return "FATAL";
-        default:
-            return "UNKNOWN";
+    case LogLevel::TRACE:
+        return "TRACE";
+    case LogLevel::DEBUG:
+        return "DEBUG";
+    case LogLevel::INFO:
+        return "INFO";
+    case LogLevel::WARNING:
+        return "WARNING";
+    case LogLevel::ERROR:
+        return "ERROR";
+    case LogLevel::FATAL:
+        return "FATAL";
+    default:
+        return "UNKNOWN";
     }
 }
 
@@ -198,5 +196,5 @@ std::string Logger::get_current_timestamp() {
     return ss.str();
 }
 
-}  // namespace utils
-}  // namespace thales
+} // namespace utils
+} // namespace thales

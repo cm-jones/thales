@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #include <fstream>
@@ -30,12 +32,12 @@ enum struct LogLevel : uint8_t {
  * severity levels and output destinations (console, file).
  */
 class Logger {
-   public:
+  public:
     /**
      * @brief Get the singleton instance of the logger
      * @return Reference to the logger instance
      */
-    static Logger& get_instance();
+    static Logger &get_instance();
 
     /**
      * @brief Initialize the logger
@@ -46,7 +48,7 @@ class Logger {
      * @return true if initialization was successful, false otherwise
      */
     static bool initialize(bool logToFile = true,
-                           const std::string& logFilePath = "logs/thales.log",
+                           const std::string &logFilePath = "logs/thales.log",
                            LogLevel consoleLevel = LogLevel::INFO,
                            LogLevel fileLevel = LogLevel::TRACE);
 
@@ -54,37 +56,37 @@ class Logger {
      * @brief Log a message with TRACE level
      * @param message The message to log
      */
-    void trace(const std::string& message);
+    void trace(const std::string &message);
 
     /**
      * @brief Log a message with DEBUG level
      * @param message The message to log
      */
-    void debug(const std::string& message);
+    void debug(const std::string &message);
 
     /**
      * @brief Log a message with INFO level
      * @param message The message to log
      */
-    void info(const std::string& message);
+    void info(const std::string &message);
 
     /**
      * @brief Log a message with WARNING level
      * @param message The message to log
      */
-    void warning(const std::string& message);
+    void warning(const std::string &message);
 
     /**
      * @brief Log a message with ERROR level
      * @param message The message to log
      */
-    void error(const std::string& message);
+    void error(const std::string &message);
 
     /**
      * @brief Log a message with FATAL level
      * @param message The message to log
      */
-    void fatal(const std::string& message);
+    void fatal(const std::string &message);
 
     /**
      * @brief Log a trade execution
@@ -106,14 +108,14 @@ class Logger {
      * @param additionalData JSON string with additional data
      */
     void log_trade_execution(
-        const std::string& strategy_name, const std::string& symbol,
-        const std::string& order_id, const std::string& execution_id,
-        const std::string& side, double quantity, double price,
+        const std::string &strategy_name, const std::string &symbol,
+        const std::string &order_id, const std::string &execution_id,
+        const std::string &side, double quantity, double price,
         double commission, double total_value,
-        const std::string& execution_time, const std::string& account_id,
-        const std::string& exchange, const std::string& order_type,
-        bool is_option = false, const std::string& option_data = "{}",
-        const std::string& additional_data = "{}");
+        const std::string &execution_time, const std::string &account_id,
+        const std::string &exchange, const std::string &order_type,
+        bool is_option = false, const std::string &option_data = "{}",
+        const std::string &additional_data = "{}");
 
     /**
      * @brief Set the minimum log level for console output
@@ -133,18 +135,18 @@ class Logger {
      * @param logFilePath Path to the log file (if enabling)
      * @return true if the operation was successful, false otherwise
      */
-    bool set_file_logging(bool enable, const std::string& logFilePath = "");
+    bool set_file_logging(bool enable, const std::string &logFilePath = "");
 
-   private:
+  private:
     // Private constructor for singleton pattern
     Logger();
 
     // Prevent copying and assignment
-    Logger(const Logger&) = delete;
-    Logger& operator=(const Logger&) = delete;
+    Logger(const Logger &) = delete;
+    Logger &operator=(const Logger &) = delete;
 
     // Log a message with the specified level
-    void log(LogLevel level, const std::string& message);
+    void log(LogLevel level, const std::string &message);
 
     // Convert a log level to a string
     static std::string levelToString(LogLevel level);
@@ -164,5 +166,5 @@ class Logger {
     static std::unique_ptr<Logger> instance_;
 };
 
-}  // namespace utils
-}  // namespace thales
+} // namespace utils
+} // namespace thales

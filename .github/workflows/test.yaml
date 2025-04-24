@@ -2,51 +2,43 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: main
   pull_request:
-    branches: [ main ]
+    branches: main
   workflow_dispatch:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     strategy:
       matrix:
-        os: [ubuntu-${{ vars.UBUNTU_VERSION }}]
-        build_type: [Debug]
-        
+        build_type: ["Debug"]
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Install dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-${{ vars.UBUNTU_VERSION }}'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake libboost-all-dev googletest
-    
-    - name: Install dependencies (macOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew update
-        brew install cmake boost googletest
-    
-    - name: Configure
-      run: |
-        mkdir -p build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING=ON ..
-    
-    - name: Build
-      run: |
-        cd build
-        cmake --build . --config ${{ matrix.build_type }}
-    
-    - name: Run tests
-      run: |
-        cd build
-        ctest --output-on-failure -C ${{ matrix.build_type }}
-      
-    - name: Run test script
-      run: |
-        chmod +x scripts/test/test.sh
-        ./scripts/test/test.sh
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake libboost-all-dev googletest
+
+      - name: Configure
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING=ON ..
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config ${{ matrix.build_type }}
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure -C ${{ matrix.build_type }}
+
+      - name: Run test script
+        run: |
+          chmod +x scripts/test/test.sh
+          ./scripts/test/test.sh

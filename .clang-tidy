@@ -4,10 +4,5 @@ HeaderFilterRegex: '.*'
 FormatStyle: file
 
 CheckOptions:
-  # Options for all functions
   readability-identifier-naming.FunctionCase: lower_case
-  # Options for all classes
   readability-identifier-naming.ClassCase: CamelCase
-  # Options for extern funtions
-  readability-identifier-naming.GlobalFunctionCase: CamelCase
-  readability-identifier-naming.GlobalFunctionPrefix: 'extern_'

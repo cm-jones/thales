@@ -1,5 +1,5 @@
 # Project versioning
 THALES_VERSION=0.1.0
 
-# Ubuntu Docker image
+# Ubuntu version for Docker
 UBUNTU_VERSION=22.04

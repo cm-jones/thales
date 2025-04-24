@@ -6,7 +6,7 @@ cd "$(git rev-parse --show-toplevel)"
 
 # Check if the build_asan directory exists
 if [ ! -d "build_asan" ]; then
-    echo "Error: build_asan directory not found. Please run scripts/build_with_asan.sh first."
+    echo "Error: build_asan directory not found. Please run scripts/build/build_with_asan.sh first."
     exit 1
 fi
 
@@ -15,7 +15,7 @@ cd build_asan
 
 # Check if the test executable exists
 if [ ! -f "thales_tests" ]; then
-    echo "Error: thales_tests executable not found in build_asan directory."
+    echo "Error: thales_tests executable not found in the build_asan directory."
     exit 1
 fi
 
