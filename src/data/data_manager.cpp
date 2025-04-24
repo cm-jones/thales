@@ -5,8 +5,8 @@
 #include <mutex>
 
 // Project includes
-#include <thales/data/data_manager.hpp>
-#include <thales/utils/logger.hpp>
+#include "thales/data/data_manager.hpp"
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace data {
@@ -14,7 +14,7 @@ namespace data {
 namespace {
 // Thread-safe access to shared data
 std::mutex g_market_data_mutex;
-} // namespace
+}  // namespace
 
 DataManager::DataManager(const utils::Config &config)
     : config_(config), ib_client_(nullptr) {}
@@ -174,8 +174,8 @@ bool DataManager::unsubscribe_market_data(const std::string &symbol) {
     }
 }
 
-MarketData
-DataManager::get_latest_market_data(const std::string &symbol) const {
+MarketData DataManager::get_latest_market_data(
+    const std::string &symbol) const {
     try {
         std::lock_guard<std::mutex> lock(g_market_data_mutex);
         auto it = latest_market_data_.find(symbol);
@@ -209,7 +209,6 @@ struct HistoricalDataRequest {
 std::vector<MarketData> DataManager::get_historical_market_data(
     const std::string &symbol, const std::string &start_time,
     const std::string &end_time, const std::string &interval) const {
-
     const HistoricalDataRequest request{.symbol = symbol,
                                         .start_time = start_time,
                                         .end_time = end_time,
@@ -225,10 +224,8 @@ struct OptionChainRequest {
     std::string expiration_date;
 };
 
-std::unordered_map<std::string, OptionData>
-DataManager::get_option_chain(const std::string &symbol,
-                              const std::string &expiration_date) const {
-
+std::unordered_map<std::string, OptionData> DataManager::get_option_chain(
+    const std::string &symbol, const std::string &expiration_date) const {
     const OptionChainRequest request{.symbol = symbol,
                                      .expiration_date = expiration_date};
 
@@ -270,5 +267,5 @@ void DataManager::cache_market_data(const MarketData &data) {
     latest_market_data_[data.symbol] = data;
 }
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/utils/config.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include <thales/utils/config.hpp>
-#include <thales/utils/logger.hpp>
+
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace utils {
@@ -16,8 +18,7 @@ namespace {
 // Trim whitespace from beginning and end of string
 std::string trim(const std::string &str) {
     const auto begin = str.find_first_not_of(" \t\r\n");
-    if (begin == std::string::npos)
-        return "";
+    if (begin == std::string::npos) return "";
     const auto end = str.find_last_not_of(" \t\r\n");
     return str.substr(begin, end - begin + 1);
 }
@@ -34,10 +35,8 @@ std::string remove_quotes(const std::string &str) {
 // Parse string to boolean
 bool parse_bool(const std::string &str) {
     std::string value = trim(str);
-    if (value == "true")
-        return true;
-    if (value == "false")
-        return false;
+    if (value == "true") return true;
+    if (value == "false") return false;
     throw std::runtime_error("Invalid boolean value: " + str);
 }
 
@@ -100,8 +99,7 @@ std::vector<std::string> parse_string_array(const std::string &input) {
 
         while (std::getline(iss, line)) {
             line = trim(line);
-            if (line.empty())
-                continue;
+            if (line.empty()) continue;
 
             // Check if line starts with dash and space
             if (line.size() >= 2 && line.front() == '-' &&
@@ -114,7 +112,7 @@ std::vector<std::string> parse_string_array(const std::string &input) {
 
     return result;
 }
-} // namespace
+}  // namespace
 
 bool Config::load_from_file(const std::string &file_path) {
     auto &logger = Logger::get_instance();
@@ -172,8 +170,7 @@ bool Config::load_from_file(const std::string &file_path) {
             }
 
             // Skip if we're still collecting array lines
-            if (in_array)
-                continue;
+            if (in_array) continue;
 
             // Process normal yaml lines (key: value)
             size_t colon_pos = line.find(':');
@@ -200,7 +197,6 @@ bool Config::load_from_file(const std::string &file_path) {
                                           value.back() == ']') &&
                     std::getline(file, line) &&
                     line.find('-') != std::string::npos) {
-
                     in_array = true;
                     array_key = key;
                     array_content = value.empty() ? line + "\n" : value;
@@ -294,8 +290,7 @@ bool Config::save_to_file(const std::string &file_path) const {
 
         // Write each section
         for (const auto &[section_name, section_entries] : sections) {
-            if (section_name.empty())
-                continue; // Already handled
+            if (section_name.empty()) continue;  // Already handled
 
             file << section_name << ":\n";
 
@@ -348,7 +343,6 @@ void Config::writeYamlValue(std::ofstream &file, const std::string &key,
                                  std::is_same_v<T, std::vector<int>> ||
                                  std::is_same_v<T, std::vector<double>> ||
                                  std::is_same_v<T, std::vector<std::string>>) {
-
                 if (v.empty()) {
                     file << "[]\n";
                     return;
@@ -439,9 +433,9 @@ std::string Config::get_string(const std::string &key,
     }
 }
 
-std::vector<std::string>
-Config::get_string_vector(const std::string &key,
-                          const std::vector<std::string> &defaultValue) const {
+std::vector<std::string> Config::get_string_vector(
+    const std::string &key,
+    const std::vector<std::string> &defaultValue) const {
     auto it = data_.find(key);
     if (it == data_.end()) {
         return defaultValue;
@@ -458,5 +452,5 @@ void Config::set_value(const std::string &key, const ConfigValue &value) {
     data_[key] = value;
 }
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

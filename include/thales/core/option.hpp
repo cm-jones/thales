@@ -6,27 +6,29 @@
 #include <array>
 #include <memory>
 #include <string>
-#include <thales/utils/symbol_lookup.hpp>
+
+#include "thales/utils/symbol_lookup.hpp"
 
 #define CACHE_LINE_SIZE 64
+#define CACHE_ALIGNED alignas(CACHE_LINE_SIZE)
 
 namespace thales {
 namespace core {
 
 /// @struct Option
 /// @brief Represents an options contract
-struct alignas(CACHE_LINE_SIZE) Option {
+struct CACHE_ALIGNED Option {
     /// @enum Type
     /// @brief Defines the type of the option: CALL or PUT.
     enum struct Type : uint8_t {
-        CALL,    // Call option
-        PUT,     // Put option
-        UNKNOWN, // Used for initialization or error handling
+        CALL,     // Call option
+        PUT,      // Put option
+        UNKNOWN,  // Used for initialization or error handling
     };
 
     /// @struct Greeks
     /// @brief Contains the Greeks of the option
-    struct alignas(CACHE_LINE_SIZE) Greeks {
+    struct CACHE_ALIGNED Greeks {
         double delta = 0.0;
         double gamma = 0.0;
         double theta = 0.0;
@@ -36,12 +38,12 @@ struct alignas(CACHE_LINE_SIZE) Option {
         Greeks() = default;
     };
 
-    std::unique_ptr<Greeks> greeks; // Greeks of the option
-    std::array<char, 8> exchange;   // The exchange where the option is traded
-    std::array<char, 8> expiry;     // Expiration date
-    double strike;                  // Strike price
-    utils::SymbolLookup::SymbolID symbol_id; // The ID of the symbol
-    Type type;                               // CALL or PUT
+    std::unique_ptr<Greeks> greeks;  // Greeks of the option
+    std::array<char, 8> exchange;    // The exchange where the option is traded
+    std::array<char, 8> expiry;      // Expiration date
+    double strike;                   // Strike price
+    utils::SymbolLookup::SymbolID symbol_id;  // The ID of the symbol
+    Type type;                                // CALL or PUT
 
     // Constructor
     Option(utils::SymbolLookup::SymbolID sym_id =
@@ -66,5 +68,5 @@ struct alignas(CACHE_LINE_SIZE) Option {
     }
 };
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

@@ -3,7 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
-#include <thales/models/black_scholes_model.hpp>
+
+#include "thales/models/black_scholes_model.hpp"
 
 using namespace thales::models;
 
@@ -12,15 +13,15 @@ namespace {
 inline bool isClose(double a, double b, double tolerance = 0.0001) {
     return std::abs(a - b) < tolerance;
 }
-} // namespace
+}  // namespace
 
 TEST(BlackScholesTest, CallPriceTest) {
     // Test case 1: At-the-money call option
-    double S = 100.0;   // Current stock price
-    double K = 100.0;   // Strike price
-    double r = 0.05;    // Risk-free rate (5%)
-    double sigma = 0.2; // Volatility (20%)
-    double T = 1.0;     // Time to expiration (1 year)
+    double S = 100.0;    // Current stock price
+    double K = 100.0;    // Strike price
+    double r = 0.05;     // Risk-free rate (5%)
+    double sigma = 0.2;  // Volatility (20%)
+    double T = 1.0;      // Time to expiration (1 year)
 
     double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
 
@@ -50,11 +51,11 @@ TEST(BlackScholesTest, CallPriceTest) {
 
 TEST(BlackScholesTest, PutPriceTest) {
     // Test case 1: At-the-money put option
-    double S = 100.0;   // Current stock price
-    double K = 100.0;   // Strike price
-    double r = 0.05;    // Risk-free rate (5%)
-    double sigma = 0.2; // Volatility (20%)
-    double T = 1.0;     // Time to expiration (1 year)
+    double S = 100.0;    // Current stock price
+    double K = 100.0;    // Strike price
+    double r = 0.05;     // Risk-free rate (5%)
+    double sigma = 0.2;  // Volatility (20%)
+    double T = 1.0;      // Time to expiration (1 year)
 
     double putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
 
@@ -83,11 +84,11 @@ TEST(BlackScholesTest, PutPriceTest) {
 }
 
 TEST(BlackScholesTest, GreeksTest) {
-    double S = 100.0;   // Current stock price
-    double K = 100.0;   // Strike price
-    double r = 0.05;    // Risk-free rate (5%)
-    double sigma = 0.2; // Volatility (20%)
-    double T = 1.0;     // Time to expiration (1 year)
+    double S = 100.0;    // Current stock price
+    double K = 100.0;    // Strike price
+    double r = 0.05;     // Risk-free rate (5%)
+    double sigma = 0.2;  // Volatility (20%)
+    double T = 1.0;      // Time to expiration (1 year)
 
     // Test Delta
     double callDelta = BlackScholesModel::call_delta(S, K, r, sigma, T);
@@ -136,13 +137,13 @@ TEST(BlackScholesTest, GreeksTest) {
 }
 
 TEST(BlackScholesTest, ImpliedVolatilityTest) {
-    double S = 100.0; // Current stock price
-    double K = 100.0; // Strike price
-    double r = 0.05;  // Risk-free rate (5%)
-    double T = 1.0;   // Time to expiration (1 year)
+    double S = 100.0;  // Current stock price
+    double K = 100.0;  // Strike price
+    double r = 0.05;   // Risk-free rate (5%)
+    double T = 1.0;    // Time to expiration (1 year)
 
     // Test call implied volatility
-    double sigma = 0.2; // True volatility (20%)
+    double sigma = 0.2;  // True volatility (20%)
     double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
 
     double impliedVol =
@@ -160,11 +161,11 @@ TEST(BlackScholesTest, ImpliedVolatilityTest) {
 }
 
 TEST(BlackScholesTest, PutCallParityTest) {
-    double S = 100.0;   // Current stock price
-    double K = 100.0;   // Strike price
-    double r = 0.05;    // Risk-free rate (5%)
-    double sigma = 0.2; // Volatility (20%)
-    double T = 1.0;     // Time to expiration (1 year)
+    double S = 100.0;    // Current stock price
+    double K = 100.0;    // Strike price
+    double r = 0.05;     // Risk-free rate (5%)
+    double sigma = 0.2;  // Volatility (20%)
+    double T = 1.0;      // Time to expiration (1 year)
 
     double callPrice = BlackScholesModel::call_price(S, K, r, sigma, T);
     double putPrice = BlackScholesModel::put_price(S, K, r, sigma, T);
@@ -177,11 +178,11 @@ TEST(BlackScholesTest, PutCallParityTest) {
 }
 
 TEST(BlackScholesTest, ExpiredOptionsTest) {
-    double S = 100.0;   // Current stock price
-    double K = 100.0;   // Strike price
-    double r = 0.05;    // Risk-free rate (5%)
-    double sigma = 0.2; // Volatility (20%)
-    double T = 0.0;     // Time to expiration (expired)
+    double S = 100.0;    // Current stock price
+    double K = 100.0;    // Strike price
+    double r = 0.05;     // Risk-free rate (5%)
+    double sigma = 0.2;  // Volatility (20%)
+    double T = 0.0;      // Time to expiration (expired)
 
     // For expired options, the price should be the intrinsic value
 

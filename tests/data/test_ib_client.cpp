@@ -2,12 +2,13 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <thales/data/ib_client.hpp>
-#include <thales/data/ib_contract.hpp>
-#include <thales/data/ib_order.hpp>
-#include <thales/data/ib_wrapper.hpp>
-#include <thales/utils/config.hpp>
-#include <thales/utils/symbol_lookup.hpp>
+
+#include "thales/data/ib_client.hpp"
+#include "thales/data/ib_contract.hpp"
+#include "thales/data/ib_order.hpp"
+#include "thales/data/ib_wrapper.hpp"
+#include "thales/utils/config.hpp"
+#include "thales/utils/symbol_lookup.hpp"
 
 using namespace thales::data;
 using namespace thales::utils;
@@ -16,7 +17,7 @@ using namespace testing;
 
 // Mock class for IBWrapper to test IBClient without actual IB API connection
 class MockIBWrapper : public IBWrapper {
-  public:
+   public:
     explicit MockIBWrapper(IBClient &client) : IBWrapper(client) {}
 
     MOCK_METHOD(void, connectAck, ());
@@ -45,7 +46,7 @@ class MockIBWrapper : public IBWrapper {
 
 // Test fixture for IBClient tests
 class IBClientTest : public ::testing::Test {
-  protected:
+   protected:
     Config config;
     std::unique_ptr<IBClient> client;
     std::unique_ptr<MockIBWrapper> mock_wrapper;

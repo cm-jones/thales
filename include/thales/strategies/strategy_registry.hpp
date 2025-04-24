@@ -4,12 +4,13 @@
 
 #include <memory>
 #include <string>
-#include <thales/core/portfolio.hpp>
-#include <thales/data/data_manager.hpp>
-#include <thales/strategies/strategy_base.hpp>
-#include <thales/utils/config.hpp>
 #include <unordered_map>
 #include <vector>
+
+#include "thales/core/portfolio.hpp"
+#include "thales/data/data_manager.hpp"
+#include "thales/strategies/strategy_base.hpp"
+#include "thales/utils/config.hpp"
 
 namespace thales {
 namespace strategies {
@@ -19,7 +20,7 @@ namespace strategies {
 /// @note This class manages the registration, initialization, and execution
 /// of trading strategies.
 class StrategyRegistry {
-  public:
+   public:
     /// @brief Constructor
     /// @param config The configuration for the strategy registry
     /// @brief Constructor
@@ -76,11 +77,11 @@ class StrategyRegistry {
         return data_manager_;
     }
 
-  private:
+   private:
     // Core components
     utils::Config config_;
     std::shared_ptr<data::DataManager> data_manager_;
-    core::Portfolio *portfolio_; // Non-owning pointer
+    core::Portfolio *portfolio_;  // Non-owning pointer
 
     // Strategy management
     std::unordered_map<std::string, std::unique_ptr<StrategyBase>> strategies_;
@@ -90,5 +91,5 @@ class StrategyRegistry {
     void load_strategies_from_config();
 };
 
-} // namespace strategies
-} // namespace thales
+}  // namespace strategies
+}  // namespace thales

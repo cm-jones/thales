@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-#include <algorithm>
 #include <gtest/gtest.h>
+
+#include <algorithm>
 #include <random>
-#include <thales/models/black_scholes_model.hpp>
-#include <thales/models/black_scholes_model_vectorized.hpp>
 #include <vector>
+
+#include "thales/models/black_scholes_model.hpp"
+#include "thales/models/black_scholes_model_vectorized.hpp"
 
 using namespace thales::models;
 
@@ -17,15 +19,15 @@ void generate_test_data(int size, std::vector<double> &S,
     std::mt19937 gen(42);
 
     // Distributions for realistic option parameters
-    std::uniform_real_distribution<> S_dist(50.0, 200.0); // Stock price
-    std::uniform_real_distribution<> K_dist(50.0, 200.0); // Strike price
+    std::uniform_real_distribution<> S_dist(50.0, 200.0);  // Stock price
+    std::uniform_real_distribution<> K_dist(50.0, 200.0);  // Strike price
     std::uniform_real_distribution<> r_dist(0.01,
-                                            0.05); // Risk-free rate (1-5%)
+                                            0.05);  // Risk-free rate (1-5%)
     std::uniform_real_distribution<> sigma_dist(0.1,
-                                                0.5); // Volatility (10-50%)
+                                                0.5);  // Volatility (10-50%)
     std::uniform_real_distribution<> T_dist(
         0.1,
-        2.0); // Time to expiry (0.1-2 years)
+        2.0);  // Time to expiry (0.1-2 years)
 
     // Resize vectors
     S.resize(size);
@@ -45,7 +47,7 @@ void generate_test_data(int size, std::vector<double> &S,
 }
 
 class BlackScholesVectorizedTest : public ::testing::Test {
-  protected:
+   protected:
     void SetUp() override {
         // Skip the tests if AVX is not supported
         if (!BlackScholesVectorized::cpu_supports_avx()) {
@@ -56,7 +58,7 @@ class BlackScholesVectorizedTest : public ::testing::Test {
 
 // Test vectorized call price against scalar implementation
 TEST_F(BlackScholesVectorizedTest, TestCallPrice) {
-    const int num_options = 16; // Test multiple options at once
+    const int num_options = 16;  // Test multiple options at once
 
     // Generate random test data
     std::vector<double> S, K, r, sigma, T;
@@ -217,12 +219,12 @@ TEST_F(BlackScholesVectorizedTest, TestExpiredOptions) {
     }
 
     // Verify intrinsic values for expired options
-    EXPECT_NEAR(vector_call_results[0], 0.0, epsilon);  // ATM call (S = K)
-    EXPECT_NEAR(vector_call_results[1], 0.0, epsilon);  // OTM call (S < K)
-    EXPECT_NEAR(vector_call_results[2], 10.0, epsilon); // ITM call (S > K)
-    EXPECT_NEAR(vector_put_results[0], 0.0, epsilon);   // ATM put (S = K)
-    EXPECT_NEAR(vector_put_results[1], 10.0, epsilon);  // ITM put (S < K)
-    EXPECT_NEAR(vector_put_results[2], 0.0, epsilon);   // OTM put (S > K)
+    EXPECT_NEAR(vector_call_results[0], 0.0, epsilon);   // ATM call (S = K)
+    EXPECT_NEAR(vector_call_results[1], 0.0, epsilon);   // OTM call (S < K)
+    EXPECT_NEAR(vector_call_results[2], 10.0, epsilon);  // ITM call (S > K)
+    EXPECT_NEAR(vector_put_results[0], 0.0, epsilon);    // ATM put (S = K)
+    EXPECT_NEAR(vector_put_results[1], 10.0, epsilon);   // ITM put (S < K)
+    EXPECT_NEAR(vector_put_results[2], 0.0, epsilon);    // OTM put (S > K)
 }
 
 // Test with invalid inputs (negative T or sigma)
@@ -233,8 +235,8 @@ TEST_F(BlackScholesVectorizedTest, TestInvalidInputs) {
     std::vector<double> S = {100.0, 100.0, 100.0, 100.0};
     std::vector<double> K = {100.0, 100.0, 100.0, 100.0};
     std::vector<double> r = {0.05, 0.05, 0.05, 0.05};
-    std::vector<double> sigma = {0.2, -0.1, 0.0, 0.2}; // Invalid sigma
-    std::vector<double> T = {1.0, 1.0, 1.0, -0.1};     // Invalid T
+    std::vector<double> sigma = {0.2, -0.1, 0.0, 0.2};  // Invalid sigma
+    std::vector<double> T = {1.0, 1.0, 1.0, -0.1};      // Invalid T
 
     // Compute scalar results (expecting NaN for invalid inputs)
     std::vector<double> scalar_results(num_options);

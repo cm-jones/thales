@@ -23,7 +23,7 @@ namespace utils {
  * from JSON files or other sources.
  */
 class Config {
-  public:
+   public:
     // Define the types that can be stored in the configuration
     using ConfigValue =
         std::variant<bool, int, double, std::string, std::vector<bool>,
@@ -106,9 +106,9 @@ class Config {
      * exist
      * @return The vector of strings
      */
-    std::vector<std::string>
-    get_string_vector(const std::string &key,
-                      const std::vector<std::string> &defaultValue = {}) const;
+    std::vector<std::string> get_string_vector(
+        const std::string &key,
+        const std::vector<std::string> &defaultValue = {}) const;
 
     /**
      * @brief Set a configuration value
@@ -117,7 +117,7 @@ class Config {
      */
     void set_value(const std::string &key, const ConfigValue &value);
 
-  private:
+   private:
     // Helper to write YAML values with proper formatting
     void writeYamlValue(std::ofstream &file, const std::string &key,
                         const ConfigValue &value, int indent) const;
@@ -125,5 +125,5 @@ class Config {
     std::unordered_map<std::string, ConfigValue> data_;
 };
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

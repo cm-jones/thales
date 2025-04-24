@@ -1,10 +1,12 @@
-#include <algorithm>
 #include <benchmark/benchmark.h>
+
+#include <algorithm>
 #include <cmath>
 #include <random>
-#include <thales/models/black_scholes_model.hpp>
-#include <thales/models/black_scholes_model_vectorized.hpp>
 #include <vector>
+
+#include "thales/models/black_scholes_model.hpp"
+#include "thales/models/black_scholes_model_vectorized.hpp"
 
 using namespace thales::models;
 
@@ -16,15 +18,15 @@ void generate_test_data(int size, std::vector<double> &S,
     std::mt19937 gen(rd());
 
     // Distributions for realistic option parameters
-    std::uniform_real_distribution<> S_dist(50.0, 200.0); // Stock price
-    std::uniform_real_distribution<> K_dist(50.0, 200.0); // Strike price
+    std::uniform_real_distribution<> S_dist(50.0, 200.0);  // Stock price
+    std::uniform_real_distribution<> K_dist(50.0, 200.0);  // Strike price
     std::uniform_real_distribution<> r_dist(0.01,
-                                            0.05); // Risk-free rate (1-5%)
+                                            0.05);  // Risk-free rate (1-5%)
     std::uniform_real_distribution<> sigma_dist(0.1,
-                                                0.5); // Volatility (10-50%)
+                                                0.5);  // Volatility (10-50%)
     std::uniform_real_distribution<> T_dist(
         0.1,
-        2.0); // Time to expiry (0.1-2 years)
+        2.0);  // Time to expiry (0.1-2 years)
 
     // Resize vectors
     S.resize(size);
@@ -321,54 +323,54 @@ static void BM_BlackScholesCallPrice_BatchTest(benchmark::State &state) {
 
 // Register the benchmarks with Google Benchmark
 BENCHMARK(BM_BlackScholesCallPrice_Scalar)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(16)    // Small batch
-    ->Arg(64)    // Medium batch
-    ->Arg(1024)  // Large batch
-    ->Arg(4096); // Very large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(16)     // Small batch
+    ->Arg(64)     // Medium batch
+    ->Arg(1024)   // Large batch
+    ->Arg(4096);  // Very large batch
 
 BENCHMARK(BM_BlackScholesCallPrice_Vectorized)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(16)    // Small batch
-    ->Arg(64)    // Medium batch
-    ->Arg(1024)  // Large batch
-    ->Arg(4096); // Very large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(16)     // Small batch
+    ->Arg(64)     // Medium batch
+    ->Arg(1024)   // Large batch
+    ->Arg(4096);  // Very large batch
 
 BENCHMARK(BM_BlackScholesPutPrice_Scalar)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(64)    // Medium batch
-    ->Arg(1024); // Large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(64)     // Medium batch
+    ->Arg(1024);  // Large batch
 
 BENCHMARK(BM_BlackScholesPutPrice_Vectorized)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(64)    // Medium batch
-    ->Arg(1024); // Large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(64)     // Medium batch
+    ->Arg(1024);  // Large batch
 
 BENCHMARK(BM_BlackScholesCallDelta_Scalar)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(64)    // Medium batch
-    ->Arg(1024); // Large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(64)     // Medium batch
+    ->Arg(1024);  // Large batch
 
 BENCHMARK(BM_BlackScholesCallDelta_Vectorized)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(64)    // Medium batch
-    ->Arg(1024); // Large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(64)     // Medium batch
+    ->Arg(1024);  // Large batch
 
 BENCHMARK(BM_BlackScholesGamma_Scalar)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(64)    // Medium batch
-    ->Arg(1024); // Large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(64)     // Medium batch
+    ->Arg(1024);  // Large batch
 
 BENCHMARK(BM_BlackScholesGamma_Vectorized)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(64)    // Medium batch
-    ->Arg(1024); // Large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(64)     // Medium batch
+    ->Arg(1024);  // Large batch
 
 BENCHMARK(BM_BlackScholesCallPrice_BatchTest)
-    ->Arg(4)     // Minimum size (one AVX vector)
-    ->Arg(16)    // Small batch
-    ->Arg(64)    // Medium batch
-    ->Arg(256)   // Larger batch
-    ->Arg(1024); // Very large batch
+    ->Arg(4)      // Minimum size (one AVX vector)
+    ->Arg(16)     // Small batch
+    ->Arg(64)     // Medium batch
+    ->Arg(256)    // Larger batch
+    ->Arg(1024);  // Very large batch
 
 BENCHMARK_MAIN();

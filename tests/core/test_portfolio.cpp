@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 
 #include <gtest/gtest.h>
-#include <thales/core/portfolio.hpp>
-#include <thales/utils/config.hpp>
-#include <thales/utils/symbol_lookup.hpp>
+
+#include "thales/core/portfolio.hpp"
+#include "thales/utils/config.hpp"
+#include "thales/utils/symbol_lookup.hpp"
 
 using namespace thales::core;
 using namespace thales::utils;
 
 class PortfolioTest : public ::testing::Test {
-  protected:
+   protected:
     Config config;
 
     void SetUp() override {
@@ -88,7 +89,7 @@ TEST_F(PortfolioTest, UpdatePosition) {
     EXPECT_EQ(updated_position.unrealized_pnl,
               updated_position.get_unrealized_pnl());
     EXPECT_EQ(updated_position.get_unrealized_pnl(),
-              2000.0); // (170 - 150) * 100
+              2000.0);  // (170 - 150) * 100
 }
 
 TEST_F(PortfolioTest, AddOrder) {
@@ -153,7 +154,7 @@ TEST_F(PortfolioTest, UpdateOrder) {
     EXPECT_EQ(symbol_orders[0].status, Order::Status::FILLED);
     EXPECT_EQ(symbol_orders[0].filled_quantity, 100);
     EXPECT_EQ(symbol_orders[0].average_fill_price,
-              150.0); // (149*50 + 151*50)/100
+              150.0);  // (149*50 + 151*50)/100
 }
 
 TEST_F(PortfolioTest, CancelOrder) {

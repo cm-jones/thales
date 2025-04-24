@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 
 #include <gtest/gtest.h>
-#include <thales/core/position.hpp>
-#include <thales/utils/symbol_lookup.hpp>
+
+#include "thales/core/position.hpp"
+#include "thales/utils/symbol_lookup.hpp"
 
 using namespace thales::core;
 using namespace thales::utils;
 
 class PositionTest : public ::testing::Test {
-  protected:
+   protected:
     void SetUp() override {
         // Initialize symbol lookup with test symbols
         std::vector<std::string> symbols = {"AAPL", "MSFT", "GOOG"};
@@ -155,7 +156,7 @@ TEST_F(PositionTest, PositionWithDifferentQuantities) {
     Position short_position(short_params);
 
     EXPECT_EQ(short_position.quantity,
-              static_cast<uint16_t>(-50) & 0xFFFF); // Unsigned conversion
+              static_cast<uint16_t>(-50) & 0xFFFF);  // Unsigned conversion
     EXPECT_EQ(short_position.get_value(), short_position.quantity * 160.0);
     EXPECT_EQ(short_position.get_unrealized_pnl(),
               short_position.quantity * (160.0 - 150.0));

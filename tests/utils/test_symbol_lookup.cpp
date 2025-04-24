@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 
 #include <gtest/gtest.h>
+
 #include <string>
-#include <thales/utils/symbol_lookup.hpp>
 #include <vector>
+
+#include "thales/utils/symbol_lookup.hpp"
 
 using namespace thales::utils;
 
 class SymbolLookupTest : public ::testing::Test {
-  protected:
+   protected:
     void SetUp() override {
         // Reset the singleton for each test by creating a new instance
         // with an empty vector (this is a bit of a hack but necessary for
@@ -39,7 +41,7 @@ TEST_F(SymbolLookupTest, Initialization) {
 
     // Check all IDs were assigned
     for (size_t i = 0; i < symbols.size(); ++i) {
-        SymbolLookup::SymbolID id = i + 1; // IDs start from 1
+        SymbolLookup::SymbolID id = i + 1;  // IDs start from 1
         EXPECT_TRUE(lookup.has_id(id));
         EXPECT_FALSE(lookup.get_symbol(id).empty());
     }
@@ -68,7 +70,7 @@ TEST_F(SymbolLookupTest, AddSymbol) {
     // Add the same symbol again (should return the same ID)
     auto id3 = lookup.add_symbol("AAPL");
     EXPECT_EQ(id3, id1);
-    EXPECT_EQ(lookup.size(), 2); // Size should still be 2
+    EXPECT_EQ(lookup.size(), 2);  // Size should still be 2
 }
 
 TEST_F(SymbolLookupTest, GetId) {

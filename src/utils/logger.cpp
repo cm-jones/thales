@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "thales/utils/logger.hpp"
+
 #include <chrono>
 #include <ctime>
 #include <filesystem>
@@ -12,11 +13,11 @@ namespace thales {
 namespace utils {
 class DbLogger;
 }
-} // namespace thales
+}  // namespace thales
 
 // Include DbLogger header if enabled
 #if ENABLE_DB_LOGGER
-#include <thales/utils/db_logger.h>
+#include "thales/utils/db_logger.h>
 #endif
 
 namespace thales {
@@ -26,8 +27,10 @@ namespace utils {
 std::unique_ptr<Logger> Logger::instance_ = nullptr;
 
 Logger::Logger()
-    : logToFile_(false), log_file_path_("logs/thales.log"),
-      console_level_(LogLevel::INFO), file_level_(LogLevel::TRACE) {}
+    : logToFile_(false),
+      log_file_path_("logs/thales.log"),
+      console_level_(LogLevel::INFO),
+      file_level_(LogLevel::TRACE) {}
 
 Logger &Logger::get_instance() {
     if (!instance_) {
@@ -165,20 +168,20 @@ void Logger::log(LogLevel level, const std::string &message) {
 
 std::string Logger::levelToString(LogLevel level) {
     switch (level) {
-    case LogLevel::TRACE:
-        return "TRACE";
-    case LogLevel::DEBUG:
-        return "DEBUG";
-    case LogLevel::INFO:
-        return "INFO";
-    case LogLevel::WARNING:
-        return "WARNING";
-    case LogLevel::ERROR:
-        return "ERROR";
-    case LogLevel::FATAL:
-        return "FATAL";
-    default:
-        return "UNKNOWN";
+        case LogLevel::TRACE:
+            return "TRACE";
+        case LogLevel::DEBUG:
+            return "DEBUG";
+        case LogLevel::INFO:
+            return "INFO";
+        case LogLevel::WARNING:
+            return "WARNING";
+        case LogLevel::ERROR:
+            return "ERROR";
+        case LogLevel::FATAL:
+            return "FATAL";
+        default:
+            return "UNKNOWN";
     }
 }
 
@@ -196,5 +199,5 @@ std::string Logger::get_current_timestamp() {
     return ss.str();
 }
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

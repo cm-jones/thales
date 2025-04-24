@@ -20,7 +20,7 @@ namespace {
 std::mutex signal_mutex_;
 std::mutex order_mutex_;
 std::mutex portfolio_mutex_;
-} // namespace
+}  // namespace
 
 Engine::Engine(const utils::Config &config) : config_(config) {
     // No initialization in constructor - following RAII principles
@@ -182,6 +182,7 @@ void Engine::execute_orders() {
                         (order.type != Order::Type::MARKET
                              ? ", Price: " + std::to_string(order.price.limit)
                              : ""));
+            // TODO: Implement actual order execution logic
         }
     } catch (const std::exception &e) {
         logger.error("Error executing orders: " + std::string(e.what()));
@@ -224,5 +225,5 @@ void Engine::update_portfolio() {
     }
 }
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

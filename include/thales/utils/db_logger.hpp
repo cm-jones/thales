@@ -22,7 +22,7 @@ namespace utils {
  * with a queue to minimize impact on trading performance.
  */
 class DbLogger {
-  public:
+   public:
     /**
      * @brief Get the singleton instance of the database logger
      * @return Reference to the database logger instance
@@ -105,7 +105,7 @@ class DbLogger {
     // Destructor made public for unique_ptr
     ~DbLogger();
 
-  private:
+   private:
     // Private constructor for singleton pattern
     DbLogger();
 
@@ -187,5 +187,5 @@ class DbLogger {
     static std::unique_ptr<DbLogger> instance_;
 };
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

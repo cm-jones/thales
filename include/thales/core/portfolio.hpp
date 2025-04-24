@@ -15,8 +15,8 @@
 #include "option.hpp"
 #include "order.hpp"
 #include "position.hpp"
-#include <thales/utils/config.hpp>
-#include <thales/utils/symbol_lookup.hpp>
+#include "thales/utils/config.hpp"
+#include "thales/utils/symbol_lookup.hpp"
 
 namespace thales {
 namespace core {
@@ -30,8 +30,8 @@ namespace core {
 /// - Position updates from market data and fills
 ///
 /// Uses static vectors with pre-allocated capacity for performance.
-class alignas(CACHE_LINE_SIZE) Portfolio {
-  public:
+class CACHE_ALIGNED Portfolio {
+   public:
     /// Construct a new Portfolio instance
     /// @param config Portfolio configuration parameters
     explicit Portfolio(const utils::Config &config);
@@ -59,8 +59,8 @@ class alignas(CACHE_LINE_SIZE) Portfolio {
     /// Lookup all orders for a specific symbol
     /// @param symbol Trading symbol to search for
     /// @return Vector of all orders for the symbol (thread-safe copy)
-    boost::container::static_vector<Order, 256>
-    get_orders(const std::string &symbol) const;
+    boost::container::static_vector<Order, 256> get_orders(
+        const std::string &symbol) const;
 
     /// Calculate total portfolio market value
     /// @return Sum of all position values in portfolio
@@ -101,21 +101,21 @@ class alignas(CACHE_LINE_SIZE) Portfolio {
     /// @return true if order was found and canceled, false otherwise
     bool cancel_order(const std::string &order_id);
 
-  private:
+   private:
     // Core data structures
-    alignas(CACHE_LINE_SIZE) boost::container::static_vector<
-        Position, 256> positions_; ///< Active positions
+    CACHE_ALIGNED boost::container::static_vector<Position, 256>
+        positions_;  ///< Active positions
 
-    alignas(CACHE_LINE_SIZE)
-        boost::container::static_vector<Order, 256> orders_; ///< Order history
+    CACHE_ALIGNED
+    boost::container::static_vector<Order, 256> orders_;  ///< Order history
 
-    utils::Config config_;     ///< Portfolio configuration
-    mutable std::mutex mutex_; ///< Synchronization guard
+    utils::Config config_;      ///< Portfolio configuration
+    mutable std::mutex mutex_;  ///< Synchronization guard
 
     /// Update position based on order execution
     /// @param order Order that was executed
     void update_position_from_order(const Order &order);
 };
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

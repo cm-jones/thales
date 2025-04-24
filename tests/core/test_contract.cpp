@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 
 #include <gtest/gtest.h>
-#include <thales/core/option.hpp>
-#include <thales/utils/symbol_lookup.hpp>
+
+#include "thales/core/option.hpp"
+#include "thales/utils/symbol_lookup.hpp"
 
 using namespace thales::core;
 using namespace thales::utils;
 
 class ContractTest : public ::testing::Test {
-  protected:
+   protected:
     void SetUp() override {
         // Initialize symbol lookup with test symbols
         std::vector<std::string> symbols = {"AAPL", "MSFT", "GOOG"};

@@ -6,8 +6,8 @@
 #include <string>
 
 // Project includes
-#include <thales/core/portfolio.hpp>
-#include <thales/utils/config.hpp>
+#include "thales/core/portfolio.hpp"
+#include "thales/utils/config.hpp"
 
 namespace thales {
 namespace core {
@@ -24,7 +24,7 @@ namespace core {
 /// All risk parameters are configurable and can be updated dynamically
 /// based on market conditions and portfolio performance.
 class RiskManager {
-  public:
+   public:
     /// Construct a new RiskManager with configuration
     /// @param config Risk management parameters
     explicit RiskManager(const utils::Config &config);
@@ -58,16 +58,16 @@ class RiskManager {
     /// @param portfolio Current portfolio state to analyze
     void update_risk_params(const Portfolio &portfolio);
 
-  private:
+   private:
     // Core configuration
-    utils::Config config_; ///< Risk management settings
+    utils::Config config_;  ///< Risk management settings
 
     // Risk limits
-    double max_position_size_;  ///< Maximum position size per instrument
-    double max_drawdown_;       ///< Maximum allowed drawdown percentage
-    double max_leverage_;       ///< Maximum portfolio leverage ratio
-    double max_risk_per_trade_; ///< Maximum risk per single trade
-    double max_daily_loss_;     ///< Maximum allowed daily loss
+    double max_position_size_;   ///< Maximum position size per instrument
+    double max_drawdown_;        ///< Maximum allowed drawdown percentage
+    double max_leverage_;        ///< Maximum portfolio leverage ratio
+    double max_risk_per_trade_;  ///< Maximum risk per single trade
+    double max_daily_loss_;      ///< Maximum allowed daily loss
 
     /// Calculate risk for a specific position
     /// @param symbol Trading symbol
@@ -83,5 +83,5 @@ class RiskManager {
     double calculate_portfolio_risk(const Portfolio &portfolio) const;
 };
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

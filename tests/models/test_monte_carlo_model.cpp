@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: MIT
 
 #include <gtest/gtest.h>
-#include <thales/models/monte_carlo_model.hpp>
+
+#include "thales/models/monte_carlo_model.hpp"
 
 namespace thales {
 namespace tests {
 
 class MonteCarloModelTest : public ::testing::Test {
-  protected:
+   protected:
     void SetUp() override {
         // Set up common test parameters
-        params.S = 100.0;               // Current stock price
-        params.K = 100.0;               // Strike price
-        params.r = 0.05;                // Risk-free rate
-        params.sigma = 0.2;             // Volatility
-        params.T = 1.0;                 // Time to expiration (1 year)
-        params.num_simulations = 10000; // Number of simulations
-        params.num_steps = 100;         // Number of time steps
-        params.seed = 42;               // Random seed for reproducibility
+        params.S = 100.0;                // Current stock price
+        params.K = 100.0;                // Strike price
+        params.r = 0.05;                 // Risk-free rate
+        params.sigma = 0.2;              // Volatility
+        params.T = 1.0;                  // Time to expiration (1 year)
+        params.num_simulations = 10000;  // Number of simulations
+        params.num_steps = 100;          // Number of time steps
+        params.seed = 42;                // Random seed for reproducibility
     }
 
     models::OptionParameters params;
@@ -29,17 +30,17 @@ TEST_F(MonteCarloModelTest, CallPrice) {
     double call_price = models::MonteCarloModel::call_price(params);
     EXPECT_GT(call_price, 0.0);
     EXPECT_LT(call_price,
-              params.S); // Call price should be less than stock price
+              params.S);  // Call price should be less than stock price
 
     // Test ITM call option
-    params.K = 90.0; // Lower strike price
+    params.K = 90.0;  // Lower strike price
     double itm_call_price = models::MonteCarloModel::call_price(params);
-    EXPECT_GT(itm_call_price, call_price); // ITM call should be more expensive
+    EXPECT_GT(itm_call_price, call_price);  // ITM call should be more expensive
 
     // Test OTM call option
-    params.K = 110.0; // Higher strike price
+    params.K = 110.0;  // Higher strike price
     double otm_call_price = models::MonteCarloModel::call_price(params);
-    EXPECT_LT(otm_call_price, call_price); // OTM call should be less expensive
+    EXPECT_LT(otm_call_price, call_price);  // OTM call should be less expensive
 
     // Test expired option
     params.T = 0.0;
@@ -53,17 +54,17 @@ TEST_F(MonteCarloModelTest, PutPrice) {
     double put_price = models::MonteCarloModel::put_price(params);
     EXPECT_GT(put_price, 0.0);
     EXPECT_LT(put_price,
-              params.K); // Put price should be less than strike price
+              params.K);  // Put price should be less than strike price
 
     // Test ITM put option
-    params.K = 110.0; // Higher strike price
+    params.K = 110.0;  // Higher strike price
     double itm_put_price = models::MonteCarloModel::put_price(params);
-    EXPECT_GT(itm_put_price, put_price); // ITM put should be more expensive
+    EXPECT_GT(itm_put_price, put_price);  // ITM put should be more expensive
 
     // Test OTM put option
-    params.K = 90.0; // Lower strike price
+    params.K = 90.0;  // Lower strike price
     double otm_put_price = models::MonteCarloModel::put_price(params);
-    EXPECT_LT(otm_put_price, put_price); // OTM put should be less expensive
+    EXPECT_LT(otm_put_price, put_price);  // OTM put should be less expensive
 
     // Test expired option
     params.T = 0.0;
@@ -86,38 +87,38 @@ TEST_F(MonteCarloModelTest, PutCallParity) {
 TEST_F(MonteCarloModelTest, CallDelta) {
     // Test ATM call delta (should be around 0.5)
     double atm_delta = models::MonteCarloModel::call_delta(params);
-    EXPECT_NEAR(atm_delta, 0.5, 0.1); // Allow for some numerical error
+    EXPECT_NEAR(atm_delta, 0.5, 0.1);  // Allow for some numerical error
 
     // Test ITM call delta (should be closer to 1.0)
     params.K = 90.0;
     double itm_delta = models::MonteCarloModel::call_delta(params);
     EXPECT_GT(itm_delta, atm_delta);
-    EXPECT_NEAR(itm_delta, 0.7, 0.1); // Allow for some numerical error
+    EXPECT_NEAR(itm_delta, 0.7, 0.1);  // Allow for some numerical error
 
     // Test OTM call delta (should be closer to 0.0)
     params.K = 110.0;
     double otm_delta = models::MonteCarloModel::call_delta(params);
     EXPECT_LT(otm_delta, atm_delta);
-    EXPECT_NEAR(otm_delta, 0.3, 0.1); // Allow for some numerical error
+    EXPECT_NEAR(otm_delta, 0.3, 0.1);  // Allow for some numerical error
 }
 
 // Test put delta
 TEST_F(MonteCarloModelTest, PutDelta) {
     // Test ATM put delta (should be around -0.5)
     double atm_delta = models::MonteCarloModel::put_delta(params);
-    EXPECT_NEAR(atm_delta, -0.5, 0.1); // Allow for some numerical error
+    EXPECT_NEAR(atm_delta, -0.5, 0.1);  // Allow for some numerical error
 
     // Test ITM put delta (should be closer to -1.0)
     params.K = 110.0;
     double itm_delta = models::MonteCarloModel::put_delta(params);
     EXPECT_LT(itm_delta, atm_delta);
-    EXPECT_NEAR(itm_delta, -0.7, 0.1); // Allow for some numerical error
+    EXPECT_NEAR(itm_delta, -0.7, 0.1);  // Allow for some numerical error
 
     // Test OTM put delta (should be closer to 0.0)
     params.K = 90.0;
     double otm_delta = models::MonteCarloModel::put_delta(params);
     EXPECT_GT(otm_delta, atm_delta);
-    EXPECT_NEAR(otm_delta, -0.3, 0.1); // Allow for some numerical error
+    EXPECT_NEAR(otm_delta, -0.3, 0.1);  // Allow for some numerical error
 }
 
 // Test gamma
@@ -170,5 +171,5 @@ TEST_F(MonteCarloModelTest, OptionParametersStruct) {
     EXPECT_NEAR(call_price - put_price, expected_diff, 0.5);
 }
 
-} // namespace tests
-} // namespace thales
+}  // namespace tests
+}  // namespace thales

@@ -4,8 +4,8 @@
 #include <algorithm>
 
 // Project includes
-#include <thales/core/portfolio.hpp>
-#include <thales/core/position.hpp>
+#include "thales/core/portfolio.hpp"
+#include "thales/core/position.hpp"
 
 namespace thales {
 namespace core {
@@ -23,9 +23,9 @@ bool Portfolio::initialize() {
     }
 }
 
-boost::container::static_vector<Position, 256>
-Portfolio::get_positions() const {
-    std::lock_guard<std::mutex> lock(mutex_); // Thread safety for positions
+boost::container::static_vector<Position, 256> Portfolio::get_positions()
+    const {
+    std::lock_guard<std::mutex> lock(mutex_);  // Thread safety for positions
     boost::container::static_vector<Position, 256> result;
     result.reserve(positions_.size());
 
@@ -48,7 +48,7 @@ Portfolio::get_positions() const {
 }
 
 Position Portfolio::get_position(const std::string &symbol) const {
-    std::lock_guard<std::mutex> lock(mutex_); // Thread safety for positions
+    std::lock_guard<std::mutex> lock(mutex_);  // Thread safety for positions
     const auto symbol_id = utils::SymbolLookup::get_instance().get_id(symbol);
 
     // Lookup position by symbol
@@ -67,32 +67,32 @@ Position Portfolio::get_position(const std::string &symbol) const {
         }
     }
 
-    return Position(); // Return an empty position if not found
+    return Position();  // Return an empty position if not found
 }
 
 boost::container::static_vector<Order, 256> Portfolio::get_open_orders() const {
-    std::lock_guard<std::mutex> lock(mutex_); // Thread safety for orders
+    std::lock_guard<std::mutex> lock(mutex_);  // Thread safety for orders
     boost::container::static_vector<Order, 256> result;
 
     for (const auto &order : orders_) {
         if (order.is_active()) {
-            result.push_back(order); // Order is copyable, no need for move
+            result.push_back(order);  // Order is copyable, no need for move
         }
     }
 
     return result;
 }
 
-boost::container::static_vector<Order, 256>
-Portfolio::get_orders(const std::string &symbol) const {
-    std::lock_guard<std::mutex> lock(mutex_); // Thread safety for orders
+boost::container::static_vector<Order, 256> Portfolio::get_orders(
+    const std::string &symbol) const {
+    std::lock_guard<std::mutex> lock(mutex_);  // Thread safety for orders
     boost::container::static_vector<Order, 256> result;
 
     for (const auto &order : orders_) {
         const std::string order_symbol =
             utils::SymbolLookup::get_instance().get_symbol(order.symbol_id);
         if (order_symbol == symbol) {
-            result.push_back(order); // Order is copyable, no need for move
+            result.push_back(order);  // Order is copyable, no need for move
         }
     }
 
@@ -225,7 +225,7 @@ void Portfolio::update_order(const std::string &order_id, Order::Status status,
 }
 
 void Portfolio::add_order(const Order &order) {
-    std::lock_guard<std::mutex> lock(mutex_); // Thread safety for orders
+    std::lock_guard<std::mutex> lock(mutex_);  // Thread safety for orders
 
     // Check for existing order
     auto it = std::find_if(
@@ -233,14 +233,14 @@ void Portfolio::add_order(const Order &order) {
         [id = order.order_id](const Order &o) { return o.order_id == id; });
 
     if (it != orders_.end()) {
-        *it = order; // Order is copyable
+        *it = order;  // Order is copyable
     } else {
-        orders_.push_back(order); // Order is copyable
+        orders_.push_back(order);  // Order is copyable
     }
 }
 
 bool Portfolio::cancel_order(const std::string &order_id) {
-    std::lock_guard<std::mutex> lock(mutex_); // Thread safety for orders
+    std::lock_guard<std::mutex> lock(mutex_);  // Thread safety for orders
     const uint32_t numeric_order_id = std::stoul(order_id);
 
     // Find order by ID
@@ -275,7 +275,7 @@ void Portfolio::update_position_from_order(const Order &order) {
         // Create a new position if we don't have one
         Position new_pos(PositionParams{.id = order.symbol_id});
         positions_.push_back(std::move(new_pos));
-        it = positions_.end() - 1; // Point to the newly added position
+        it = positions_.end() - 1;  // Point to the newly added position
     }
 
     // Convert fill quantity to position delta
@@ -306,5 +306,5 @@ void Portfolio::update_position_from_order(const Order &order) {
     position.unrealized_pnl = position.get_unrealized_pnl();
 }
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

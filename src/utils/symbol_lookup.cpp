@@ -79,5 +79,5 @@ std::vector<std::string> SymbolLookup::get_all_symbols() const {
     return symbols;
 }
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

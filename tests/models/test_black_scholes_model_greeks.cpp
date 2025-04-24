@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-#include <cmath>
 #include <gtest/gtest.h>
-#include <thales/models/black_scholes_model.hpp>
+
+#include <cmath>
+
+#include "thales/models/black_scholes_model.hpp"
 
 using namespace thales::models;
 
@@ -11,17 +13,17 @@ namespace {
 inline bool is_close(double a, double b, double tolerance = 0.0001) {
     return std::abs(a - b) < tolerance;
 }
-} // namespace
+}  // namespace
 
 class BlackScholesModelGreeksTest : public ::testing::Test {
-  protected:
+   protected:
     // Common test parameters
-    double S = 100.0;        // Current stock price
-    double K = 100.0;        // Strike price
-    double r = 0.05;         // Risk-free rate (5%)
-    double sigma = 0.2;      // Volatility (20%)
-    double T = 1.0;          // Time to expiration (1 year)
-    double tolerance = 0.01; // Tolerance for floating point comparisons
+    double S = 100.0;         // Current stock price
+    double K = 100.0;         // Strike price
+    double r = 0.05;          // Risk-free rate (5%)
+    double sigma = 0.2;       // Volatility (20%)
+    double T = 1.0;           // Time to expiration (1 year)
+    double tolerance = 0.01;  // Tolerance for floating point comparisons
 };
 
 TEST_F(BlackScholesModelGreeksTest, DeltaTest) {
@@ -174,7 +176,7 @@ TEST_F(BlackScholesModelGreeksTest, RhoTest) {
 
 TEST_F(BlackScholesModelGreeksTest, GreeksAtExpirationTest) {
     // At expiration (T = 0), for ATM options:
-    double T_expiry = 0.0001; // Very close to expiration
+    double T_expiry = 0.0001;  // Very close to expiration
 
     // Delta should approach 0.5 for ATM call and -0.5 for ATM put
     double call_delta = BlackScholesModel::call_delta(S, K, r, sigma, T_expiry);
