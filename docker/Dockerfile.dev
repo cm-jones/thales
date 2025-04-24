@@ -57,7 +57,7 @@ RUN apt update && apt install -y \
 # Install IB API
 RUN mkdir -p /app/third_party/ibapi
 WORKDIR /app
-COPY scripts/depends/install_ibapi.sh /app/
+COPY scripts/install_ibapi.sh /app/
 RUN IB_API_VERSION="1035.01" && \
     DOWNLOAD_URL="https://interactivebrokers.github.io/downloads/twsapi_macunix.${IB_API_VERSION}.zip" && \
     TMP_DIR=$(mktemp -d) && \

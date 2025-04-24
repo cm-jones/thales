@@ -18,7 +18,7 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install IB API in builder stage
-COPY scripts/depends/install_ibapi.sh /tmp/
+COPY scripts/install_ibapi.sh /tmp/
 RUN chmod +x /tmp/install_ibapi.sh && \
     cd /tmp && \
     ./install_ibapi.sh && \
@@ -38,12 +38,12 @@ COPY third_party ./third_party
 RUN mkdir -p build && \
     cd build && \
     cmake .. \
-        -G Ninja \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_DOCS=OFF \
-        -DBUILD_EXAMPLES=OFF \
-        -DCMAKE_CXX_FLAGS="-O3 -march=native -DNDEBUG" && \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TESTING=OFF \
+    -DBUILD_DOCS=OFF \
+    -DBUILD_EXAMPLES=OFF \
+    -DCMAKE_CXX_FLAGS="-O3 -march=native -DNDEBUG" && \
     ninja
 
 # Runtime stage

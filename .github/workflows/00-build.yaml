@@ -30,8 +30,8 @@ jobs:
       - name: Configure and build
         id: build_step
         run: |
-          chmod +x scripts/build/build.sh
-          ./scripts/build/build.sh --type ${{ matrix.build_type }} --clean --test
+          chmod +x scripts/build.sh
+          ./scripts/build.sh --type ${{ matrix.build_type }} --clean --test
           echo "success=true" >> $GITHUB_OUTPUT
           echo "build_id=$(date +%s)" >> $GITHUB_OUTPUT
 
