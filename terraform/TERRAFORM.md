@@ -1,6 +1,6 @@
 # AWS Deployment with Terraform
 
-This directory contains Terraform configurations for deploying the Thales trading bot on AWS.
+This directory contains Terraform configurations for deploying Thales on AWS.
 
 ## Prerequisites
 
