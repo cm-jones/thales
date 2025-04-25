@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential cmake libboost-all-dev googletest
+          sudo apt install -y build-essential cmake libboost-all-dev googletest 24.
 
       - name: Configure
         run: |
