@@ -123,7 +123,7 @@ resource "aws_security_group" "thales_sg" {
 
 # EC2 Instance
 resource "aws_instance" "thales_instance" {
-  ami           = "ami-0430580de6244e02e"  # Ubuntu 22.04 LTS in us-east-2
+  ami           = "ami-0430580de6244e02e"  # Ubuntu 24.04 LTS in us-east-2
   instance_type = var.instance_type
 
   subnet_id                   = aws_subnet.thales_public_subnet.id
@@ -132,8 +132,8 @@ resource "aws_instance" "thales_instance" {
 
   user_data = <<-EOF
               #!/bin/bash
-              apt-get update
-              apt-get install -y docker.io docker-compose
+              apt update
+              apt install -y docker.io docker-compose
               systemctl start docker
               systemctl enable docker
               usermod -aG docker ubuntu
