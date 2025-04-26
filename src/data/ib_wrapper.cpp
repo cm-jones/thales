@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/data/ib_wrapper.hpp"
+
 #include <chrono>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
-#include <thales/data/ib_client.hpp>
-#include <thales/data/ib_wrapper.hpp>
-#include <thales/utils/logger.hpp>
+
+#include "thales/data/ib_client.hpp"
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace data {
@@ -123,30 +125,30 @@ void IBWrapper::tickPrice(int tickerId, int field, double price,
 
     // Set the appropriate field based on the tick type
     switch (field) {
-    case 1: // BID
-        data.bid = price;
-        break;
-    case 2: // ASK
-        data.ask = price;
-        break;
-    case 4: // LAST
-        data.price = price;
-        break;
-    case 6: // HIGH
-        data.high = price;
-        break;
-    case 7: // LOW
-        data.low = price;
-        break;
-    case 9: // CLOSE
-        data.close = price;
-        break;
-    case 14: // OPEN
-        data.open = price;
-        break;
-    default:
-        // Ignore other tick types
-        return;
+        case 1:  // BID
+            data.bid = price;
+            break;
+        case 2:  // ASK
+            data.ask = price;
+            break;
+        case 4:  // LAST
+            data.price = price;
+            break;
+        case 6:  // HIGH
+            data.high = price;
+            break;
+        case 7:  // LOW
+            data.low = price;
+            break;
+        case 9:  // CLOSE
+            data.close = price;
+            break;
+        case 14:  // OPEN
+            data.open = price;
+            break;
+        default:
+            // Ignore other tick types
+            return;
     }
 
     // Notify the client of the market data update
@@ -183,21 +185,21 @@ void IBWrapper::tickSize(int tickerId, int field, int size) {
 
     // Set the appropriate field based on the tick type
     switch (field) {
-    case 0: // BID_SIZE
-        data.bid_size = size;
-        break;
-    case 3: // ASK_SIZE
-        data.ask_size = size;
-        break;
-    case 5: // LAST_SIZE
-        data.volume = size;
-        break;
-    case 8: // VOLUME
-        data.volume = size;
-        break;
-    default:
-        // Ignore other tick types
-        return;
+        case 0:  // BID_SIZE
+            data.bid_size = size;
+            break;
+        case 3:  // ASK_SIZE
+            data.ask_size = size;
+            break;
+        case 5:  // LAST_SIZE
+            data.volume = size;
+            break;
+        case 8:  // VOLUME
+            data.volume = size;
+            break;
+        default:
+            // Ignore other tick types
+            return;
     }
 
     // Notify the client of the market data update
@@ -335,5 +337,5 @@ void IBWrapper::bondContractDetails(
     [[maybe_unused]] int reqId,
     [[maybe_unused]] const IBContractDetails &contractDetails) {}
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

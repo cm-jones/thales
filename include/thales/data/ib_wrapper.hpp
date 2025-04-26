@@ -7,12 +7,13 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <thales/core/order.hpp>
-#include <thales/core/position.hpp>
-#include <thales/data/ib_contract.hpp>
-#include <thales/data/ib_order.hpp>
-#include <thales/data/market_data.hpp>
 #include <unordered_map>
+
+#include "thales/core/order.hpp"
+#include "thales/core/position.hpp"
+#include "thales/data/ib_contract.hpp"
+#include "thales/data/ib_order.hpp"
+#include "thales/data/market_data.hpp"
 
 // Forward declarations for IB API classes we don't need to fully implement
 namespace IB {
@@ -113,7 +114,7 @@ struct CommissionReport {
     double yield;
     int yieldRedemptionDate;
 };
-} // namespace IB
+}  // namespace IB
 
 namespace thales {
 namespace data {
@@ -130,7 +131,7 @@ class IBClient;
  * converts them to the appropriate format for the IBClient class.
  */
 class IBWrapper {
-  public:
+   public:
     /**
      * @brief Constructor
      * @param client Reference to the IBClient instance
@@ -278,10 +279,9 @@ class IBWrapper {
     void historicalTicks(int reqId,
                          const std::vector<IB::HistoricalTick> &ticks,
                          bool done);
-    void
-    historicalTicksBidAsk(int reqId,
-                          const std::vector<IB::HistoricalTickBidAsk> &ticks,
-                          bool done);
+    void historicalTicksBidAsk(
+        int reqId, const std::vector<IB::HistoricalTickBidAsk> &ticks,
+        bool done);
     void historicalTicksLast(int reqId,
                              const std::vector<IB::HistoricalTickLast> &ticks,
                              bool done);
@@ -296,7 +296,7 @@ class IBWrapper {
     void orderBound(long orderId, int apiClientId, int apiOrderId);
     void nextValidId(int orderId);
 
-  private:
+   private:
     // Reference to the IBClient instance
     IBClient &client_;
 
@@ -314,5 +314,5 @@ class IBWrapper {
     std::unordered_map<int, std::string> orderIdToOrderId_;
 };
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

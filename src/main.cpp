@@ -2,11 +2,12 @@
 
 #include <iostream>
 #include <string>
-#include <thales/core/engine.hpp>
-#include <thales/data/ib_client.hpp>
-#include <thales/utils/config.hpp>
-#include <thales/utils/logger.hpp>
-#include <thales/utils/symbol_lookup.hpp>
+
+#include "thales/core/engine.hpp"
+#include "thales/data/ib_client.hpp"
+#include "thales/utils/config.hpp"
+#include "thales/utils/logger.hpp"
+#include "thales/utils/symbol_lookup.hpp"
 
 using namespace thales::utils;
 using namespace thales::core;
@@ -16,27 +17,27 @@ int main(int argc, char *argv[]) {
     std::string config_path;
 
     switch (argc) {
-    case 1: {
-        // No arguments, use default config path
-        config_path = "config/config.json";
-        break;
-    }
-
-    case 2: {
-        // One argument, check if it's a flag
-        if (std::string(argv[1]) == "--config") {
-            std::cerr << "Error: --config requires a path argument\n";
-            return EXIT_FAILURE;
-        } else {
-            config_path = argv[1];
+        case 1: {
+            // No arguments, use default config path
+            config_path = "config/config.json";
+            break;
         }
-        break;
-    }
 
-    default:
-        // Multiple arguments, check for --config flag
-        config_path = "config/config.json"; // Default path
-        break;
+        case 2: {
+            // One argument, check if it's a flag
+            if (std::string(argv[1]) == "--config") {
+                std::cerr << "Error: --config requires a path argument\n";
+                return EXIT_FAILURE;
+            } else {
+                config_path = argv[1];
+            }
+            break;
+        }
+
+        default:
+            // Multiple arguments, check for --config flag
+            config_path = "config/config.json";  // Default path
+            break;
     }
 
     // Create config object
@@ -69,18 +70,12 @@ int main(int argc, char *argv[]) {
 
     // Convert log level strings to enum values
     auto string_to_log_level = [](const std::string &level_str) -> LogLevel {
-        if (level_str == "TRACE")
-            return LogLevel::TRACE;
-        if (level_str == "DEBUG")
-            return LogLevel::DEBUG;
-        if (level_str == "INFO")
-            return LogLevel::INFO;
-        if (level_str == "WARNING")
-            return LogLevel::WARNING;
-        if (level_str == "ERROR")
-            return LogLevel::ERROR;
-        if (level_str == "FATAL")
-            return LogLevel::FATAL;
+        if (level_str == "TRACE") return LogLevel::TRACE;
+        if (level_str == "DEBUG") return LogLevel::DEBUG;
+        if (level_str == "INFO") return LogLevel::INFO;
+        if (level_str == "WARNING") return LogLevel::WARNING;
+        if (level_str == "ERROR") return LogLevel::ERROR;
+        if (level_str == "FATAL") return LogLevel::FATAL;
         return LogLevel::INFO;
     };
 

@@ -19,7 +19,7 @@ namespace utils {
 /// efficient storage and lookup of trading symbols by mapping string symbols to
 /// integer IDs and vice versa.
 class SymbolLookup {
-  public:
+   public:
     using SymbolID = uint16_t;
     static constexpr SymbolID INVALID_SYMBOL_ID = 0;
 
@@ -93,7 +93,7 @@ class SymbolLookup {
      */
     std::vector<std::string> get_all_symbols() const;
 
-  private:
+   private:
     /**
      * @brief Default constructor - private to enforce singleton pattern
      */
@@ -108,8 +108,8 @@ class SymbolLookup {
 
     std::unordered_map<std::string, SymbolID> symbol_to_id_;
     std::unordered_map<SymbolID, std::string> id_to_symbol_;
-    SymbolID next_id_ = 1; // Start from 1, 0 is reserved for INVALID_SYMBOL_ID
+    SymbolID next_id_ = 1;  // Start from 1, 0 is reserved for INVALID_SYMBOL_ID
 };
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

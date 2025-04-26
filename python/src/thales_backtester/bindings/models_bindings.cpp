@@ -1,11 +1,11 @@
 #include <pybind11/pybind11.h>
-#include <thales/models/black_scholes_model.hpp>
+#include "thales/models/black_scholes_model.hpp"
 
 namespace py = pybind11;
 
 void bind_models(py::module& m) {
     // Bind BlackScholesModel class
-    py::class_<thales::models::BlackScholesModel>(m, "BlackScholesModel")
+    py::class_"thales::models::BlackScholesModel>(m, "BlackScholesModel")
         .def(py::init<>())
         .def_static("call_price", &thales::models::BlackScholesModel::call_price,
                    py::arg("S"), py::arg("K"), py::arg("r"), py::arg("sigma"), py::arg("T"),

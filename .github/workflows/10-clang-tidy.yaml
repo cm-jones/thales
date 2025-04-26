@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential cmake libboost-all-dev clang-tidy
+          sudo apt install -y build-essential cmake libboost-all-dev clang-tidy libpqxx-dev-dev
 
       - name: Check for .clang-tidy file
         id: check_clang_tidy

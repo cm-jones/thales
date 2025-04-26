@@ -32,7 +32,7 @@ enum struct LogLevel : uint8_t {
  * severity levels and output destinations (console, file).
  */
 class Logger {
-  public:
+   public:
     /**
      * @brief Get the singleton instance of the logger
      * @return Reference to the logger instance
@@ -137,7 +137,7 @@ class Logger {
      */
     bool set_file_logging(bool enable, const std::string &logFilePath = "");
 
-  private:
+   private:
     // Private constructor for singleton pattern
     Logger();
 
@@ -166,5 +166,5 @@ class Logger {
     static std::unique_ptr<Logger> instance_;
 };
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

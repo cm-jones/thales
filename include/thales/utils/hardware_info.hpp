@@ -17,7 +17,7 @@ namespace utils {
  * it's running on, which can be useful for performance tuning and logging.
  */
 class HardwareInfo {
-  public:
+   public:
     /**
      * @brief Get the singleton instance of HardwareInfo
      * @return Reference to the HardwareInfo instance
@@ -60,7 +60,7 @@ class HardwareInfo {
      */
     std::string get_cpu_model() const;
 
-  private:
+   private:
     // Private constructor to enforce singleton pattern
     HardwareInfo();
 
@@ -83,5 +83,5 @@ class HardwareInfo {
     void update_memory_info();
 };
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

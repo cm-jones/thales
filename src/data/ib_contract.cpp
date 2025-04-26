@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/data/ib_contract.hpp"
+
 #include <sstream>
-#include <thales/data/ib_contract.hpp>
 
 namespace thales {
 namespace data {
 
 IBContract::IBContract(const std::string &symbol, const std::string &sec_type,
                        const std::string &exchange, const std::string &currency)
-    : symbol(symbol), sec_type(sec_type), exchange(exchange),
+    : symbol(symbol),
+      sec_type(sec_type),
+      exchange(exchange),
       currency(currency) {}
 
 std::string IBContract::to_string() const {
@@ -111,5 +114,5 @@ std::string IBContractDescription::to_string() const {
     return ss.str();
 }
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

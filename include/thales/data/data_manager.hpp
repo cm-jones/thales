@@ -9,9 +9,9 @@
 #include <vector>
 
 // Project includes
-#include <thales/data/ib_client.hpp>
-#include <thales/data/market_data.hpp>
-#include <thales/utils/config.hpp>
+#include "thales/data/ib_client.hpp"
+#include "thales/data/market_data.hpp"
+#include "thales/utils/config.hpp"
 
 namespace thales {
 namespace data {
@@ -27,7 +27,7 @@ namespace data {
 /// Primary interface for all market data operations, abstracting
 /// provider-specific details (e.g., Interactive Brokers integration).
 class DataManager {
-  public:
+   public:
     /// Construct a new DataManager instance
     /// @param config Market data configuration parameters
     explicit DataManager(const utils::Config &config);
@@ -68,22 +68,22 @@ class DataManager {
     /// @param symbol Underlying symbol to query
     /// @param expirationDate Specific expiry date (empty for all)
     /// @return Map of option data indexed by option symbol
-    std::unordered_map<std::string, OptionData>
-    get_option_chain(const std::string &symbol,
-                     const std::string &expirationDate = "") const;
+    std::unordered_map<std::string, OptionData> get_option_chain(
+        const std::string &symbol,
+        const std::string &expirationDate = "") const;
 
     /// Handle incoming market data updates
     /// @param data New market data to process
     void process_market_data(const MarketData &data);
 
-  private:
-    utils::Config config_;                ///< Data manager configuration
-    std::unique_ptr<IBClient> ib_client_; ///< Interactive Brokers connection
+   private:
+    utils::Config config_;                 ///< Data manager configuration
+    std::unique_ptr<IBClient> ib_client_;  ///< Interactive Brokers connection
 
     // Data caches
     std::unordered_map<std::string, MarketData>
-        latest_market_data_;                      ///< Real-time data cache
-    std::vector<std::string> subscribed_symbols_; ///< Active subscriptions
+        latest_market_data_;                       ///< Real-time data cache
+    std::vector<std::string> subscribed_symbols_;  ///< Active subscriptions
 
     /// Establish connections to market data providers
     /// @return true if all connections succeeded
@@ -94,5 +94,5 @@ class DataManager {
     void cache_market_data(const MarketData &data);
 };
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

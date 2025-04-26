@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/utils/db_logger.hpp"
+
 #include <chrono>
 #include <iomanip>
 #include <sstream>
-#include <thales/utils/db_logger.hpp>
-#include <thales/utils/logger.hpp>
 #include <vector>
+
+#include "thales/utils/logger.hpp"
 
 // Include libpqxx for PostgreSQL connectivity
 #include <pqxx/pqxx>
@@ -17,9 +19,16 @@ namespace utils {
 std::unique_ptr<DbLogger> DbLogger::instance_ = nullptr;
 
 DbLogger::DbLogger()
-    : db_host_("localhost"), db_port_(5432), db_name_("thales"),
-      db_user_("thales_user"), db_password_(""), max_queue_size_(10000),
-      batch_size_(100), connected_(false), running_(false), failed_count_(0) {}
+    : db_host_("localhost"),
+      db_port_(5432),
+      db_name_("thales"),
+      db_user_("thales_user"),
+      db_password_(""),
+      max_queue_size_(10000),
+      batch_size_(100),
+      connected_(false),
+      running_(false),
+      failed_count_(0) {}
 
 DbLogger::~DbLogger() { shutdown(); }
 
@@ -238,12 +247,15 @@ bool DbLogger::create_tables_if_not_exist() {
         )");
 
         // Create indexes for faster queries
-        txn.exec("CREATE INDEX IF NOT EXISTS idx_trade_executions_timestamp ON "
-                 "trade_executions(timestamp)");
-        txn.exec("CREATE INDEX IF NOT EXISTS idx_trade_executions_symbol ON "
-                 "trade_executions(symbol)");
-        txn.exec("CREATE INDEX IF NOT EXISTS idx_trade_executions_strategy ON "
-                 "trade_executions(strategy_name)");
+        txn.exec(
+            "CREATE INDEX IF NOT EXISTS idx_trade_executions_timestamp ON "
+            "trade_executions(timestamp)");
+        txn.exec(
+            "CREATE INDEX IF NOT EXISTS idx_trade_executions_symbol ON "
+            "trade_executions(symbol)");
+        txn.exec(
+            "CREATE INDEX IF NOT EXISTS idx_trade_executions_strategy ON "
+            "trade_executions(strategy_name)");
 
         // Commit the transaction
         txn.commit();
@@ -481,7 +493,7 @@ bool DbLogger::is_connected() const { return connected_; }
 
 size_t DbLogger::get_queue_size() const {
     std::lock_guard<std::mutex> lock(
-        queue_mutex_); // non-const mutex passed here
+        queue_mutex_);  // non-const mutex passed here
     return log_queue_.size();
 }
 
@@ -497,5 +509,5 @@ std::string DbLogger::get_current_timestamp() {
     return ss.str();
 }
 
-} // namespace utils
-} // namespace thales
+}  // namespace utils
+}  // namespace thales

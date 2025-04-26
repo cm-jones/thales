@@ -19,7 +19,7 @@ namespace data {
  * instrument for trading purposes.
  */
 class IBContract {
-  public:
+   public:
     /**
      * @brief Default constructor
      */
@@ -41,31 +41,31 @@ class IBContract {
     ~IBContract() = default;
 
     // Contract identification
-    int contract_id = 0;          // Contract ID
-    std::string symbol;           // Symbol
-    std::string sec_type;         // Security type (STK, OPT, FUT, etc.)
-    std::string last_trade_date;  // Last trade date (YYYYMMDD format)
-    double strike = 0.0;          // Strike price for options
-    std::string right;            // Option right (C for call, P for put)
-    std::string multiplier;       // Contract multiplier
-    std::string exchange;         // Exchange
-    std::string primary_exchange; // Primary exchange
-    std::string currency;         // Currency
-    std::string local_symbol;     // Local symbol
-    std::string trading_class;    // Trading class
+    int contract_id = 0;           // Contract ID
+    std::string symbol;            // Symbol
+    std::string sec_type;          // Security type (STK, OPT, FUT, etc.)
+    std::string last_trade_date;   // Last trade date (YYYYMMDD format)
+    double strike = 0.0;           // Strike price for options
+    std::string right;             // Option right (C for call, P for put)
+    std::string multiplier;        // Contract multiplier
+    std::string exchange;          // Exchange
+    std::string primary_exchange;  // Primary exchange
+    std::string currency;          // Currency
+    std::string local_symbol;      // Local symbol
+    std::string trading_class;     // Trading class
 
     // For options on futures or options
-    std::string include_expired; // Include expired contracts
+    std::string include_expired;  // Include expired contracts
 
     // For combo contracts
-    std::vector<IBContract> combo_legs; // Combo legs
+    std::vector<IBContract> combo_legs;  // Combo legs
 
     // For delta-neutral contracts
-    bool delta_neutral = false; // Delta neutral flag
+    bool delta_neutral = false;  // Delta neutral flag
     std::shared_ptr<IBContract>
-        delta_neutral_contract; // Delta neutral contract (using shared_ptr for
-                                // copyability)
-    double delta_neutral_aux_price = 0.0; // Delta neutral auxiliary price
+        delta_neutral_contract;  // Delta neutral contract (using shared_ptr for
+                                 // copyability)
+    double delta_neutral_aux_price = 0.0;  // Delta neutral auxiliary price
 
     /**
      * @brief Convert to a string representation
@@ -84,7 +84,7 @@ class IBContract {
  * contract.
  */
 class IBContractDetails {
-  public:
+   public:
     /**
      * @brief Default constructor
      */
@@ -105,34 +105,34 @@ class IBContractDetails {
     IBContract contract;
 
     // Contract details
-    std::string market_name;          // Market name
-    std::string trading_hours;        // Trading hours
-    std::string liquid_hours;         // Liquid hours
-    std::string time_zone_id;         // Time zone ID
-    std::string category;             // Category
-    std::string subcategory;          // Subcategory
-    double min_tick = 0.0;            // Minimum tick
-    std::string price_magnifier;      // Price magnifier
-    int order_types = 0;              // Order types
-    int valid_exchanges = 0;          // Valid exchanges
-    int underlying_contract_id = 0;   // Underlying contract ID
-    std::string long_name;            // Long name
-    std::string contract_month;       // Contract month
-    std::string industry;             // Industry
-    std::string category_industry;    // Category industry
-    std::string subcategory_industry; // Subcategory industry
-    std::string time_zone;            // Time zone
-    std::string trading_class;        // Trading class
-    std::string description;          // Description
-    std::string bond_type;            // Bond type
-    std::string coupon_type;          // Coupon type
-    double coupon = 0.0;              // Coupon
-    std::string maturity;             // Maturity
-    std::string issue_date;           // Issue date
-    std::string ratings;              // Ratings
-    std::string bond_issuer;          // Bond issuer
-    std::string cusip;                // CUSIP
-    std::string notes;                // Notes
+    std::string market_name;           // Market name
+    std::string trading_hours;         // Trading hours
+    std::string liquid_hours;          // Liquid hours
+    std::string time_zone_id;          // Time zone ID
+    std::string category;              // Category
+    std::string subcategory;           // Subcategory
+    double min_tick = 0.0;             // Minimum tick
+    std::string price_magnifier;       // Price magnifier
+    int order_types = 0;               // Order types
+    int valid_exchanges = 0;           // Valid exchanges
+    int underlying_contract_id = 0;    // Underlying contract ID
+    std::string long_name;             // Long name
+    std::string contract_month;        // Contract month
+    std::string industry;              // Industry
+    std::string category_industry;     // Category industry
+    std::string subcategory_industry;  // Subcategory industry
+    std::string time_zone;             // Time zone
+    std::string trading_class;         // Trading class
+    std::string description;           // Description
+    std::string bond_type;             // Bond type
+    std::string coupon_type;           // Coupon type
+    double coupon = 0.0;               // Coupon
+    std::string maturity;              // Maturity
+    std::string issue_date;            // Issue date
+    std::string ratings;               // Ratings
+    std::string bond_issuer;           // Bond issuer
+    std::string cusip;                 // CUSIP
+    std::string notes;                 // Notes
 
     /**
      * @brief Convert to a string representation
@@ -149,7 +149,7 @@ class IBContractDetails {
  * the IB API. It contains a contract and a list of derivative security types.
  */
 class IBContractDescription {
-  public:
+   public:
     /**
      * @brief Default constructor
      */
@@ -179,5 +179,5 @@ class IBContractDescription {
     std::string to_string() const;
 };
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

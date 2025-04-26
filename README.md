@@ -2,11 +2,9 @@
 
 [![Build](https://github.com/cm-jones/thales/actions/workflows/build.yaml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yaml) [![codecov](https://codecov.io/gh/cm-jones/thales/branch/main/graph/badge.svg)](https://codecov.io/gh/cm-jones/thales) [![CodeFactor](https://www.codefactor.io/repository/github/cm-jones/thales/badge)](https://www.codefactor.io/repository/github/cm-jones/thales) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Thales is a low-latency, multi-threaded, and extensible algorithmic trading bot designed solely for trading options contracts, not equities or any other securities.
+Thales is an ultra low-latency, multi-threaded, and extensible automated trading bot designed solely for trading options contracts (not equities or any other financial instruments) via the Interactive Brokers API.
 
-It is named after the ancient Greek philosopher [Thales of Miletus](https://en.wikipedia.org/wiki/Thales_of_Miletus), who is credited with the first recorded use of an options contract.
-
-_Disclaimer: Trading options involves significant risk of loss and is not suitable for all investors. Past performance is not indicative of future results. This software is for educational and informational purposes only and should not be considered investment advice._
+<small>_Disclaimer: Trading options involves significant risk of loss and is not suitable for all investors. Past performance is not indicative of future results. This software is for educational and informational purposes only and should not be considered investment advice._</small>
 
 ## Features
 
@@ -20,17 +18,17 @@ _Disclaimer: Trading options involves significant risk of loss and is not suitab
 
 ## Requirements
 
+- An Interactive Brokers account and TWS or IB Gateway
 - C++23 compatible compiler
 - CMake 3.12 or higher
-- Interactive Brokers TWS or IB Gateway
-- Boost libraries (for networking and datetime handling)
+- Boost libraries
 - nlohmann/json (for configuration parsing)
-- PostgreSQL 10+ (optional, for database logging)
-- libpqxx (optional, for PostgreSQL connectivity)
+- (Optional) PostgreSQL 10+ (for database logging)
+- (Optional) libpqxx (for PostgreSQL connectivity)
 
 ## Build
 
-### Linux/macOS
+### Linux
 
 ```bash
 # Clone the repository
@@ -41,7 +39,7 @@ cd thales
 ./scripts/install/install_ibapi.sh
 
 # Create a build directory
-mkdir build && cd build
+mkdir -p build && cd build
 
 # Configure and build
 cmake ..
@@ -63,28 +61,6 @@ make
 
 The coverage report will be generated in `build/coverage_report/index.html`. Open this file in a browser to view the detailed coverage report.
 
-### Windows
-
-```bash
-# Clone the repository
-git clone https://github.com/cm-jones/thales.git
-cd thales
-
-# Install the Interactive Brokers C++ API
-./scripts/install/install_ibapi.sh
-
-# Create a build directory
-mkdir build
-cd build
-
-# Configure and build
-cmake ..
-cmake --build . --config Release
-
-# Run the trading bot
-Release\thales.exe
-```
-
 ## Setting up Interactive Brokers
 
 Thales integrates with Interactive Brokers for market data and trade execution. To use this feature:
@@ -103,7 +79,7 @@ Thales integrates with Interactive Brokers for market data and trade execution. 
    - Check "Allow connections from localhost only" for security
    - Uncheck "Read-Only API" to allow trading
 
-3. **Paper Trading**:
+3. (Optional) **Paper Trading**:
 
    - Create a paper trading account in TWS/IB Gateway for testing
    - Go to File > Login > Paper Trading
@@ -128,59 +104,7 @@ Thales is configured through a JSON file located in the `config` directory. The 
 ./thales path/to/your/config.json
 ```
 
-### Configuration Options
-
-- **Engine**: General settings for the trading engine
-
-  - `loop_interval_ms`: Main loop interval in milliseconds
-  - `max_threads`: Maximum number of threads to use
-
-- **Risk**: Risk management settings
-
-  - `max_position_size`: Maximum position size in dollars
-  - `max_drawdown`: Maximum allowed drawdown as a fraction of portfolio value
-  - `max_leverage`: Maximum allowed leverage
-  - `max_risk_per_trade`: Maximum risk per trade as a fraction of portfolio value
-  - `max_daily_loss`: Maximum allowed daily loss as a fraction of portfolio value
-
-- **Data**: Market data settings
-
-  - `ib_host`: Interactive Brokers TWS/Gateway host
-  - `ib_port`: Interactive Brokers TWS/Gateway port
-  - `ib_client_id`: Interactive Brokers client ID
-  - `ib_account`: Interactive Brokers account ID
-  - `symbols`: List of symbols to trade
-  - `bar_sizes`: List of bar sizes to request
-  - `history_days`: Number of days of historical data to request
-
-- **Strategies**: Trading strategy settings
-
-  - `enabled`: List of enabled strategies
-  - Strategy-specific settings
-
-- **Logging**: Logging settings
-
-  - `log_to_file`: Whether to log to a file
-  - `log_file_path`: Path to the log file
-  - `console_log_level`: Minimum log level for console output
-  - `file_log_level`: Minimum log level for file output
-  - `database`: Database logging settings
-    - `enabled`: Whether to enable database logging
-    - `host`: Database host
-    - `port`: Database port
-    - `name`: Database name
-    - `user`: Database user
-    - `password`: Database password
-    - `max_queue_size`: Maximum size of the log queue
-    - `batch_size`: Number of logs to insert in a batch
-
-- **Backtesting**: Backtesting settings
-  - `enabled`: Whether to run in backtesting mode
-  - `start_date`: Start date for backtesting
-  - `end_date`: End date for backtesting
-  - `initial_capital`: Initial capital for backtesting
-  - `commission`: Commission rate for backtesting
-  - `slippage`: Slippage rate for backtesting
+See [config/README.md](config/README.md) for details.
 
 ## Adding a New Strategy
 
@@ -199,7 +123,7 @@ Example:
 // include/thales/strategies/my_strategy.h
 #pragma once
 
-#include <thales/strategies/strategy_base.h>
+#include "thales/strategies/strategy_base.h>
 
 namespace thales {
 namespace strategies {

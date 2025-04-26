@@ -4,8 +4,8 @@
 #include <cmath>
 
 // Project includes
-#include <thales/core/risk_manager.hpp>
-#include <thales/utils/logger.hpp>
+#include "thales/core/risk_manager.hpp"
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace core {
@@ -127,7 +127,7 @@ double RiskManager::get_current_risk_level(const Portfolio &portfolio) const {
     try {
         const double total_value = portfolio.get_total_value();
         if (total_value <= 0.0) {
-            return 1.0; // Maximum risk if portfolio value is zero or negative
+            return 1.0;  // Maximum risk if portfolio value is zero or negative
         }
 
         // Calculate risk components
@@ -141,7 +141,7 @@ double RiskManager::get_current_risk_level(const Portfolio &portfolio) const {
     } catch (const std::exception &e) {
         auto &logger = utils::Logger::get_instance();
         logger.error("Error calculating risk level: " + std::string(e.what()));
-        return 1.0; // Return maximum risk on error
+        return 1.0;  // Return maximum risk on error
     }
 }
 
@@ -151,11 +151,11 @@ void RiskManager::update_risk_params(const Portfolio &portfolio) {
         auto &logger = utils::Logger::get_instance();
 
         // Dynamically adjust risk parameters based on portfolio performance
-        if (current_risk > 0.8) { // High risk situation
+        if (current_risk > 0.8) {  // High risk situation
             max_position_size_ *= 0.9;
             max_risk_per_trade_ *= 0.9;
             logger.info("Reducing risk limits due to high risk level");
-        } else if (current_risk < 0.3) { // Low risk situation
+        } else if (current_risk < 0.3) {  // Low risk situation
             const double max_allowed_position =
                 config_.get_double("risk.maxPositionSize", 100000.0);
             const double max_allowed_risk =
@@ -209,5 +209,5 @@ double RiskManager::calculate_portfolio_risk(const Portfolio &portfolio) const {
     return total_exposure / total_value;
 }
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

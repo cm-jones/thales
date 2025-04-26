@@ -1,6 +1,6 @@
 # AWS Deployment with Terraform
 
-This directory contains Terraform configurations for deploying the Thales trading bot on AWS.
+This directory contains Terraform configurations for deploying Thales on AWS.
 
 ## Prerequisites
 
@@ -8,6 +8,70 @@ This directory contains Terraform configurations for deploying the Thales tradin
 2. Terraform installed (version >= 1.2.0)
 3. Docker and Docker Compose installed
 4. An S3 bucket for Terraform state (will be created in the setup step)
+5. For GitHub Actions deployment:
+   - AWS IAM Role with appropriate permissions
+   - GitHub repository secrets configured (see below)
+
+## GitHub Actions Deployment
+
+This project includes automated deployment via GitHub Actions. The workflow will:
+- Run on pushes to main and pull requests
+- Perform Terraform format checks
+- Plan and apply infrastructure changes
+- Deploy the application to EC2
+
+### Required GitHub Secrets
+
+Set up the following secrets in your GitHub repository:
+
+1. `AWS_ROLE_ARN` - ARN of the AWS IAM role for GitHub Actions
+   ```
+   arn:aws:iam::<account-id>:role/GitHubActionsRole
+   ```
+
+2. `DB_PASSWORD` - Secure password for the RDS database
+   ```
+   your-secure-database-password
+   ```
+
+3. `SSH_PRIVATE_KEY` - SSH private key for EC2 access
+   ```
+   -----BEGIN RSA PRIVATE KEY-----
+   Your EC2 SSH private key content
+   -----END RSA PRIVATE KEY-----
+   ```
+
+### IAM Role Setup
+
+Create an AWS IAM role with the following trust relationship:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::<account-id>:oidc-provider/token.actions.githubusercontent.com"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringLike": {
+                    "token.actions.githubusercontent.com:sub": "repo:<org>/<repo>:*"
+                }
+            }
+        }
+    ]
+}
+```
+
+Required IAM permissions:
+- AmazonEC2FullAccess
+- AmazonRDSFullAccess
+- AmazonVPCFullAccess
+- IAMFullAccess (or more restricted custom policy)
+- S3 access for Terraform state
+- DynamoDB access for state locking
 
 ## Initial Setup
 

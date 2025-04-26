@@ -12,7 +12,7 @@ namespace models {
 /// using the Black-Scholes formula.
 ///
 class BlackScholesModel {
-  public:
+   public:
     /// @brief Calculate the price of a European call option
     /// @param S The current price of the underlying asset
     /// @param K The strike price of the option
@@ -138,7 +138,7 @@ class BlackScholesModel {
                                          double epsilon = 0.0001,
                                          int max_iterations = 100);
 
-  private:
+   private:
     // Helper functions
     static double d1(double S, double K, double r, double sigma, double T);
     static double d2(double S, double K, double r, double sigma, double T);
@@ -146,5 +146,5 @@ class BlackScholesModel {
     static double normal_pdf(double x);
 };
 
-} // namespace models
-} // namespace thales
+}  // namespace models
+}  // namespace thales

@@ -6,25 +6,30 @@
 #include <thread>
 
 // Project includes
-#include <thales/data/ib_client.hpp>
-#include <thales/utils/logger.hpp>
+#include "thales/data/ib_client.hpp"
+#include "thales/utils/logger.hpp"
 
 namespace {
-constexpr int DEFAULT_TWS_PORT = 7497;        // Default TWS demo port
-constexpr int DEFAULT_CLIENT_ID = 0;          // Default client ID
-constexpr int READER_TIMEOUT_MS = 2000;       // Reader thread timeout
-constexpr int CONNECTION_DELAY_MS = 500;      // Connection establishment delay
-constexpr int DISCONNECT_DELAY_MS = 200;      // Disconnection delay
-constexpr double DEFAULT_DUMMY_PRICE = 100.0; // Default price for dummy data
-constexpr int DEFAULT_DUMMY_VOLUME = 1000;    // Default volume for dummy data
-} // namespace
+constexpr int DEFAULT_TWS_PORT = 7497;         // Default TWS demo port
+constexpr int DEFAULT_CLIENT_ID = 0;           // Default client ID
+constexpr int READER_TIMEOUT_MS = 2000;        // Reader thread timeout
+constexpr int CONNECTION_DELAY_MS = 500;       // Connection establishment delay
+constexpr int DISCONNECT_DELAY_MS = 200;       // Disconnection delay
+constexpr double DEFAULT_DUMMY_PRICE = 100.0;  // Default price for dummy data
+constexpr int DEFAULT_DUMMY_VOLUME = 1000;     // Default volume for dummy data
+}  // namespace
 
 namespace thales {
 namespace data {
 
 IBClient::IBClient(const utils::Config &config)
-    : config_(config), wrapper_(nullptr), client_(nullptr), signal_(nullptr),
-      reader_(nullptr), connected_(false), next_request_id_(0) {}
+    : config_(config),
+      wrapper_(nullptr),
+      client_(nullptr),
+      signal_(nullptr),
+      reader_(nullptr),
+      connected_(false),
+      next_request_id_(0) {}
 
 IBClient::~IBClient() { disconnect(); }
 
@@ -140,7 +145,7 @@ bool IBClient::connect_to_tws(const ConnectionParams &params) {
         return false;
     }
 
-    return true; // Simulated successful connection
+    return true;  // Simulated successful connection
 }
 
 bool IBClient::start_reader_thread() {
@@ -313,16 +318,14 @@ MarketData IBClient::get_latest_market_data(const std::string &symbol) const {
     }
 }
 
-std::vector<MarketData>
-IBClient::get_historical_market_data(const HistoricalDataParams &params
-                                     [[maybe_unused]]) const {
+std::vector<MarketData> IBClient::get_historical_market_data(
+    const HistoricalDataParams &params [[maybe_unused]]) const {
     // For the stub implementation, return an empty vector
     return {};
 }
 
-std::unordered_map<std::string, OptionData>
-IBClient::get_option_chain(const OptionChainParams &params
-                           [[maybe_unused]]) const {
+std::unordered_map<std::string, OptionData> IBClient::get_option_chain(
+    const OptionChainParams &params [[maybe_unused]]) const {
     // For the stub implementation, return an empty map
     return {};
 }
@@ -394,7 +397,7 @@ void IBClient::set_next_request_id(int id) { next_request_id_ = id; }
 void IBClient::set_managed_accounts(const std::string &accounts) {
     // Store the managed accounts
     // This would be used in a real implementation
-    (void)accounts; // Avoid unused parameter warning
+    (void)accounts;  // Avoid unused parameter warning
 }
 
 void IBClient::process_messages() {
@@ -402,5 +405,5 @@ void IBClient::process_messages() {
     // For now, we'll just do nothing
 }
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

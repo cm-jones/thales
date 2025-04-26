@@ -1,21 +1,25 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/strategies/black_scholes_arbitrage.hpp"
+
 #include <algorithm>
-#include <chrono>  // For std::chrono
-#include <cmath>   // For std::log, std::sqrt
-#include <ctime>   // For std::mktime, std::localtime
-#include <iomanip> // For std::get_time, std::put_time
-#include <sstream> // For std::stringstream, std::istringstream
-#include <thales/strategies/black_scholes_arbitrage.hpp>
-#include <thales/utils/logger.hpp>
+#include <chrono>   // For std::chrono
+#include <cmath>    // For std::log, std::sqrt
+#include <ctime>    // For std::mktime, std::localtime
+#include <iomanip>  // For std::get_time, std::put_time
+#include <sstream>  // For std::stringstream, std::istringstream
+
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace strategies {
 
 BlackScholesArbitrage::BlackScholesArbitrage(const utils::Config &config)
     : StrategyBase("BlackScholesArbitrage", config),
-      min_price_discrepancy_(0.05), min_volatility_(0.15),
-      max_volatility_(0.50), min_days_to_expiration_(7),
+      min_price_discrepancy_(0.05),
+      min_volatility_(0.15),
+      max_volatility_(0.50),
+      min_days_to_expiration_(7),
       max_days_to_expiration_(45) {
     description_ = "Strategy based on Black-Scholes pricing model";
 }
@@ -189,7 +193,7 @@ double BlackScholesArbitrage::calculate_historical_volatility(
     }
 
     if (returns.empty()) {
-        return min_volatility_; // Default to minimum volatility if no data
+        return min_volatility_;  // Default to minimum volatility if no data
     }
 
     // Calculate standard deviation of returns
@@ -219,7 +223,7 @@ double BlackScholesArbitrage::calculate_historical_volatility(
 double BlackScholesArbitrage::calculate_risk_free_rate() const {
     // In a real implementation, you would get the risk-free rate from a data
     // source For simplicity, we'll use a fixed value
-    return 0.02; // 2% risk-free rate
+    return 0.02;  // 2% risk-free rate
 }
 
 double BlackScholesArbitrage::calculate_time_to_expiration(
@@ -305,11 +309,11 @@ Signal BlackScholesArbitrage::generate_signal(const data::OptionData &option,
     params.type = signal_type;
     params.strength = strength;
     params.target_price = theoretical_price;
-    params.stop_loss = 0.0; // No stop loss for now
+    params.stop_loss = 0.0;  // No stop loss for now
     params.timestamp = timestamp;
     params.strategy_name = "BlackScholesArbitrage";
     return Signal(params);
 }
 
-} // namespace strategies
-} // namespace thales
+}  // namespace strategies
+}  // namespace thales

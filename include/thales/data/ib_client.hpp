@@ -11,10 +11,10 @@
 #include <vector>
 
 // Project includes
-#include <thales/core/portfolio.hpp>
-#include <thales/data/ib_wrapper.hpp>
-#include <thales/data/market_data.hpp>
-#include <thales/utils/config.hpp>
+#include "thales/core/portfolio.hpp"
+#include "thales/data/ib_wrapper.hpp"
+#include "thales/data/market_data.hpp"
+#include "thales/utils/config.hpp"
 
 // Forward declarations for IB API classes
 namespace IB {
@@ -22,7 +22,7 @@ class EClient;
 class EWrapper;
 class EReaderOSSignal;
 class EReader;
-} // namespace IB
+}  // namespace IB
 
 namespace thales {
 namespace data {
@@ -38,28 +38,28 @@ namespace data {
 /// Manages connection lifecycle and message processing.
 /// Thread-safe interface to TWS/Gateway.
 class IBClient {
-  public:
-    friend class IBWrapper; // Allows wrapper to access message handlers
+   public:
+    friend class IBWrapper;  // Allows wrapper to access message handlers
 
     /// Parameters for historical market data requests
     struct HistoricalDataParams {
-        std::string symbol;     ///< Trading symbol
-        std::string start_time; ///< Start of data range
-        std::string end_time;   ///< End of data range
-        std::string interval;   ///< Bar size (e.g., "1 min")
+        std::string symbol;      ///< Trading symbol
+        std::string start_time;  ///< Start of data range
+        std::string end_time;    ///< End of data range
+        std::string interval;    ///< Bar size (e.g., "1 min")
     };
 
     /// Parameters for option chain requests
     struct OptionChainParams {
-        std::string symbol;          ///< Underlying symbol
-        std::string expiration_date; ///< Option expiration date
+        std::string symbol;           ///< Underlying symbol
+        std::string expiration_date;  ///< Option expiration date
     };
 
     /// Parameters for TWS/Gateway connection
     struct ConnectionParams {
-        std::string host; ///< TWS/Gateway hostname
-        int port;         ///< Connection port
-        int client_id;    ///< Unique client identifier
+        std::string host;  ///< TWS/Gateway hostname
+        int port;          ///< Connection port
+        int client_id;     ///< Unique client identifier
     };
 
     /// Construct a new IBClient instance
@@ -98,14 +98,14 @@ class IBClient {
     /// Fetch historical market data
     /// @param params Historical data request parameters
     /// @return Vector of historical data points
-    std::vector<MarketData>
-    get_historical_market_data(const HistoricalDataParams &params) const;
+    std::vector<MarketData> get_historical_market_data(
+        const HistoricalDataParams &params) const;
 
     /// Retrieve option chain information
     /// @param params Option chain request parameters
     /// @return Map of option data by symbol
-    std::unordered_map<std::string, OptionData>
-    get_option_chain(const OptionChainParams &params) const;
+    std::unordered_map<std::string, OptionData> get_option_chain(
+        const OptionChainParams &params) const;
 
     /// Submit new order to TWS/Gateway
     /// @param order Order to place
@@ -127,8 +127,8 @@ class IBClient {
 
     /// Register market data update handler
     /// @param callback Function to handle updates
-    void
-    set_market_data_callback(std::function<void(const MarketData &)> callback);
+    void set_market_data_callback(
+        std::function<void(const MarketData &)> callback);
 
     /// Register order status update handler
     /// @param callback Function to handle updates
@@ -140,24 +140,24 @@ class IBClient {
     void set_position_update_callback(
         std::function<void(const core::Position &)> callback);
 
-  private:
+   private:
     // Core configuration
-    utils::Config config_; ///< Client configuration
+    utils::Config config_;  ///< Client configuration
 
     // IB API components
-    std::unique_ptr<IBWrapper> wrapper_;    ///< Message handler wrapper
-    std::unique_ptr<bool> client_;          ///< IB::EClient placeholder
-    std::unique_ptr<int> signal_;           ///< IB::EReaderOSSignal placeholder
-    std::unique_ptr<bool> reader_;          ///< IB::EReader placeholder
-    std::thread message_processing_thread_; ///< Message processing thread
+    std::unique_ptr<IBWrapper> wrapper_;  ///< Message handler wrapper
+    std::unique_ptr<bool> client_;        ///< IB::EClient placeholder
+    std::unique_ptr<int> signal_;         ///< IB::EReaderOSSignal placeholder
+    std::unique_ptr<bool> reader_;        ///< IB::EReader placeholder
+    std::thread message_processing_thread_;  ///< Message processing thread
 
     // State management
-    bool connected_;      ///< Connection state flag
-    int next_request_id_; ///< Request sequence counter
+    bool connected_;       ///< Connection state flag
+    int next_request_id_;  ///< Request sequence counter
 
     // Data caches
     std::unordered_map<std::string, MarketData>
-        latest_market_data_; ///< Market data cache
+        latest_market_data_;  ///< Market data cache
 
     // Callback handlers
     std::function<void(const MarketData &)> market_data_callback_;
@@ -185,5 +185,5 @@ class IBClient {
     bool initialize_client();
 };
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

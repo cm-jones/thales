@@ -2,12 +2,10 @@
 
 #pragma once
 
-// Standard library includes
 #include <string>
 
-// Project includes
 #include "thales/core/option.hpp"
-#include <thales/utils/symbol_lookup.hpp>
+#include "thales/utils/symbol_lookup.hpp"
 
 namespace thales {
 namespace core {
@@ -20,10 +18,10 @@ namespace core {
 /// - Average fill price for executed orders
 ///
 /// Uses a parameter struct pattern to avoid confusion when constructing prices.
-struct alignas(CACHE_LINE_SIZE) Price {
-    double limit;        // Limit price for the order
-    double stop;         // Stop price for stop/stop-limit orders
-    double average_fill; // Average fill price for executed orders
+struct CACHE_ALIGNED Price {
+    double limit;         // Limit price for the order
+    double stop;          // Stop price for stop/stop-limit orders
+    double average_fill;  // Average fill price for executed orders
 
     /// Default constructor initializes all prices to zero
     Price() : limit(0.0), stop(0.0), average_fill(0.0) {}
@@ -37,7 +35,8 @@ struct alignas(CACHE_LINE_SIZE) Price {
 
     /// Construct a Price with specific parameters
     explicit Price(const PriceParams &params)
-        : limit(params.limit_price), stop(params.stop_price),
+        : limit(params.limit_price),
+          stop(params.stop_price),
           average_fill(params.avg_fill_price) {}
 
     /// Factory Methods
@@ -72,7 +71,7 @@ struct alignas(CACHE_LINE_SIZE) Price {
 ///
 /// Uses a parameter struct pattern for clear construction.
 /// Includes utilities for order status checking and string conversion.
-struct alignas(CACHE_LINE_SIZE) Order {
+struct CACHE_ALIGNED Order {
     /// @enum Type
     /// @brief Defines the type of the order: MARKET, LIMIT, STOP, or
     /// STOP_LIMIT.
@@ -101,15 +100,15 @@ struct alignas(CACHE_LINE_SIZE) Order {
         REJECTED,
     };
 
-    std::string timestamp;                   ///< Order creation timestamp
-    Price price;                             ///< Order price information
-    uint32_t order_id;                       ///< Unique order identifier
-    uint16_t quantity;                       ///< Total quantity to trade
-    uint16_t filled_quantity;                ///< Amount already filled
-    utils::SymbolLookup::SymbolID symbol_id; ///< Trading instrument identifier
-    Type type;     ///< Order type (MARKET, LIMIT, etc.)
-    Side side;     ///< Trading side (BUY or SELL)
-    Status status; ///< Current order status
+    std::string timestamp;                    ///< Order creation timestamp
+    Price price;                              ///< Order price information
+    uint32_t order_id;                        ///< Unique order identifier
+    uint16_t quantity;                        ///< Total quantity to trade
+    uint16_t filled_quantity;                 ///< Amount already filled
+    utils::SymbolLookup::SymbolID symbol_id;  ///< Trading instrument identifier
+    Type type;      ///< Order type (MARKET, LIMIT, etc.)
+    Side side;      ///< Trading side (BUY or SELL)
+    Status status;  ///< Current order status
 
     /// Parameters for constructing an Order object
     struct OrderParams {
@@ -149,5 +148,5 @@ struct alignas(CACHE_LINE_SIZE) Order {
     std::string status_to_string() const;
 };
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

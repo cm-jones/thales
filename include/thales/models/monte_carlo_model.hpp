@@ -13,14 +13,14 @@ namespace models {
  * @brief Parameters for option pricing calculations
  */
 struct OptionParameters {
-    double S;            ///< Current price of the underlying asset
-    double K;            ///< Strike price of the option
-    double r;            ///< Risk-free interest rate
-    double sigma;        ///< Volatility of the underlying asset
-    double T;            ///< Time to expiration in years
-    int num_simulations; ///< Number of Monte Carlo simulations
-    int num_steps;       ///< Number of time steps in each simulation
-    unsigned int seed;   ///< Random number generator seed
+    double S;             ///< Current price of the underlying asset
+    double K;             ///< Strike price of the option
+    double r;             ///< Risk-free interest rate
+    double sigma;         ///< Volatility of the underlying asset
+    double T;             ///< Time to expiration in years
+    int num_simulations;  ///< Number of Monte Carlo simulations
+    int num_steps;        ///< Number of time steps in each simulation
+    unsigned int seed;    ///< Random number generator seed
 
     /**
      * @brief Constructor with default values for simulation parameters
@@ -28,8 +28,14 @@ struct OptionParameters {
     OptionParameters(double S, double K, double r, double sigma, double T,
                      int num_simulations = 10000, int num_steps = 100,
                      unsigned int seed = 0)
-        : S(S), K(K), r(r), sigma(sigma), T(T),
-          num_simulations(num_simulations), num_steps(num_steps), seed(seed) {}
+        : S(S),
+          K(K),
+          r(r),
+          sigma(sigma),
+          T(T),
+          num_simulations(num_simulations),
+          num_steps(num_steps),
+          seed(seed) {}
 };
 
 /**
@@ -40,7 +46,7 @@ struct OptionParameters {
  * simulation. It supports both European call and put options.
  */
 class MonteCarloModel {
-  public:
+   public:
     /**
      * @brief Calculate the price of a European call option using Monte Carlo
      * simulation
@@ -112,19 +118,20 @@ class MonteCarloModel {
                               double T, int num_simulations = 10000,
                               int num_steps = 100, unsigned int seed = 0);
 
-  private:
+   private:
     static double simulate_path(double S, double r, double sigma, double T,
                                 int num_steps, std::mt19937 &gen);
 
     static double calculate_payoff(double S_T, double K, bool is_call);
 
-    static double
-    calculate_greek(double S, double K, double r, double sigma, double T,
-                    int num_simulations, int num_steps, unsigned int seed,
-                    double (*price_func)(double, double, double, double, double,
-                                         int, int, unsigned int),
-                    double delta);
+    static double calculate_greek(double S, double K, double r, double sigma,
+                                  double T, int num_simulations, int num_steps,
+                                  unsigned int seed,
+                                  double (*price_func)(double, double, double,
+                                                       double, double, int, int,
+                                                       unsigned int),
+                                  double delta);
 };
 
-} // namespace models
-} // namespace thales
+}  // namespace models
+}  // namespace thales

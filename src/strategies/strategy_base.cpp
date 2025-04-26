@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-#include <thales/strategies/strategy_base.hpp>
-#include <thales/utils/logger.hpp>
+#include "thales/strategies/strategy_base.hpp"
+
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace strategies {
@@ -46,5 +47,5 @@ void StrategyBase::load_symbols() {
     }
 }
 
-} // namespace strategies
-} // namespace thales
+}  // namespace strategies
+}  // namespace thales

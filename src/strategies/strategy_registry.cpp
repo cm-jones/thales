@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-#include <thales/strategies/black_scholes_arbitrage.hpp>
-#include <thales/strategies/strategy_registry.hpp>
-#include <thales/utils/logger.hpp>
+#include "thales/strategies/strategy_registry.hpp"
+
+#include "thales/strategies/black_scholes_arbitrage.hpp"
+#include "thales/utils/logger.hpp"
 
 namespace thales {
 namespace strategies {
@@ -11,7 +12,8 @@ StrategyRegistry::StrategyRegistry(
     const utils::Config &config,
     std::shared_ptr<data::DataManager> &&data_manager,
     core::Portfolio *portfolio)
-    : config_(config), data_manager_(std::move(data_manager)),
+    : config_(config),
+      data_manager_(std::move(data_manager)),
       portfolio_(portfolio) {}
 
 bool StrategyRegistry::initialize() {
@@ -210,5 +212,5 @@ void StrategyRegistry::load_strategies_from_config() {
     }
 }
 
-} // namespace strategies
-} // namespace thales
+}  // namespace strategies
+}  // namespace thales

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/data/ib_order.hpp"
+
 #include <sstream>
-#include <thales/data/ib_order.hpp>
 
 namespace thales {
 namespace data {
@@ -87,5 +88,5 @@ std::string IBExecution::to_string() const {
     return ss.str();
 }
 
-} // namespace data
-} // namespace thales
+}  // namespace data
+}  // namespace thales

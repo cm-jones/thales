@@ -5,10 +5,14 @@ on:
     branches: main
   pull_request:
     branches: main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    outputs:
+      build_success: ${{ steps.build_step.outputs.success }}
+      build_id: ${{ steps.build_step.outputs.build_id }}
     strategy:
       matrix:
         os:
@@ -24,15 +28,21 @@ jobs:
           sudo apt install -y build-essential cmake libboost-all-dev
 
       - name: Configure and build
+        id: build_step
         run: |
-          chmod +x scripts/build/build.sh
-          ./scripts/build/build.sh --type ${{ matrix.build_type }} --clean --test
+          chmod +x scripts/build.sh
+          ./scripts/build.sh --type ${{ matrix.build_type }} --clean --test
+          echo "success=true" >> $GITHUB_OUTPUT
+          echo "build_id=$(date +%s)" >> $GITHUB_OUTPUT
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: thales-${{ matrix.os }}-${{ matrix.build_type }}
           path: |
-            build/thales
-            build/thales.exe
-          if-no-files-found: ignore
+            build/
+            !build/_deps/**/*
+            !build/CMakeFiles/**/*
+            !build/Testing/**/*
+          if-no-files-found: error
+          retention-days: 1

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 
+#include "thales/models/black_scholes_model.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
-#include <thales/models/black_scholes_model.hpp>
 
 namespace thales {
 namespace models {
@@ -76,8 +77,8 @@ double BlackScholesModel::vega(double S, double K, double r, double sigma,
     double d1_val = d1(S, K, r, sigma, T);
 
     return S * std::sqrt(T) * normal_pdf(d1_val) /
-           100.0; // Divided by 100 to get the change per 1% change in
-                  // volatility
+           100.0;  // Divided by 100 to get the change per 1% change in
+                   // volatility
 }
 
 double BlackScholesModel::call_theta(double S, double K, double r, double sigma,
@@ -93,7 +94,7 @@ double BlackScholesModel::call_theta(double S, double K, double r, double sigma,
     double term1 = -S * sigma * normal_pdf(d1_val) / (2.0 * std::sqrt(T));
     double term2 = -r * K * std::exp(-r * T) * normal_cdf(d2_val);
 
-    return (term1 + term2) / 365.0; // Divided by 365 to get the daily theta
+    return (term1 + term2) / 365.0;  // Divided by 365 to get the daily theta
 }
 
 double BlackScholesModel::put_theta(double S, double K, double r, double sigma,
@@ -109,7 +110,7 @@ double BlackScholesModel::put_theta(double S, double K, double r, double sigma,
     double term1 = -S * sigma * normal_pdf(d1_val) / (2.0 * std::sqrt(T));
     double term2 = r * K * std::exp(-r * T) * normal_cdf(-d2_val);
 
-    return (term1 + term2) / 365.0; // Divided by 365 to get the daily theta
+    return (term1 + term2) / 365.0;  // Divided by 365 to get the daily theta
 }
 
 double BlackScholesModel::call_rho(double S, double K, double r, double sigma,
@@ -122,8 +123,8 @@ double BlackScholesModel::call_rho(double S, double K, double r, double sigma,
     double d2_val = d2(S, K, r, sigma, T);
 
     return K * T * std::exp(-r * T) * normal_cdf(d2_val) /
-           100.0; // Divided by 100 to get the change per 1% change in interest
-                  // rate
+           100.0;  // Divided by 100 to get the change per 1% change in interest
+                   // rate
 }
 
 double BlackScholesModel::put_rho(double S, double K, double r, double sigma,
@@ -136,8 +137,8 @@ double BlackScholesModel::put_rho(double S, double K, double r, double sigma,
     double d2_val = d2(S, K, r, sigma, T);
 
     return -K * T * std::exp(-r * T) * normal_cdf(-d2_val) /
-           100.0; // Divided by 100 to get the change per 1% change in interest
-                  // rate
+           100.0;  // Divided by 100 to get the change per 1% change in interest
+                   // rate
 }
 
 double BlackScholesModel::call_implied_volatility(double price, double S,
@@ -155,7 +156,7 @@ double BlackScholesModel::call_implied_volatility(double price, double S,
     }
 
     // Initial guess for implied volatility
-    double sigma = 0.2; // Start with 20% volatility
+    double sigma = 0.2;  // Start with 20% volatility
 
     // Newton-Raphson method
     for (int i = 0; i < max_iterations; ++i) {
@@ -174,7 +175,7 @@ double BlackScholesModel::call_implied_volatility(double price, double S,
 
         sigma +=
             diff / (vega_estimate *
-                    100.0); // Multiply by 100 because vega is per 1% change
+                    100.0);  // Multiply by 100 because vega is per 1% change
 
         // Ensure sigma stays within reasonable bounds
         if (sigma <= 0.001) {
@@ -205,7 +206,7 @@ double BlackScholesModel::put_implied_volatility(double price, double S,
     }
 
     // Initial guess for implied volatility
-    double sigma = 0.2; // Start with 20% volatility
+    double sigma = 0.2;  // Start with 20% volatility
 
     // Newton-Raphson method
     for (int i = 0; i < max_iterations; ++i) {
@@ -224,7 +225,7 @@ double BlackScholesModel::put_implied_volatility(double price, double S,
 
         sigma +=
             diff / (vega_estimate *
-                    100.0); // Multiply by 100 because vega is per 1% change
+                    100.0);  // Multiply by 100 because vega is per 1% change
 
         // Ensure sigma stays within reasonable bounds
         if (sigma <= 0.001) {
@@ -279,5 +280,5 @@ double BlackScholesModel::normal_pdf(double x) {
     return (1.0 / std::sqrt(2.0 * M_PI)) * std::exp(-0.5 * x * x);
 }
 
-} // namespace models
-} // namespace thales
+}  // namespace models
+}  // namespace thales

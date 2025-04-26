@@ -2,4 +2,4 @@
 THALES_VERSION=0.1.0
 
 # Ubuntu version for Docker
-UBUNTU_VERSION=22.04
+UBUNTU_VERSION=24.04

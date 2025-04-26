@@ -6,7 +6,7 @@
 #include <string>
 
 // Project includes
-#include <thales/core/option.hpp>
+#include "thales/core/option.hpp"
 
 namespace thales {
 namespace core {
@@ -37,13 +37,13 @@ struct PositionParams {
 ///
 /// All monetary values are stored as doubles for precision.
 /// Memory aligned for optimal cache usage.
-struct alignas(CACHE_LINE_SIZE) Position {
-    Option option;         ///< Associated financial instrument
-    double average_price;  ///< Average entry price per unit
-    double last_price;     ///< Current market price
-    double unrealized_pnl; ///< Current paper profit/loss
-    double realized_pnl;   ///< Actual booked profit/loss
-    uint16_t quantity;     ///< Number of units held
+struct CACHE_ALIGNED Position {
+    Option option;          ///< Associated financial instrument
+    double average_price;   ///< Average entry price per unit
+    double last_price;      ///< Current market price
+    double unrealized_pnl;  ///< Current paper profit/loss
+    double realized_pnl;    ///< Actual booked profit/loss
+    uint16_t quantity;      ///< Number of units held
 
     /// Construct a Position with specific parameters
     explicit Position(const PositionParams &params = PositionParams{});
@@ -64,5 +64,5 @@ struct alignas(CACHE_LINE_SIZE) Position {
     double get_unrealized_pnl() const;
 };
 
-} // namespace core
-} // namespace thales
+}  // namespace core
+}  // namespace thales

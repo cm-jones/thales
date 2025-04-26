@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-#include <thales/models/black_scholes_model_vectorized.hpp>
+#include "thales/models/black_scholes_model_vectorized.hpp"
 
 namespace thales {
 namespace models {
@@ -457,7 +457,7 @@ bool BlackScholesVectorized::cpu_supports_avx() {
 #ifdef THALES_X86_OR_X64
     int cpu_info[4];
     __cpuid(cpu_info, 1);
-    return (cpu_info[2] & (1 << 28)) != 0; // Check AVX bit
+    return (cpu_info[2] & (1 << 28)) != 0;  // Check AVX bit
 #else
     return false;
 #endif
@@ -467,11 +467,11 @@ bool BlackScholesVectorized::cpu_supports_avx2() {
 #ifdef THALES_X86_OR_X64
     int cpu_info[4];
     __cpuid(cpu_info, 7);
-    return (cpu_info[1] & (1 << 5)) != 0; // Check AVX2 bit
+    return (cpu_info[1] & (1 << 5)) != 0;  // Check AVX2 bit
 #else
     return false;
 #endif
 }
 
-} // namespace models
-} // namespace thales
+}  // namespace models
+}  // namespace thales

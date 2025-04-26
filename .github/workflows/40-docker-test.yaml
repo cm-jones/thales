@@ -1,9 +1,13 @@
 name: Test Docker Image
 
 on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+    branches: [main]
   pull_request:
     branches: main
-    # Only trigger when relevant files change
     paths:
       - "docker/**"
       - ".github/workflows/docker-test.yaml"
@@ -11,12 +15,15 @@ on:
       - "include/**"
       - "CMakeLists.txt"
       - ".version"
-  # Allow manual triggering
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     steps:
       - name: Checkout repository
@@ -33,7 +40,15 @@ jobs:
           UBUNTU_VERSION=$(grep "UBUNTU_VERSION" .version | cut -d= -f2)
           echo "UBUNTU_VERSION=$UBUNTU_VERSION" >> $GITHUB_ENV
 
-      # Build but don't push the Docker image
+      # Download build artifacts if available
+      - name: Download build artifacts
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: thales-ubuntu-${{ vars.UBUNTU_VERSION }}-Release
+          path: build/
+
+      # Build Docker image
       - name: Build Docker image
         uses: docker/build-push-action@v4
         with:
