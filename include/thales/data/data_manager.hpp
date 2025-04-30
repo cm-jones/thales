@@ -37,17 +37,17 @@ class DataManager {
 
     /// Initialize market data connections and caching
     /// @return true if all systems initialized successfully
-    bool initialize();
+    [[nodiscard]] bool initialize();
 
     /// Start real-time market data feed for symbol
     /// @param symbol Trading symbol to subscribe to
     /// @return true if subscription succeeded
-    bool subscribe_market_data(const std::string &symbol);
+    [[nodiscard]] bool subscribe_market_data(const std::string &symbol);
 
     /// Stop real-time market data feed for symbol
     /// @param symbol Trading symbol to unsubscribe from
     /// @return true if unsubscription succeeded
-    bool unsubscribe_market_data(const std::string &symbol);
+    [[nodiscard]] bool unsubscribe_market_data(const std::string &symbol);
 
     /// Retrieve most recent market data snapshot
     /// @param symbol Trading symbol to query
@@ -87,7 +87,7 @@ class DataManager {
 
     /// Establish connections to market data providers
     /// @return true if all connections succeeded
-    bool connect_to_data_sources();
+    [[nodiscard]] bool connect_to_data_sources();
 
     /// Update market data cache with new information
     /// @param data New market data to cache
