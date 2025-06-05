@@ -1,6 +1,6 @@
 # Thales
 
-[![Build](https://github.com/cm-jones/thales/actions/workflows/build.yaml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/build.yaml) [![codecov](https://codecov.io/gh/cm-jones/thales/branch/main/graph/badge.svg)](https://codecov.io/gh/cm-jones/thales) [![CodeFactor](https://www.codefactor.io/repository/github/cm-jones/thales/badge)](https://www.codefactor.io/repository/github/cm-jones/thales) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build](https://github.com/cm-jones/thales/actions/workflows/00-build.yaml/badge.svg)](https://github.com/cm-jones/thales/actions/workflows/00-build.yaml) [![codecov](https://codecov.io/gh/cm-jones/thales/branch/main/graph/badge.svg)](https://codecov.io/gh/cm-jones/thales) [![CodeFactor](https://www.codefactor.io/repository/github/cm-jones/thales/badge)](https://www.codefactor.io/repository/github/cm-jones/thales) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Thales is an ultra low-latency, multi-threaded, and extensible automated trading bot designed solely for trading options contracts (not equities or any other financial instruments) via the Interactive Brokers API.
 
@@ -8,13 +8,60 @@ Thales is an ultra low-latency, multi-threaded, and extensible automated trading
 
 ## Features
 
-- **Interactive Brokers Integration**: Connect to Interactive Brokers API for real-time market data and order execution
+- **IB Integration**: Connect to Interactive Brokers API for real-time market data and order execution
 - **Black-Scholes Model**: Accurate options pricing and Greeks calculation
 - **Multiple Trading Strategies**: Implement and test various options trading strategies
 - **Risk Management**: Sophisticated risk controls to protect your capital
 - **Backtesting**: Test strategies against historical data
 - **PostgreSQL Database Logging**: Log trade executions to a PostgreSQL database for analysis and reporting
 - **Extensible Architecture**: Easily add new strategies and components
+
+## Development Environment
+
+### Using Dev Container (Recommended)
+
+The project includes a dev container configuration that provides a standardized development environment with all required dependencies pre-installed. This is the recommended way to develop for Thales.
+
+#### Prerequisites
+
+- [Docker](https://www.docker.com/get-started)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [VS Code Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+#### Getting Started with Dev Container
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/cm-jones/thales.git
+   cd thales
+   ```
+
+2. Open the project in VS Code:
+
+   ```bash
+   code .
+   ```
+
+3. When prompted "Reopen in Container", click "Reopen in Container". Alternatively:
+
+   - Press F1
+   - Type "Reopen in Container"
+   - Select "Remote-Containers: Reopen in Container"
+
+4. Wait for the container to build. This will:
+   - Set up a complete development environment
+   - Install all required dependencies
+   - Configure build tools and extensions
+   - Set up debugging support
+
+The dev container provides:
+
+- All required build tools and libraries
+- Consistent compiler version and flags
+- Pre-configured development environment
+- Debug configurations
+- Code formatting and linting tools
 
 ## Requirements
 
@@ -26,9 +73,17 @@ Thales is an ultra low-latency, multi-threaded, and extensible automated trading
 - (Optional) PostgreSQL 10+ (for database logging)
 - (Optional) libpqxx (for PostgreSQL connectivity)
 
+All of these requirements are automatically handled if you use the recommended dev container setup above.
+
+### Manual Setup
+
+If you prefer not to use the dev container, you'll need to install all the requirements listed above manually. Instructions for installing each dependency can be found in their respective documentation.
+
 ## Build
 
-### Linux
+> **Note:** The following build instructions are provided for reference. We strongly recommend using the dev container setup described above for the best development experience, as it provides a pre-configured environment with all dependencies and proper tooling.
+
+### Manual Build on Linux
 
 ```bash
 # Clone the repository
@@ -123,7 +178,7 @@ Example:
 // include/thales/strategies/my_strategy.h
 #pragma once
 
-#include "thales/strategies/strategy_base.h>
+#include "thales/strategies/strategy_base.hpp"
 
 namespace thales {
 namespace strategies {
@@ -146,8 +201,6 @@ private:
 
 } // namespace strategies
 } // namespace thales
-
-#endif // THALES_STRATEGIES_MY_STRATEGY_H
 ```
 
 ## Performance Benchmarks
