@@ -40,7 +40,7 @@ class Engine {
     /// Each component must initialize successfully for the engine to start.
     ///
     /// @return true if all components initialized successfully, false otherwise
-    bool initialize();
+    [[nodiscard]] bool initialize();
 
     /// Run the trading engine main loop
     ///
@@ -56,7 +56,7 @@ class Engine {
 
     /// Check if the engine is running
     /// @return true if the engine is running, false otherwise
-    bool is_running() const;
+    [[nodiscard]] bool is_running() const;
 
    private:
     // Core configuration

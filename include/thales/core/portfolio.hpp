@@ -41,7 +41,7 @@ class CACHE_ALIGNED Portfolio {
 
     /// Initialize the portfolio state
     /// @return true if initialization succeeds, false otherwise
-    bool initialize();
+    [[nodiscard]] bool initialize();
 
     /// Retrieve all current positions
     /// @return Vector of active positions (thread-safe copy)
@@ -99,7 +99,7 @@ class CACHE_ALIGNED Portfolio {
     /// Cancel existing order
     /// @param order_id ID of order to cancel
     /// @return true if order was found and canceled, false otherwise
-    bool cancel_order(const std::string &order_id);
+    [[nodiscard]] bool cancel_order(const std::string &order_id);
 
    private:
     // Core data structures

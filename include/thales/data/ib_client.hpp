@@ -71,24 +71,24 @@ class IBClient {
 
     /// Initialize connection to TWS/Gateway
     /// @return true if connection succeeds
-    bool connect();
+    [[nodiscard]] bool connect();
 
     /// @brief Disconnect from the Interactive Brokers API
     void disconnect();
 
     /// @brief Check if the client is connected
     /// @return true if the client is connected, false otherwise
-    bool is_connected() const;
+    [[nodiscard]] bool is_connected() const;
 
     /// Start real-time market data feed
     /// @param symbol Trading symbol to subscribe
     /// @return true if subscription succeeds
-    bool subscribe_market_data(const std::string &symbol);
+    [[nodiscard]] bool subscribe_market_data(const std::string &symbol);
 
     /// Stop real-time market data feed
     /// @param symbol Trading symbol to unsubscribe
     /// @return true if unsubscription succeeds
-    bool unsubscribe_market_data(const std::string &symbol);
+    [[nodiscard]] bool unsubscribe_market_data(const std::string &symbol);
 
     /// Retrieve most recent market data
     /// @param symbol Trading symbol to query
@@ -115,7 +115,7 @@ class IBClient {
     /// Cancel existing order
     /// @param order_id ID of order to cancel
     /// @return true if cancellation succeeds
-    bool cancel_order(const std::string &orderId);
+    [[nodiscard]] bool cancel_order(const std::string &orderId);
 
     /// Retrieve all current positions
     /// @return Vector of active positions
@@ -165,10 +165,10 @@ class IBClient {
     std::function<void(const core::Position &)> position_update_callback_;
 
     // Connection management
-    bool connect_to_tws(const ConnectionParams &params);
-    bool start_reader_thread();
-    bool start_message_processing_thread();
-    bool request_account_updates();
+    [[nodiscard]] bool connect_to_tws(const ConnectionParams &params);
+    [[nodiscard]] bool start_reader_thread();
+    [[nodiscard]] bool start_message_processing_thread();
+    [[nodiscard]] bool request_account_updates();
     void stop_reader_thread();
     void disconnect_from_tws();
     void cleanup_resources();
@@ -180,9 +180,9 @@ class IBClient {
     void set_managed_accounts(const std::string &accounts);
 
     // Initialization helpers
-    bool initialize_wrapper();
-    bool initialize_signal();
-    bool initialize_client();
+    [[nodiscard]] bool initialize_wrapper();
+    [[nodiscard]] bool initialize_signal();
+    [[nodiscard]] bool initialize_client();
 };
 
 }  // namespace data

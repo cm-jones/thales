@@ -34,13 +34,13 @@ class RiskManager {
 
     /// Initialize risk management system
     /// @return true if initialization succeeds, false otherwise
-    bool initialize();
+    [[nodiscard]] bool initialize();
 
     /// Validate order against risk constraints
     /// @param order Order to validate
     /// @param portfolio Current portfolio state
     /// @return true if order complies with risk limits
-    bool is_order_allowed(const Order &order, const Portfolio &portfolio) const;
+    [[nodiscard]] bool is_order_allowed(const Order &order, const Portfolio &portfolio) const;
 
     /// Calculate maximum allowed position size
     /// @param symbol Trading symbol to check
